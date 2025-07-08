@@ -1,0 +1,96 @@
+<!-- dashboard.component.html -->
+
+<div class="row">
+    <div class="col">
+        <div class="h-100">
+
+            <!-- Estatísticas principais -->
+            <div class="row mb-4">
+                <ng-container *ngFor="let stat of statData">
+                    <div class="col-xl-3 col-md-6 mb-3">
+                        <app-stat [title]="stat.title" [value]="stat.value" [icon]="stat.icon" [persantage]="stat.persantage" [profit]="stat.profit" [link]="stat.link">
+                        </app-stat>
+                    </div>
+                </ng-container>
+            </div>
+
+            <!-- Revenue Chart -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header d-flex align-items-center">
+                            <h4 class="card-title mb-0 flex-grow-1">Revenue</h4>
+                            <div class="btn-group btn-group-sm">
+                                <button class="btn btn-soft-secondary" (click)="setrevenuevalue('all')">ALL</button>
+                                <button class="btn btn-soft-secondary" (click)="setrevenuevalue('1M')">1M</button>
+                                <button class="btn btn-soft-secondary" (click)="setrevenuevalue('6M')">6M</button>
+                                <button class="btn btn-soft-primary" (click)="setrevenuevalue('1Y')">1Y</button>
+                            </div>
+                        </div>
+                        <div class="card-body p-0">
+                            <apx-chart [chart]="analyticsChart.chart" [series]="analyticsChart.series" [stroke]="analyticsChart.stroke" [colors]="analyticsChart.colors" [fill]="analyticsChart.fill" [dataLabels]="analyticsChart.dataLabels" [xaxis]="analyticsChart.xaxis" [markers]="analyticsChart.markers" [plotOptions]="analyticsChart.plotOptions" [yaxis]="analyticsChart.yaxis" [tooltip]="analyticsChart.tooltip" [grid]="analyticsChart.grid" [labels]="analyticsChart.labels">
+                            </apx-chart>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Best Selling / Top Sellers / Store Visits / Recent Orders -->
+            <div class="row">
+                <!-- Best Selling Products -->
+                <div class="col-xl-6 mb-4">
+                    <div class="card h-100">
+                        <div class="card-header d-flex align-items-center">
+                            <h4 class="card-title mb-0 flex-grow-1">Best Selling Products</h4>
+                        </div>
+                        <div class="card-body">
+                            <app-best-selling [BestSelling]="BestSelling"></app-best-selling>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Top Sellers -->
+                <div class="col-xl-6 mb-4">
+                    <div class="card h-100">
+                        <div class="card-header d-flex align-items-center">
+                            <h4 class="card-title mb-0 flex-grow-1">Top Sellers</h4>
+                        </div>
+                        <div class="card-body">
+                            <app-top-selling [TopSelling]="TopSelling"></app-top-selling>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <!-- Store Visits by Source -->
+                <div class="col-xl-4 mb-4">
+                    <div class="card h-100">
+                        <div class="card-header d-flex align-items-center">
+                            <h4 class="card-title mb-0 flex-grow-1">Store Visits by Source</h4>
+                        </div>
+                        <div class="card-body">
+                            <apx-chart [series]="SalesCategoryChart.series" [labels]="SalesCategoryChart.labels" [chart]="SalesCategoryChart.chart" [legend]="SalesCategoryChart.legend" [stroke]="SalesCategoryChart.stroke" [dataLabels]="SalesCategoryChart.dataLabels" [colors]="SalesCategoryChart.colors">
+                            </apx-chart>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Orders -->
+                <div class="col-xl-8 mb-4">
+                    <div class="card h-100">
+                        <div class="card-header d-flex align-items-center">
+                            <h4 class="card-title mb-0 flex-grow-1">Recent Orders</h4>
+                        </div>
+                        <div class="card-body">
+                            <app-recent-orders [Recentelling]="Recentelling"></app-recent-orders>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div> <!-- end .h-100 -->
+    </div> <!-- end col -->
+</div>
+
+<app-toasts aria-live="polite" aria-atomic="true"></app-toasts>

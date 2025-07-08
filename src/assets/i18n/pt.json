@@ -1,0 +1,37 @@
+{
+  "HEADER": {
+    "MORE": {
+      "TEXT": "Mais"
+    }
+  },
+  "MENUITEMS": {
+    "MENU": {
+      "TEXT": "MENU"
+    },
+    "CADASTROS": {
+      "TEXT": "Cadastros",
+      "LIST": {
+        "GRUPO_RAMO": "Grupo Ramo",
+        "RAMO": "Ramo"
+      }
+    },
+    "APPS": {
+      "TEXT": "Apps"
+    },
+    "AUTHENTICATION": {
+      "TEXT": "Authentication"
+    },
+    "PAGES": {
+      "TEXT": "Pages"
+    },
+    "LANDING": {
+      "TEXT": "Landing"
+    },
+    "BASEUI": {
+      "TEXT": "Base UI"
+    },
+    "MORE": {
+      "TEXT": "Mais"
+    }
+  }
+}

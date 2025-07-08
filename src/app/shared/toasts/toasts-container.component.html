@@ -1,0 +1,13 @@
+<ngb-toast *ngFor="let toast of toastService.toasts; let i = index" [class]="toast.classname" [autohide]="true" [delay]="toast.delay || 5000" (hidden)="toastService.remove(toast)">
+
+  <!-- Quando for TemplateRef, usamos o helper getTemplate() -->
+  <ng-container *ngIf="isTemplate(toast)">
+    <ng-container *ngTemplateOutlet="getTemplate(toast)"></ng-container>
+  </ng-container>
+
+  <!-- Quando for string, exibimos diretamente -->
+  <ng-container *ngIf="!isTemplate(toast)">
+    {{ toast.textOrTpl }}
+  </ng-container>
+
+</ngb-toast>

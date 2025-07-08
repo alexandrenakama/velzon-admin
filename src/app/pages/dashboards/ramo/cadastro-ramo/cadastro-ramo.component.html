@@ -1,0 +1,115 @@
+<!-- src/app/pages/dashboards/ramo/cadastro-ramo/cadastro-ramo.component.html -->
+<div class="row">
+  <div class="col-xl-12">
+    <div class="card">
+      <!-- Header -->
+      <div class="card-header">
+        <h4 class="card-title mb-0">
+          {{ isEdit ? 'Editar Ramo' : 'Novo Ramo' }}
+        </h4>
+      </div>
+
+      <div class="card-body">
+        <form [formGroup]="form" (ngSubmit)="save()">
+
+          <!-- Grupo -->
+          <div class="mb-3">
+            <label for="grupoId" class="form-label">Grupo</label>
+            <div class="input-group">
+              <select id="grupoId" formControlName="grupoId" class="form-select">
+                <option [ngValue]="null" disabled>-- selecione --</option>
+                <option *ngFor="let g of grupos" [ngValue]="g.id">
+                  {{ g.id }} – {{ g.nome }}
+                </option>
+              </select>
+              <button class="btn btn-outline-secondary" type="button">
+                <i class="ri-search-line"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Nome do Grupo (readonly) -->
+          <div class="mb-3">
+            <label for="grupoNome" class="form-label">Nome do Grupo</label>
+            <input id="grupoNome" type="text" formControlName="grupoNome" class="form-control" readonly />
+          </div>
+
+          <!-- Identificador e Código -->
+          <div class="row g-3 mb-3">
+            <div class="col-md-6">
+              <label for="identificadorRamo" class="form-label">
+                Identificador do Ramo
+              </label>
+              <input id="identificadorRamo" type="number" formControlName="identificadorRamo" class="form-control" placeholder="Ex: 12" />
+              <div *ngIf="
+                  form.get('identificadorRamo')?.touched &&
+                  form.get('identificadorRamo')?.invalid
+                " class="form-text text-danger">
+                <span *ngIf="form.get('identificadorRamo')?.hasError('required')">Identificador é obrigatório.</span>
+                <span *ngIf="form.get('identificadorRamo')?.hasError('pattern')">Deve ser um número inteiro.</span>
+              </div>
+              <div *ngIf="form.hasError('uniqueIdentificador')" class="form-text text-danger">
+                {{ form.getError('uniqueIdentificador') }}
+              </div>
+            </div>
+            <div class="col-md-6">
+              <label for="codigoRamo" class="form-label">Código do Ramo</label>
+              <input id="codigoRamo" type="text" formControlName="codigoRamo" class="form-control" readonly />
+            </div>
+          </div>
+
+          <!-- Nome e Nome Abreviado -->
+          <div class="row g-3 mb-3">
+            <div class="col-md-6">
+              <label for="nomeRamo" class="form-label">Nome do Ramo</label>
+              <input id="nomeRamo" type="text" formControlName="nomeRamo" class="form-control" />
+            </div>
+            <div class="col-md-6">
+              <label for="nomeAbreviado" class="form-label">Nome Abreviado</label>
+              <input id="nomeAbreviado" type="text" formControlName="nomeAbreviado" class="form-control" />
+            </div>
+          </div>
+
+          <!-- Vigência -->
+          <div class="row g-3 mb-3">
+            <div class="col-md-6">
+              <label for="inicioVigencia" class="form-label">Início de Vigência</label>
+              <input #inicioDate id="inicioVigencia" type="date" formControlName="inicioVigencia" class="form-control" (click)="openInicioPicker()" />
+            </div>
+            <div class="col-md-6">
+              <label for="fimVigencia" class="form-label">Fim de Vigência</label>
+              <input #fimDate id="fimVigencia" type="date" formControlName="fimVigencia" class="form-control" [min]="form.get('inicioVigencia')?.value" (click)="openFimPicker()" />
+            </div>
+          </div>
+          <div *ngIf="form.hasError('dateRange')" class="form-text text-danger mb-3">
+            {{ form.getError('dateRange') }}
+          </div>
+
+          <!-- Ativo -->
+          <div class="form-check mb-4">
+            <input id="ramoAtivo" type="checkbox" formControlName="ramoAtivo" class="form-check-input" />
+            <label for="ramoAtivo" class="form-check-label">Ramo Ativo</label>
+          </div>
+
+          <!-- Botões de Ação -->
+          <div class="d-flex gap-2">
+            <!-- Salvar/Atualizar -->
+            <button type="submit" class="btn btn-primary" [disabled]="form.invalid">
+              {{ isEdit ? 'Atualizar' : 'Salvar' }}
+            </button>
+
+            <!-- Cancelar -->
+            <button type="button" class="btn btn-secondary" (click)="cancel()">
+              Cancelar
+            </button>
+
+            <!-- Novo Ramo -->
+            <button *ngIf="isEdit" type="button" class="btn btn-outline-secondary" routerLink="/ramo/cadastro">
+              + Novo Ramo
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,19 @@
+<!-- src/app/shared/confirm-modal/confirm-modal.component.html -->
+<div class="modal-body text-center p-5">
+  <lord-icon _ngcontent-ng-c192296824="" src="https://cdn.lordicon.com/gsqxdxog.json" trigger="loop" colors="primary:#405189,secondary:#f06548" style="width: 130px; height: 130px;"></lord-icon>
+
+  <div class="mt-4 pt-4">
+    <h4>{{ title }}</h4>
+    <p class="text-muted">{{ message }}</p>
+
+    <div class="hstack gap-2 justify-content-center mt-4">
+      <button type="button" class="btn btn-outline-secondary" (click)="activeModal.dismiss()">
+        {{ cancelText }}
+      </button>
+      <!-- botão de confirmação vermelho -->
+      <button type="button" class="btn btn-danger" (click)="activeModal.close(true)">
+        {{ confirmText }}
+      </button>
+    </div>
+  </div>
+</div>

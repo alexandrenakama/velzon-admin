@@ -1,0 +1,57 @@
+<!-- src/app/pages/dashboards/grupo-ramo/cadastro-grupo-ramo/cadastro-grupo-ramo.component.html -->
+<div class="row">
+  <div class="col-xl-12">
+    <div class="card">
+      <!-- Header -->
+      <div class="card-header d-flex align-items-center">
+        <h4 class="card-title mb-0 flex-grow-1">
+          {{ isEdit ? 'Editar Grupo de Ramo' : 'Novo Grupo de Ramo' }}
+        </h4>
+      </div>
+      <div class="card-body">
+        <form [formGroup]="form" (ngSubmit)="save()">
+
+          <!-- ID -->
+          <div class="mb-3">
+            <label for="id" class="form-label">ID</label>
+            <input id="id" type="number" formControlName="id" class="form-control" placeholder="Ex: 10" />
+            <div *ngIf="form.get('id')?.touched && form.get('id')?.invalid" class="form-text text-danger">
+              <span *ngIf="form.get('id')?.hasError('required')">ID é obrigatório.</span>
+              <span *ngIf="form.get('id')?.hasError('pattern')">Deve ser um número inteiro.</span>
+            </div>
+            <div *ngIf="form.hasError('uniqueId')" class="form-text text-danger">
+              {{ form.getError('uniqueId') }}
+            </div>
+          </div>
+
+          <!-- Nome -->
+          <div class="mb-4">
+            <label for="nome" class="form-label">Nome do Grupo</label>
+            <input id="nome" type="text" formControlName="nome" class="form-control" placeholder="Ex: Seguro Auto" />
+            <div *ngIf="form.get('nome')?.touched && form.get('nome')?.invalid" class="form-text text-danger">
+              Nome é obrigatório.
+            </div>
+          </div>
+
+          <!-- Botões -->
+          <div class="d-flex gap-2">
+            <!-- Salvar/Atualizar -->
+            <button type="submit" class="btn btn-primary" [disabled]="form.invalid">
+              {{ isEdit ? 'Atualizar' : 'Salvar' }}
+            </button>
+
+            <!-- Cancelar -->
+            <button type="button" class="btn btn-secondary" (click)="cancel()">
+              Cancelar
+            </button>
+
+            <!-- Novo Grupo (só em edição) -->
+            <button *ngIf="isEdit" type="button" class="btn btn-outline-secondary" routerLink="/grupo-ramo/cadastro">
+              + Novo Grupo
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
