@@ -1,12 +1,17 @@
 // src/app/pages/dashboards/grupo-ramo/lista-grupo-ramo/lista-grupo-ramo.component.ts
+
 import { Component, OnInit }      from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { NgbModal }               from '@ng-bootstrap/ng-bootstrap';
 
 import { GrupoRamo }               from 'src/app/store/Grupo Ramo/grupo-ramo.model';
 import { GrupoRamoService }        from 'src/app/core/services/grupo-ramo.service';
+import { Seguradora }              from 'src/app/store/Seguradora/seguradora.model';
+import { SeguradoraService }       from 'src/app/core/services/seguradora.service';
+import { RamoService }             from 'src/app/core/services/ramo.service';
 import { ToastService }            from 'src/app/shared/toasts/toast-service';
 import { ConfirmModalComponent }   from 'src/app/shared/confirm-modal/confirm-modal.component';
+import { take }                    from 'rxjs/operators';
 
 @Component({
   selector: 'app-lista-grupo-ramo',
@@ -16,25 +21,31 @@ import { ConfirmModalComponent }   from 'src/app/shared/confirm-modal/confirm-mo
 export class ListaGrupoRamoComponent implements OnInit {
   private allGroups: GrupoRamo[]  = [];
   paginatedGroups:   GrupoRamo[] = [];
+  seguradoras:       Seguradora[] = [];
 
   page           = 1;
   pageSize       = 10;
   collectionSize = 0;
   searchTerm     = '';
 
-  // propriedades de ordenação
   sortField = '';
   sortDir: 1 | -1 = 1;
 
   constructor(
-    private service: GrupoRamoService,
-    private router:  Router,
-    private route:   ActivatedRoute,
-    private toast:   ToastService,
-    private modal:   NgbModal
+    private service:        GrupoRamoService,
+    private seguradoraSrv:  SeguradoraService,
+    private ramoService:    RamoService,
+    private router:         Router,
+    private route:          ActivatedRoute,
+    private toast:          ToastService,
+    private modal:          NgbModal
   ) {}
 
   ngOnInit(): void {
+    // carrega as seguradoras (para mostrar o nome na tabela)
+    this.seguradoraSrv.getAll().subscribe(list => this.seguradoras = list);
+
+    // carrega os grupos
     this.service.getAll().subscribe(groups => {
       this.allGroups      = groups;
       this.collectionSize = groups.length;
@@ -48,7 +59,6 @@ export class ListaGrupoRamoComponent implements OnInit {
     this.refreshGroups();
   }
 
-  /** 3-state sort: none → asc → desc → none */
   onSort(field: string): void {
     if (this.sortField !== field) {
       this.sortField = field;
@@ -62,12 +72,6 @@ export class ListaGrupoRamoComponent implements OnInit {
     this.refreshGroups();
   }
 
-  /**
-   * Classes para o ícone de ordenação:
-   * - posicionamento absoluto (não afeta largura)
-   * - invisible quando não for a coluna ativa (reserva espaço)
-   * - seta up/down quando ativo
-   */
   getIconClasses(field: string): { [klass: string]: boolean } {
     return {
       'position-absolute':    true,
@@ -80,9 +84,15 @@ export class ListaGrupoRamoComponent implements OnInit {
     };
   }
 
-  refreshGroups(): void {
-    let filtered = this.allGroups
-      .filter(g => this.matchesSearch(g));
+  private matchesSearch(g: GrupoRamo): boolean {
+    if (!this.searchTerm) return true;
+    const term = this.searchTerm;
+    return [ g.id.toString(), g.nome ]
+      .some(v => v.toLowerCase().includes(term));
+  }
+
+  private refreshGroups(): void {
+    let filtered = this.allGroups.filter(g => this.matchesSearch(g));
 
     if (this.sortField) {
       filtered = filtered.sort((a, b) => {
@@ -96,16 +106,9 @@ export class ListaGrupoRamoComponent implements OnInit {
       filtered = filtered.sort((a, b) => a.nome.localeCompare(b.nome));
     }
 
-    this.collectionSize = filtered.length;
-    const start = (this.page - 1) * this.pageSize;
+    this.collectionSize   = filtered.length;
+    const start           = (this.page - 1) * this.pageSize;
     this.paginatedGroups = filtered.slice(start, start + this.pageSize);
-  }
-
-  private matchesSearch(g: GrupoRamo): boolean {
-    if (!this.searchTerm) return true;
-    const term = this.searchTerm;
-    return [ g.id.toString(), g.nome ]
-      .some(v => v.toLowerCase().includes(term));
   }
 
   onPageChange(pageNum: number): void {
@@ -118,17 +121,30 @@ export class ListaGrupoRamoComponent implements OnInit {
   }
 
   onDelete(g: GrupoRamo): void {
-    const ref = this.modal.open(ConfirmModalComponent, {
-      centered: true,
-      backdrop: 'static'
-    });
-    ref.componentInstance.title       = 'Confirma exclusão';
-    ref.componentInstance.message     = `Deseja realmente apagar o grupo “${g.nome}”?`;
-    ref.componentInstance.confirmText = 'Apagar';
-    ref.componentInstance.cancelText  = 'Cancelar';
+    // 1) verifica quantos ramos estão vinculados a este grupo
+    this.ramoService.getAll().pipe(take(1)).subscribe(allRamos => {
+      const vinculados = allRamos.filter(r => r.grupo.id === g.id).length;
 
-    ref.result
-      .then(ok => {
+      if (vinculados > 0) {
+        // 2) se houver ramos, mostra toast de erro e sai
+        this.toast.show(
+          `Falha ao apagar grupo. Você tem ${vinculados} ramo(s) vinculados.`,
+          { classname: 'bg-warning text-dark', delay: 6000 }
+        );
+        return;
+      }
+
+      // 3) caso não haja vínculos, abre modal de confirmação
+      const ref = this.modal.open(ConfirmModalComponent, {
+        centered: true,
+        backdrop: 'static'
+      });
+      ref.componentInstance.title       = 'Confirma exclusão';
+      ref.componentInstance.message     = `Deseja realmente apagar o grupo “${g.nome}”?`;
+      ref.componentInstance.confirmText = 'Apagar';
+      ref.componentInstance.cancelText  = 'Cancelar';
+
+      ref.result.then(ok => {
         if (!ok) return;
         this.service.delete(g.id).subscribe({
           next: () => {
@@ -144,7 +160,13 @@ export class ListaGrupoRamoComponent implements OnInit {
             { classname: 'bg-warning text-dark', delay: 5000 }
           )
         });
-      })
-      .catch(() => {});
+      }).catch(() => {});
+    });
+  }
+
+  /** Pega o nome da seguradora associado */
+  getSeguradoraNome(id: number): string {
+    const seg = this.seguradoras.find(s => s.id === id);
+    return seg ? seg.nome : '–';
   }
 }

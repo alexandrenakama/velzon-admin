@@ -33,6 +33,20 @@
             </div>
           </div>
 
+          <!-- Seguradora -->
+          <div class="mb-4">
+            <label for="seguradoraId" class="form-label">Seguradora</label>
+            <select id="seguradoraId" formControlName="seguradoraId" class="form-select">
+              <option [ngValue]="null">Selecione a seguradora</option>
+              <option *ngFor="let s of seguradoras" [ngValue]="s.id">
+                {{ s.nome }}
+              </option>
+            </select>
+            <div *ngIf="form.get('seguradoraId')?.touched && form.get('seguradoraId')?.invalid" class="form-text text-danger">
+              Seguradora é obrigatória.
+            </div>
+          </div>
+
           <!-- Botões -->
           <div class="d-flex gap-2">
             <!-- Salvar/Atualizar -->

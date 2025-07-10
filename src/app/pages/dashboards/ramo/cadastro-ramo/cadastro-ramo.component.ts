@@ -9,11 +9,13 @@ import {
 } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 
-import { Ramo } from 'src/app/store/Ramo/ramo.model';
-import { GrupoRamo } from 'src/app/store/Grupo Ramo/grupo-ramo.model';
-import { RamoService } from 'src/app/core/services/ramo.service';
+import { Ramo }            from 'src/app/store/Ramo/ramo.model';
+import { GrupoRamo }       from 'src/app/store/Grupo Ramo/grupo-ramo.model';
+import { Seguradora }      from 'src/app/store/Seguradora/seguradora.model';
+import { RamoService }     from 'src/app/core/services/ramo.service';
+import { ToastService }    from 'src/app/shared/toasts/toast-service';
+import { SeguradoraService } from 'src/app/core/services/seguradora.service';
 import { dateRangeValidator } from './date-range.validator';
-import { ToastService } from 'src/app/shared/toasts/toast-service';
 
 @Component({
   selector: 'app-cadastro-ramo',
@@ -27,19 +29,34 @@ export class CadastroRamoComponent implements OnInit {
   form!: FormGroup;
   isEdit = false;
   private editingId?: string;
-  grupos: GrupoRamo[] = [];
+
+  seguradoras:    Seguradora[] = [];
+  grupos:         GrupoRamo[]   = [];
+  availableGroups: GrupoRamo[]  = [];
 
   constructor(
-    private fb: FormBuilder,
-    private ramoService: RamoService,
-    private router: Router,
-    private route: ActivatedRoute,
-    private toastService: ToastService
+    private fb:               FormBuilder,
+    private ramoService:      RamoService,
+    private seguradoraService: SeguradoraService,
+    private router:           Router,
+    private route:            ActivatedRoute,
+    private toastService:     ToastService
   ) {}
 
   ngOnInit(): void {
-    this.ramoService.getGroups().subscribe(grupos => this.grupos = grupos);
+    // carrega seguradoras e grupos
+    this.seguradoraService.getAll().subscribe(s => this.seguradoras = s);
+    this.ramoService.getGroups().subscribe(g => this.grupos = g);
+
     this.buildForm();
+
+    // quando muda seguradora, filtra grupos
+    this.form.get('seguradoraId')!.valueChanges.subscribe(sId => {
+      this.availableGroups = this.grupos.filter(g => g.seguradoraId === +sId);
+      this.form.patchValue({ grupoId: null, grupoNome: '' }, { emitEvent: false });
+    });
+
+    // se for edição, popula o formulário
     this.route.paramMap.subscribe(params => {
       const id = params.get('id');
       if (id) {
@@ -47,9 +64,13 @@ export class CadastroRamoComponent implements OnInit {
         this.editingId = id;
         const ramo = this.ramoService.getById(id);
         if (ramo) {
+          // preenche seguradora e grupo
+          const grp = ramo.grupo;
           this.form.patchValue({
-            grupoId:           +ramo.grupo.id,
-            grupoNome:         ramo.grupo.nome,
+            seguradoraId:    grp.seguradoraId,
+            grupoId:         grp.id,
+            grupoNome:       grp.nome,
+
             identificadorRamo: +ramo.identificadorRamo,
             codigoRamo:        ramo.codigoRamo,
             nomeRamo:          ramo.nomeRamo,
@@ -65,12 +86,16 @@ export class CadastroRamoComponent implements OnInit {
 
   private buildForm(): void {
     this.form = this.fb.group({
+      seguradoraId:      [null, Validators.required],
       grupoId:           [null, Validators.required],
       grupoNome:         [{ value: '', disabled: true }],
+
       identificadorRamo: [null, [Validators.required, Validators.pattern(/^\d+$/)]],
       codigoRamo:        [{ value: '', disabled: true }],
+
       nomeRamo:          ['', Validators.required],
       nomeAbreviado:     [''],
+
       inicioVigencia:    [null, Validators.required],
       fimVigencia:       [null, Validators.required],
       ramoAtivo:         [true]
@@ -81,26 +106,23 @@ export class CadastroRamoComponent implements OnInit {
       ]
     });
 
-    this.form.get('grupoId')!.valueChanges.subscribe(id => {
-      const g = this.grupos.find(x => x.id === +id);
-      this.form.patchValue({ grupoNome: g?.nome || '' }, { emitEvent: false });
-      this.updateCodigo();
-    });
-
+    // atualiza código quando mudar grupo ou identificador
+    this.form.get('grupoId')!.valueChanges.subscribe(() => this.updateCodigo());
     this.form.get('identificadorRamo')!.valueChanges.subscribe(() => this.updateCodigo());
   }
 
   private updateCodigo(): void {
     const g  = this.form.get('grupoId')!.value;
     const ir = this.form.get('identificadorRamo')!.value;
+    const prefix = g != null && ir != null ? `${g}` : '';
     this.form.patchValue(
-      { codigoRamo: (g != null && ir != null) ? `${g}${ir}` : '' },
+      { codigoRamo: prefix + (ir ?? '') },
       { emitEvent: false }
     );
   }
 
-  private uniqueIdentificadorValidator(control: AbstractControl): ValidationErrors | null {
-    const identCtrl = control.get('identificadorRamo');
+  private uniqueIdentificadorValidator(c: AbstractControl): ValidationErrors | null {
+    const identCtrl = c.get('identificadorRamo');
     const identificador = identCtrl?.value?.toString();
     if (!identificador) return null;
     const existing = this.ramoService.getById(identificador);
@@ -120,7 +142,11 @@ export class CadastroRamoComponent implements OnInit {
     }
     const v = this.form.getRawValue();
     const ramo: Ramo = {
-      grupo:             { id: +v.grupoId, nome: v.grupoNome },
+      grupo: {
+        id:           +v.grupoId,
+        nome:         v.grupoNome,
+        seguradoraId: +v.seguradoraId
+      },
       identificadorRamo: v.identificadorRamo.toString(),
       codigoRamo:        v.codigoRamo,
       nomeRamo:          v.nomeRamo,
@@ -130,7 +156,7 @@ export class CadastroRamoComponent implements OnInit {
       ramoAtivo:         v.ramoAtivo
     };
 
-    const op$ = this.isEdit && this.editingId
+    const op$ = this.isEdit
       ? this.ramoService.update(ramo)
       : this.ramoService.create(ramo);
 
@@ -139,13 +165,10 @@ export class CadastroRamoComponent implements OnInit {
         const msg = this.isEdit
           ? `Ramo "${ramo.nomeRamo}" atualizado!`
           : `Ramo "${ramo.nomeRamo}" criado!`;
-
         this.toastService.show(msg, {
           classname: this.isEdit ? 'bg-info text-light' : 'bg-success text-light',
           delay: 5000
         });
-
-        // Se for criação, volta para a lista. Se edição, permanece na tela.
         if (!this.isEdit) {
           this.router.navigate(['/ramo']);
         }

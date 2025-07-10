@@ -5,15 +5,15 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NgbToastModule }                  from '@ng-bootstrap/ng-bootstrap';
 import { NgbModalModule, NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap';
 
-
 import { SharedModule }            from '../../shared/shared.module';
 import { DashboardsRoutingModule } from './dashboards-routing.module';
 
-// **Importe o feature-module de ramo**:
+// **Importe também o feature-module de Seguradora**:
+import { SeguradoraModule }        from './seguradora/seguradora.module';
 import { RamoModule }              from './ramo/ramo.module';
+import { GrupoRamoModule }         from './grupo-ramo/grupo-ramo.module';
 
 @NgModule({
-  // não declare ListaRamoComponent / NovoRamoComponent aqui!
   imports: [
     CommonModule,
     FormsModule,
@@ -22,9 +22,12 @@ import { RamoModule }              from './ramo/ramo.module';
     NgbModalModule,
     SharedModule,
     NgbPaginationModule,
-    RamoModule,            // ← aqui
+    SeguradoraModule,
+    RamoModule,
+    GrupoRamoModule,
+
     DashboardsRoutingModule
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
-export class DashboardsModule { }
+export class DashboardsModule {}

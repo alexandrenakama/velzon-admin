@@ -1,0 +1,80 @@
+<!-- src/app/pages/dashboards/seguradora/lista-seguradora/lista-seguradora.component.html -->
+<div class="row">
+  <div class="col-xl-12">
+    <div class="card">
+      <div class="card-header">
+        <h4 class="card-title mb-0">Seguradoras Cadastradas</h4>
+      </div>
+      <div class="card-body">
+        <div class="d-flex align-items-center mb-3">
+          <div class="input-group me-2" style="max-width:300px">
+            <input #searchBox type="text" class="form-control" placeholder="Pesquisar..." (input)="onSearch(searchBox.value)" />
+            <span class="input-group-text">
+              <i class="ri-search-line"></i>
+            </span>
+          </div>
+          <a class="btn btn-secondary" routerLink="cadastro">+ Nova Seguradora</a>
+        </div>
+
+        <div class="table-responsive">
+          <table class="table table-bordered text-center align-middle table-nowrap mb-0">
+            <thead class="table-light">
+              <tr>
+                <th class="sortable position-relative" (click)="onSort('id')">
+                  ID
+                  <i class="ms-1" [ngClass]="getIconClasses('id')"></i>
+                </th>
+                <th class="sortable text-start position-relative" (click)="onSort('nome')">
+                  Nome
+                  <i class="ms-1" [ngClass]="getIconClasses('nome')"></i>
+                </th>
+                <th class="sortable text-start position-relative" (click)="onSort('cnpj')">
+                  CNPJ
+                  <i class="ms-1" [ngClass]="getIconClasses('cnpj')"></i>
+                </th>
+                <th class="sortable position-relative" (click)="onSort('ativa')">
+                  Ativa
+                  <i class="ms-1" [ngClass]="getIconClasses('ativa')"></i>
+                </th>
+                <th style="width:150px">Ação</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let s of paginatedSeguradoras">
+                <td>{{ s.id }}</td>
+                <td class="text-start">{{ s.nome }}</td>
+                <td class="text-start">{{ s.cnpj }}</td>
+                <td>
+                  <span class="badge" [ngClass]="s.ativa ? 'bg-success' : 'bg-danger'">
+                    {{ s.ativa ? 'Sim' : 'Não' }}
+                  </span>
+                </td>
+                <td>
+                  <button class="btn btn-sm btn-light me-1" (click)="onEdit(s)">Editar</button>
+                  <button class="btn btn-sm btn-danger" (click)="onDelete(s)">Apagar</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="row justify-content-md-between align-items-md-center mt-3">
+          <div class="col-sm-6">
+            <div class="dataTables_info mb-2" role="status" aria-live="polite">
+              Mostrando {{ (page-1)*pageSize+1 }} até
+              {{ page*pageSize>collectionSize ? collectionSize : page*pageSize }}
+              de {{ collectionSize }} entradas
+            </div>
+          </div>
+          <div class="col-sm-6">
+            <div class="text-sm-right float-sm-end listjs-pagination mt-2 mt-sm-0">
+              <ngb-pagination class="pagination gap-1 mb-0" [collectionSize]="collectionSize" [(page)]="page" [pageSize]="pageSize" (pageChange)="onPageChange($event)" [directionLinks]="true" [boundaryLinks]="true" [ellipses]="false" [maxSize]="3" [rotate]="true" previousText="«" nextText="»">
+              </ngb-pagination>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>

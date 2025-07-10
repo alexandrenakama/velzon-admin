@@ -3,68 +3,63 @@
   <div class="col-xl-12">
     <div class="card">
 
-      <!-- Título -->
       <div class="card-header">
         <h4 class="card-title mb-0">Grupos de Ramo Cadastrados</h4>
       </div>
 
       <div class="card-body">
-        <!-- Busca + Novo Grupo -->
         <div class="d-flex align-items-center mb-3">
           <div class="input-group me-2" style="max-width:300px">
             <input #searchBox type="text" class="form-control" placeholder="Pesquisar..." (input)="onSearch(searchBox.value)" />
-            <span class="input-group-text">
-              <i class="ri-search-line"></i>
-            </span>
+            <span class="input-group-text"><i class="ri-search-line"></i></span>
           </div>
           <a class="btn btn-secondary" routerLink="cadastro">+ Novo Grupo</a>
         </div>
 
-        <!-- Tabela -->
         <div class="table-responsive">
           <table class="table table-bordered text-center align-middle table-nowrap mb-0">
             <thead class="table-light">
               <tr>
                 <th class="sortable position-relative" (click)="onSort('id')">
-                  ID
-                  <i class="ms-1" [ngClass]="getIconClasses('id')"></i>
+                  ID <i class="ms-1" [ngClass]="getIconClasses('id')"></i>
                 </th>
                 <th class="sortable text-start position-relative" (click)="onSort('nome')">
-                  Nome Grupo
-                  <i class="ms-1" [ngClass]="getIconClasses('nome')"></i>
+                  Nome Grupo <i class="ms-1" [ngClass]="getIconClasses('nome')"></i>
                 </th>
-                <th style="width:150px">Ação</th>
+                <th class="text-start">Seguradora</th>
+                <th style="width:150px">Ações</th>
               </tr>
             </thead>
             <tbody>
               <tr *ngFor="let g of paginatedGroups">
                 <td>{{ g.id }}</td>
                 <td class="text-start">{{ g.nome }}</td>
+                <td class="text-start">{{ getSeguradoraNome(g.seguradoraId) }}</td>
                 <td>
                   <button class="btn btn-sm btn-light me-1" (click)="onEdit(g)">Editar</button>
                   <button class="btn btn-sm btn-danger" (click)="onDelete(g)">Apagar</button>
                 </td>
               </tr>
+              <tr *ngIf="paginatedGroups.length === 0">
+                <td colspan="4" class="text-muted">Nenhum grupo cadastrado.</td>
+              </tr>
             </tbody>
           </table>
         </div>
 
-        <!-- Paginação -->
         <div class="row justify-content-md-between align-items-md-center mt-3">
           <div class="col-sm-6">
-            <div class="dataTables_info mb-2" role="status" aria-live="polite">
+            <div class="dataTables_info mb-2">
               Mostrando {{ (page-1)*pageSize+1 }} até
               {{ page*pageSize>collectionSize?collectionSize:page*pageSize }}
               de {{ collectionSize }} entradas
             </div>
           </div>
-          <div class="col-sm-6">
-            <div class="text-sm-right float-sm-end listjs-pagination mt-2 mt-sm-0">
-              <ngb-pagination class="pagination gap-1 mb-0" [collectionSize]="collectionSize" [(page)]="page" [pageSize]="pageSize" (pageChange)="onPageChange($event)" [directionLinks]="true" [boundaryLinks]="true" [ellipses]="false" [maxSize]="3" [rotate]="true" previousText="«" nextText="»"></ngb-pagination>
-            </div>
+          <div class="col-sm-6 text-sm-end">
+            <ngb-pagination [collectionSize]="collectionSize" [(page)]="page" [pageSize]="pageSize" (pageChange)="onPageChange($event)" [directionLinks]="true" [boundaryLinks]="true" [ellipses]="false" [maxSize]="3" [rotate]="true" previousText="«" nextText="»">
+            </ngb-pagination>
           </div>
         </div>
-
       </div>
     </div>
   </div>

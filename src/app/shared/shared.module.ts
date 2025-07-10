@@ -56,6 +56,9 @@ import { LandingScrollspyDirective }       from './landingscrollspy.directive';
 // Nosso modal de confirmação genérico
 import { ConfirmModalComponent }           from './confirm-modal/confirm-modal.component';
 
+// Máscara de CNPJ
+import { CnpjMaskDirective }               from './cnpj/cnpj-mask.directive';
+
 @NgModule({
   declarations: [
     BreadcrumbsComponent,
@@ -92,7 +95,9 @@ import { ConfirmModalComponent }           from './confirm-modal/confirm-modal.c
 
     ToastsContainer,
 
-    ConfirmModalComponent
+    ConfirmModalComponent,
+
+    CnpjMaskDirective
   ],
   imports: [
     CommonModule,
@@ -139,9 +144,10 @@ import { ConfirmModalComponent }           from './confirm-modal/confirm-modal.c
 
     ToastsContainer,
 
-    ConfirmModalComponent
+    ConfirmModalComponent,
+
+    CnpjMaskDirective
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA]
-  // entryComponents: [ ConfirmModalComponent ]  // se ainda usar Angular < 9
 })
 export class SharedModule { }

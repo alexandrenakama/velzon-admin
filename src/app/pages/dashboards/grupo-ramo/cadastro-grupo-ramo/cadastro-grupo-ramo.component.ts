@@ -9,9 +9,11 @@ import {
 } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 
-import { GrupoRamo }        from 'src/app/store/Grupo Ramo/grupo-ramo.model';
-import { GrupoRamoService } from 'src/app/core/services/grupo-ramo.service';
-import { ToastService }     from 'src/app/shared/toasts/toast-service';
+import { GrupoRamo }          from 'src/app/store/Grupo Ramo/grupo-ramo.model';
+import { Seguradora }         from 'src/app/store/Seguradora/seguradora.model';
+import { GrupoRamoService }   from 'src/app/core/services/grupo-ramo.service';
+import { SeguradoraService }  from 'src/app/core/services/seguradora.service';
+import { ToastService }       from 'src/app/shared/toasts/toast-service';
 
 @Component({
   selector: 'app-cadastro-grupo-ramo',
@@ -23,16 +25,23 @@ export class CadastroGrupoRamoComponent implements OnInit {
   isEdit = false;
   private editingId?: number;
 
+  seguradoras: Seguradora[] = [];
+
   constructor(
-    private fb: FormBuilder,
-    private service: GrupoRamoService,
-    private router: Router,
-    private route: ActivatedRoute,
-    private toast: ToastService
+    private fb:              FormBuilder,
+    private service:         GrupoRamoService,
+    private segService:      SeguradoraService,
+    private router:          Router,
+    private route:           ActivatedRoute,
+    private toast:           ToastService
   ) {}
 
   ngOnInit(): void {
+    // carrega as seguradoras para o select
+    this.segService.getAll().subscribe(list => this.seguradoras = list);
+
     this.buildForm();
+
     this.route.paramMap.subscribe(params => {
       const idParam = params.get('id');
       if (idParam) {
@@ -41,8 +50,9 @@ export class CadastroGrupoRamoComponent implements OnInit {
         const grp = this.service.getById(this.editingId);
         if (grp) {
           this.form.patchValue({
-            id:   grp.id,
-            nome: grp.nome
+            id:           grp.id,
+            nome:         grp.nome,
+            seguradoraId: grp.seguradoraId
           });
         }
       }
@@ -51,8 +61,9 @@ export class CadastroGrupoRamoComponent implements OnInit {
 
   private buildForm(): void {
     this.form = this.fb.group({
-      id:   [null, [Validators.required, Validators.pattern(/^\d+$/)]],
-      nome: ['', Validators.required]
+      id:           [null, [Validators.required, Validators.pattern(/^\d+$/)]],
+      nome:         ['', Validators.required],
+      seguradoraId: [null, Validators.required]
     }, {
       validators: [ this.uniqueIdValidator.bind(this) ]
     });
@@ -76,8 +87,9 @@ export class CadastroGrupoRamoComponent implements OnInit {
     }
     const v = this.form.value;
     const grupo: GrupoRamo = {
-      id:   +v.id,
-      nome: v.nome
+      id:           +v.id,
+      nome:         v.nome,
+      seguradoraId: +v.seguradoraId
     };
 
     const op$ = this.isEdit
@@ -89,13 +101,10 @@ export class CadastroGrupoRamoComponent implements OnInit {
         const msg = this.isEdit
           ? `Grupo de Ramo "${grupo.nome}" atualizado!`
           : `Grupo de Ramo "${grupo.nome}" criado!`;
-
         this.toast.show(msg, {
           classname: this.isEdit ? 'bg-info text-light' : 'bg-success text-light',
           delay: 5000
         });
-
-        // Se for criação, volta para a lista. Se edição, permanece na tela.
         if (!this.isEdit) {
           this.router.navigate(['/grupo-ramo']);
         }
