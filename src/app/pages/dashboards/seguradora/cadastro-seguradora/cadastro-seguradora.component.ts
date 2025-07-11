@@ -14,6 +14,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Seguradora, Endereco, Contato } from 'src/app/store/Seguradora/seguradora.model';
 import { SeguradoraService }             from 'src/app/core/services/seguradora.service';
 import { ToastService }                  from 'src/app/shared/toasts/toast-service';
+import { DefinicaoColuna }               from 'src/app/shared/lista-base/lista-base.component';
 
 @Component({
   selector: 'app-cadastro-seguradora',
@@ -24,6 +25,32 @@ export class CadastroSeguradoraComponent implements OnInit {
   form!: FormGroup;
   isEdit = false;
   private editingId?: number;
+
+  // configurações de colunas e paginações
+  colunasEndereco: DefinicaoColuna[] = [
+    { campo: 'tipoLogradouro', cabecalho: 'Tipo Logradouro' },
+    { campo: 'logradouro',     cabecalho: 'Logradouro'      },
+    { campo: 'numero',         cabecalho: 'Número'          },
+    { campo: 'complemento',    cabecalho: 'Complemento'     },
+    { campo: 'bairro',         cabecalho: 'Bairro'          },
+    { campo: 'cidade',         cabecalho: 'Cidade'          },
+    { campo: 'uf',             cabecalho: 'UF'              },
+    { campo: 'cep',            cabecalho: 'CEP'             },
+    { campo: 'tipoEndereco',   cabecalho: 'Tipo Endereço'   }
+  ];
+  paginaEndereco = 1;
+  tamanhoPaginaEndereco = 5;
+
+  colunasContato: DefinicaoColuna[] = [
+    { campo: 'tipoPessoa',  cabecalho: 'Tipo Pessoa'   },
+    { campo: 'ddd',         cabecalho: 'DDD'           },
+    { campo: 'telefone',    cabecalho: 'Telefone'      },
+    { campo: 'tipoTelefone',cabecalho: 'Tipo Telefone' },
+    { campo: 'email',       cabecalho: 'Email'         },
+    { campo: 'nomeContato', cabecalho: 'Nome Contato'  }
+  ];
+  paginaContato = 1;
+  tamanhoPaginaContato = 5;
 
   constructor(
     private fb:      FormBuilder,
@@ -39,14 +66,13 @@ export class CadastroSeguradoraComponent implements OnInit {
     this.route.paramMap.subscribe(params => {
       const idParam = params.get('id');
       if (!idParam) return;
-
       this.isEdit    = true;
       this.editingId = +idParam;
 
       const seg = this.service.getById(this.editingId);
       if (!seg) return;
 
-      // campos básicos
+      // preenche formulário
       this.form.patchValue({
         id:    seg.id,
         nome:  seg.nome,
@@ -54,15 +80,15 @@ export class CadastroSeguradoraComponent implements OnInit {
         cnpj:  seg.cnpj
       });
 
-      // endereços
+      // popula endereços
       this.enderecos.clear();
-      seg.enderecos.forEach(e =>
+      seg.enderecos.forEach((e: Endereco) =>
         this.enderecos.push(this.fb.group(e))
       );
 
-      // contatos
+      // popula contatos
       this.contatos.clear();
-      seg.contatos.forEach(c =>
+      seg.contatos.forEach((c: Contato) =>
         this.contatos.push(this.fb.group(c))
       );
     });
@@ -84,12 +110,8 @@ export class CadastroSeguradoraComponent implements OnInit {
     });
   }
 
-  get enderecos(): FormArray {
-    return this.form.get('enderecos') as FormArray;
-  }
-  get contatos(): FormArray {
-    return this.form.get('contatos') as FormArray;
-  }
+  get enderecos(): FormArray { return this.form.get('enderecos') as FormArray; }
+  get contatos():  FormArray { return this.form.get('contatos')  as FormArray; }
 
   private buildEnderecoGroup(): FormGroup {
     return this.fb.group({
@@ -116,26 +138,39 @@ export class CadastroSeguradoraComponent implements OnInit {
     });
   }
 
-  // endereços
+  // controles de array
   openAddEndereco(): void {
     this.enderecos.push(this.buildEnderecoGroup());
   }
   openEditEndereco(i: number): void {
-    console.log('Editar endereço', this.enderecos.at(i)?.value);
+    console.log('Editar endereço na posição', i);
   }
   removeEndereco(i: number): void {
     this.enderecos.removeAt(i);
   }
 
-  // contatos
   openAddContato(): void {
     this.contatos.push(this.buildContatoGroup());
   }
   openEditContato(i: number): void {
-    console.log('Editar contato', this.contatos.at(i)?.value);
+    console.log('Editar contato na posição', i);
   }
   removeContato(i: number): void {
     this.contatos.removeAt(i);
+  }
+
+  // **handlers do ListaBaseComponent** — sem modal por enquanto
+  onEditarEndereco(e: Endereco): void {
+    console.log('Editar endereço', e);
+  }
+  onApagarEndereco(e: Endereco): void {
+    console.log('Apagar endereço', e);
+  }
+  onEditarContato(c: Contato): void {
+    console.log('Editar contato', c);
+  }
+  onApagarContato(c: Contato): void {
+    console.log('Apagar contato', c);
   }
 
   private uniqueIdValidator(c: AbstractControl): ValidationErrors | null {
@@ -153,7 +188,6 @@ export class CadastroSeguradoraComponent implements OnInit {
       this.form.markAllAsTouched();
       return;
     }
-
     const v = this.form.value;
     const seg: Seguradora = {
       id:        +v.id,
@@ -163,11 +197,9 @@ export class CadastroSeguradoraComponent implements OnInit {
       enderecos: v.enderecos as Endereco[],
       contatos:  v.contatos  as Contato[]
     };
-
     const op$ = this.isEdit
       ? this.service.update(seg)
       : this.service.create(seg);
-
     op$.subscribe({
       next: () => {
         this.toast.show(

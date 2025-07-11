@@ -6,7 +6,7 @@
         <h4 class="card-title mb-0">Ramos Cadastrados</h4>
       </div>
       <div class="card-body">
-        <app-lista-base #listaBase [todosItens]="allRamos" [colunas]="colunas" [tamanhoPagina]="10" (editar)="onEdit($event)" (apagar)="onDelete($event)">
+        <app-lista-base #listaBase [todosItens]="allRamos" [colunas]="colunas" (editar)="onEdit($event)" (apagar)="onDelete($event)">
           <ng-template #toolbarTpl>
             <a class="btn btn-secondary" routerLink="cadastro">+ Novo Ramo</a>
           </ng-template>

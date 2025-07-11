@@ -27,25 +27,17 @@
         <tr *ngFor="let item of itensPaginados">
           <td *ngFor="let col of colunas">
             <ng-container *ngIf="col.formatoData; else semData">
-              {{ obterPorCaminho(item, col.campo) | date: col.formatoData }}
+              {{ obterPorCaminho(item, col.campo) | date:col.formatoData }}
             </ng-container>
             <ng-template #semData>
               <ng-container [ngSwitch]="col.campo">
                 <ng-container *ngSwitchCase="'ativa'">
-                  <span class="badge" [ngClass]="
-                      obterPorCaminho(item,'ativa')
-                        ? 'bg-success'
-                        : 'bg-danger'
-                    ">
+                  <span class="badge" [ngClass]="obterPorCaminho(item,'ativa') ? 'bg-success' : 'bg-danger'">
                     {{ obterPorCaminho(item,'ativa') ? 'Sim' : 'Não' }}
                   </span>
                 </ng-container>
                 <ng-container *ngSwitchCase="'ramoAtivo'">
-                  <span class="badge" [ngClass]="
-                      obterPorCaminho(item,'ramoAtivo')
-                        ? 'bg-success'
-                        : 'bg-danger'
-                    ">
+                  <span class="badge" [ngClass]="obterPorCaminho(item,'ramoAtivo') ? 'bg-success' : 'bg-danger'">
                     {{ obterPorCaminho(item,'ramoAtivo') ? 'Sim' : 'Não' }}
                   </span>
                 </ng-container>
@@ -56,7 +48,7 @@
             </ng-template>
           </td>
           <td>
-            <ng-container *ngTemplateOutlet="acoesTpl; context: { $implicit: item }"></ng-container>
+            <ng-container *ngTemplateOutlet="acoesTpl; context:{ $implicit: item }"></ng-container>
           </td>
         </tr>
       </ng-container>
@@ -82,7 +74,8 @@
     </div>
   </div>
   <div class="col-sm-6">
-    <div class="text-sm-right float-sm-end listjs-pagination mt-2 mt-sm-0">
+    <!-- só exibe paginação se tiver mais itens que cabem numa página -->
+    <div *ngIf="tamanhoColecao > tamanhoPagina" class="text-sm-right float-sm-end listjs-pagination mt-2 mt-sm-0">
       <ngb-pagination class="pagination gap-1 mb-0" [collectionSize]="tamanhoColecao" [(page)]="pagina" [pageSize]="tamanhoPagina" (pageChange)="aoMudarPagina($event)" [directionLinks]="true" [boundaryLinks]="true" [ellipses]="false" [maxSize]="3" [rotate]="true" previousText="«" nextText="»">
       </ngb-pagination>
     </div>

@@ -10,7 +10,7 @@
 
       <div class="card-body">
         <!-- Componente genérico de listagem -->
-        <app-lista-base #listaBase [todosItens]="allSeguradoras" [colunas]="colunas" [tamanhoPagina]="10" (editar)="onEdit($event)" (apagar)="onDelete($event)">
+        <app-lista-base #listaBase [todosItens]="allSeguradoras" [colunas]="colunas" (editar)="onEdit($event)" (apagar)="onDelete($event)">
           <!-- Toolbar: botão “+ Nova Seguradora” -->
           <ng-template #toolbarTpl>
             <a class="btn btn-secondary" routerLink="cadastro">+ Nova Seguradora</a>

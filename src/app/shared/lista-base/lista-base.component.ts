@@ -27,7 +27,7 @@ export class ListaBaseComponent<T> implements OnInit, OnChanges {
   @Input() todosItens: T[] = [];
   @Input() colunas: DefinicaoColuna[] = [];
   @Input() camposBusca: string[] = [];
-  @Input() tamanhoPagina = 10;
+  @Input() tamanhoPagina = 20;
 
   @ContentChild('toolbarTpl', { read: TemplateRef }) toolbarTpl!: TemplateRef<any>;
   @ContentChild('acoesTpl',   { read: TemplateRef }) acoesTpl!: TemplateRef<any>;

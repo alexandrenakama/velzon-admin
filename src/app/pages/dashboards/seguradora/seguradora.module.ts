@@ -3,15 +3,12 @@
 import { NgModule }                 from '@angular/core';
 import { CommonModule }             from '@angular/common';
 import { ReactiveFormsModule }      from '@angular/forms';
-import { SeguradoraRoutingModule }  from './seguradora-routing.module';
-
-// ng-bootstrap pagination
 import { NgbPaginationModule }      from '@ng-bootstrap/ng-bootstrap';
-
-import { SharedModule }             from 'src/app/shared/shared.module';
+import { SharedModule }             from '../../../shared/shared.module';
 
 import { ListaSeguradoraComponent }   from './lista-seguradora/lista-seguradora.component';
 import { CadastroSeguradoraComponent } from './cadastro-seguradora/cadastro-seguradora.component';
+import { SeguradoraRoutingModule }     from './seguradora-routing.module';
 
 @NgModule({
   declarations: [
@@ -21,7 +18,7 @@ import { CadastroSeguradoraComponent } from './cadastro-seguradora/cadastro-segu
   imports: [
     CommonModule,
     ReactiveFormsModule,
-    SharedModule,         
+    SharedModule,        
     NgbPaginationModule,
     SeguradoraRoutingModule
   ]

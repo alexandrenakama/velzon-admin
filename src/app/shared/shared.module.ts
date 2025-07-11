@@ -2,6 +2,7 @@
 
 import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { CommonModule }                    from '@angular/common';
+import { ReactiveFormsModule }             from '@angular/forms';
 import {
   NgbNavModule,
   NgbAccordionModule,
@@ -68,24 +69,30 @@ const SHARED_DECLARATIONS = [
   TeamComponent,
   ContactComponent,
   FooterComponent,
+
   MarketPlaceComponent,
   WalletComponent,
   FeaturesComponent,
   CategoriesComponent,
   DiscoverComponent,
   TopCreatorComponent,
+
   ProcessComponent,
   FindjobsComponent,
   CandidatesComponent,
   BlogComponent,
   JobcategoriesComponent,
   JobFooterComponent,
+
   ToastsContainer,
+
   ScrollspyDirective,
   LandingScrollspyDirective,
+
   ConfirmModalComponent,
   CnpjMaskDirective,
-  ListaBaseComponent
+
+  ListaBaseComponent,
 ];
 
 @NgModule({
@@ -94,6 +101,7 @@ const SHARED_DECLARATIONS = [
   ],
   imports: [
     CommonModule,
+    ReactiveFormsModule,  
     NgbNavModule,
     NgbAccordionModule,
     NgbDropdownModule,
@@ -105,8 +113,9 @@ const SHARED_DECLARATIONS = [
   ],
   exports: [
     ...SHARED_DECLARATIONS,
+    ReactiveFormsModule,  
     NgbPaginationModule
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
-export class SharedModule { }
+export class SharedModule {}

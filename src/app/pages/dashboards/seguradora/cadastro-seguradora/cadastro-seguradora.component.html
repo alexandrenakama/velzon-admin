@@ -26,7 +26,6 @@
                 {{ form.getError('uniqueId') }}
               </div>
             </div>
-
             <div class="col-md-6 mb-3">
               <label for="nome" class="form-label">Nome</label>
               <input id="nome" type="text" formControlName="nome" class="form-control" />
@@ -34,7 +33,6 @@
                 Nome é obrigatório.
               </div>
             </div>
-
             <div class="col-md-2 mb-3 d-flex align-items-center">
               <label for="ativaSwitch" class="form-label mb-0 me-2">Ativa</label>
               <div class="form-check form-switch mb-0">
@@ -44,7 +42,6 @@
                 </label>
               </div>
             </div>
-
             <div class="col-md-4 mb-3">
               <label for="cnpj" class="form-label">CNPJ</label>
               <input id="cnpj" type="text" formControlName="cnpj" cnpjMask maxlength="18" class="form-control" placeholder="00.000.000/0000-00" />
@@ -55,94 +52,42 @@
             </div>
           </div>
 
-          <!-- ENDEREÇOS -->
+          <!-- ENDEREÇOS via ListaBaseComponent -->
           <div class="mb-4">
-            <div class="d-flex justify-content-between align-items-center mb-2">
-              <h5 class="card-title mb-0">Endereços</h5>
-              <button type="button" class="btn btn-secondary" (click)="openAddEndereco()">
-                + Novo Endereço
-              </button>
-            </div>
-            <div class="table-responsive">
-              <table class="table table-bordered text-center align-middle table-nowrap mb-0">
-                <thead class="table-light">
-                  <tr>
-                    <th>Tipo Logradouro</th>
-                    <th>Logradouro</th>
-                    <th>Número</th>
-                    <th>Complemento</th>
-                    <th>Bairro</th>
-                    <th>Cidade</th>
-                    <th>UF</th>
-                    <th>CEP</th>
-                    <th>Tipo Endereço</th>
-                    <th style="width:120px">Ações</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr *ngFor="let end of enderecos.controls; let i = index">
-                    <td>{{ end.get('tipoLogradouro')?.value }}</td>
-                    <td class="text-start">{{ end.get('logradouro')?.value }}</td>
-                    <td>{{ end.get('numero')?.value }}</td>
-                    <td class="text-start">{{ end.get('complemento')?.value || '–' }}</td>
-                    <td class="text-start">{{ end.get('bairro')?.value }}</td>
-                    <td class="text-start">{{ end.get('cidade')?.value }}</td>
-                    <td>{{ end.get('uf')?.value }}</td>
-                    <td>{{ end.get('cep')?.value }}</td>
-                    <td>{{ end.get('tipoEndereco')?.value }}</td>
-                    <td>
-                      <button class="btn btn-sm btn-light me-1" (click)="openEditEndereco(i)">Editar</button>
-                      <button class="btn btn-sm btn-danger" (click)="removeEndereco(i)">Remover</button>
-                    </td>
-                  </tr>
-                  <tr *ngIf="enderecos.length === 0">
-                    <td colspan="10" class="text-muted">Nenhum endereço cadastrado.</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
+            <app-lista-base [todosItens]="enderecos.value" [colunas]="colunasEndereco" (editar)="onEditarEndereco($event)" (apagar)="onApagarEndereco($event)">
+              <ng-template #toolbarTpl>
+                <button type="button" class="btn btn-secondary" (click)="openAddEndereco()">
+                  + Novo Endereço
+                </button>
+              </ng-template>
+              <ng-template #acoesTpl let-item>
+                <button class="btn btn-sm btn-light me-1" (click)="onEditarEndereco(item)">
+                  Editar
+                </button>
+                <button class="btn btn-sm btn-danger" (click)="onApagarEndereco(item)">
+                  Remover
+                </button>
+              </ng-template>
+            </app-lista-base>
           </div>
 
-          <!-- CONTATOS -->
+          <!-- CONTATOS via ListaBaseComponent -->
           <div class="mb-4">
-            <div class="d-flex justify-content-between align-items-center mb-2">
-              <h5 class="card-title mb-0">Contatos</h5>
-              <button type="button" class="btn btn-secondary" (click)="openAddContato()">
-                + Novo Contato
-              </button>
-            </div>
-            <div class="table-responsive">
-              <table class="table table-bordered text-center align-middle table-nowrap mb-0">
-                <thead class="table-light">
-                  <tr>
-                    <th>Tipo Pessoa</th>
-                    <th>DDD</th>
-                    <th>Telefone</th>
-                    <th>Tipo Telefone</th>
-                    <th>Email</th>
-                    <th>Nome Contato</th>
-                    <th style="width:120px">Ações</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr *ngFor="let cont of contatos.controls; let i = index">
-                    <td>{{ cont.get('tipoPessoa')?.value }}</td>
-                    <td>{{ cont.get('ddd')?.value }}</td>
-                    <td>{{ cont.get('telefone')?.value }}</td>
-                    <td>{{ cont.get('tipoTelefone')?.value }}</td>
-                    <td class="text-start">{{ cont.get('email')?.value }}</td>
-                    <td class="text-start">{{ cont.get('nomeContato')?.value || '–' }}</td>
-                    <td>
-                      <button class="btn btn-sm btn-light me-1" (click)="openEditContato(i)">Editar</button>
-                      <button class="btn btn-sm btn-danger" (click)="removeContato(i)">Remover</button>
-                    </td>
-                  </tr>
-                  <tr *ngIf="contatos.length === 0">
-                    <td colspan="7" class="text-muted">Nenhum contato cadastrado.</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
+            <app-lista-base [todosItens]="contatos.value" [colunas]="colunasContato" (editar)="onEditarContato($event)" (apagar)="onApagarContato($event)">
+              <ng-template #toolbarTpl>
+                <button type="button" class="btn btn-secondary" (click)="openAddContato()">
+                  + Novo Contato
+                </button>
+              </ng-template>
+              <ng-template #acoesTpl let-item>
+                <button class="btn btn-sm btn-light me-1" (click)="onEditarContato(item)">
+                  Editar
+                </button>
+                <button class="btn btn-sm btn-danger" (click)="onApagarContato(item)">
+                  Remover
+                </button>
+              </ng-template>
+            </app-lista-base>
           </div>
 
           <!-- AÇÕES FINAIS -->
@@ -150,7 +95,9 @@
             <button type="submit" class="btn btn-primary" [disabled]="form.invalid">
               {{ isEdit ? 'Atualizar' : 'Salvar' }}
             </button>
-            <button type="button" class="btn btn-secondary" (click)="cancel()">Cancelar</button>
+            <button type="button" class="btn btn-secondary" (click)="cancel()">
+              Cancelar
+            </button>
             <button *ngIf="isEdit" type="button" class="btn btn-outline-secondary" routerLink="/seguradora/cadastro">
               + Nova Seguradora
             </button>

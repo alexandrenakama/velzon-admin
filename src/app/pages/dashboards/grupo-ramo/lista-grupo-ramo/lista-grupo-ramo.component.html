@@ -7,7 +7,7 @@
       </div>
       <div class="card-body">
 
-        <app-lista-base #listaBase [todosItens]="allGroups" [colunas]="colunas" [tamanhoPagina]="10" (editar)="onEdit($event)" (apagar)="onDelete($event)">
+        <app-lista-base #listaBase [todosItens]="allGroups" [colunas]="colunas" (editar)="onEdit($event)" (apagar)="onDelete($event)">
           <!-- toolbar: botão "+ Novo Grupo" -->
           <ng-template #toolbarTpl>
             <a class="btn btn-secondary" routerLink="cadastro">+ Novo Grupo</a>
