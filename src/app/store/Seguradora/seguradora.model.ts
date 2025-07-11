@@ -5,9 +5,7 @@ import { GrupoRamo } from '../Grupo Ramo/grupo-ramo.model';
 export type PessoaTipo = 'FISICA' | 'JURIDICA';
 
 export interface Endereco {
-  /** Identificador único do endereço (gerado pelo back-end) */
   id?:             number;
-
   tipoLogradouro: string;
   logradouro:      string;
   numero:          string;
@@ -20,9 +18,7 @@ export interface Endereco {
 }
 
 export interface Contato {
-  /** Identificador único do contato (gerado pelo back-end) */
   id?:            number;
-
   tipoPessoa:     PessoaTipo;
   ddd:            string;
   telefone:       string;
@@ -32,21 +28,10 @@ export interface Contato {
 }
 
 export interface Seguradora {
-  /** Identificador único */
   id:        number;
-
-  /** Nome da seguradora */
   nome:      string;
-
-  /** Se está ativa */
   ativa:     boolean;
-
-  /** CNPJ da empresa */
   cnpj:      string;
-
-  /** Endereços associados */
   enderecos: Endereco[];
-
-  /** Contatos associados */
   contatos:  Contato[];
 }
