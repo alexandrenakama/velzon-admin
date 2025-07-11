@@ -1,4 +1,3 @@
-// src/app/pages/dashboards/ramo/cadastro-ramo/cadastro-ramo.component.ts
 import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import {
   FormBuilder,
@@ -9,12 +8,10 @@ import {
 } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 
-import { Ramo }            from 'src/app/store/Ramo/ramo.model';
-import { GrupoRamo }       from 'src/app/store/Grupo Ramo/grupo-ramo.model';
-import { Seguradora }      from 'src/app/store/Seguradora/seguradora.model';
-import { RamoService }     from 'src/app/core/services/ramo.service';
-import { ToastService }    from 'src/app/shared/toasts/toast-service';
-import { SeguradoraService } from 'src/app/core/services/seguradora.service';
+import { Ramo } from 'src/app/store/Ramo/ramo.model';
+import { GrupoRamo } from 'src/app/store/Grupo Ramo/grupo-ramo.model';
+import { RamoService } from 'src/app/core/services/ramo.service';
+import { ToastService } from 'src/app/shared/toasts/toast-service';
 import { dateRangeValidator } from './date-range.validator';
 
 @Component({
@@ -24,39 +21,34 @@ import { dateRangeValidator } from './date-range.validator';
 })
 export class CadastroRamoComponent implements OnInit {
   @ViewChild('inicioDate') inicioDate!: ElementRef<HTMLInputElement>;
-  @ViewChild('fimDate')    fimDate!: ElementRef<HTMLInputElement>;
+  @ViewChild('fimDate') fimDate!: ElementRef<HTMLInputElement>;
 
   form!: FormGroup;
   isEdit = false;
   private editingId?: string;
 
-  seguradoras:    Seguradora[] = [];
-  grupos:         GrupoRamo[]   = [];
-  availableGroups: GrupoRamo[]  = [];
+  grupos: GrupoRamo[] = [];
 
   constructor(
-    private fb:               FormBuilder,
-    private ramoService:      RamoService,
-    private seguradoraService: SeguradoraService,
-    private router:           Router,
-    private route:            ActivatedRoute,
-    private toastService:     ToastService
+    private fb: FormBuilder,
+    private ramoService: RamoService,
+    private router: Router,
+    private route: ActivatedRoute,
+    private toastService: ToastService
   ) {}
 
   ngOnInit(): void {
-    // carrega seguradoras e grupos
-    this.seguradoraService.getAll().subscribe(s => this.seguradoras = s);
     this.ramoService.getGroups().subscribe(g => this.grupos = g);
-
     this.buildForm();
 
-    // quando muda seguradora, filtra grupos
-    this.form.get('seguradoraId')!.valueChanges.subscribe(sId => {
-      this.availableGroups = this.grupos.filter(g => g.seguradoraId === +sId);
-      this.form.patchValue({ grupoId: null, grupoNome: '' }, { emitEvent: false });
+    this.form.get('grupoId')!.valueChanges.subscribe(grupoId => {
+      const grupo = this.grupos.find(g => g.id === grupoId);
+      this.form.patchValue({ grupoNome: grupo?.nome ?? '' }, { emitEvent: false });
+      this.updateCodigo();
     });
 
-    // se for edição, popula o formulário
+    this.form.get('identificadorRamo')!.valueChanges.subscribe(() => this.updateCodigo());
+
     this.route.paramMap.subscribe(params => {
       const id = params.get('id');
       if (id) {
@@ -64,21 +56,19 @@ export class CadastroRamoComponent implements OnInit {
         this.editingId = id;
         const ramo = this.ramoService.getById(id);
         if (ramo) {
-          // preenche seguradora e grupo
           const grp = ramo.grupo;
           this.form.patchValue({
-            seguradoraId:    grp.seguradoraId,
-            grupoId:         grp.id,
-            grupoNome:       grp.nome,
-
+            grupoId: grp.id,
+            grupoNome: grp.nome,
             identificadorRamo: +ramo.identificadorRamo,
-            codigoRamo:        ramo.codigoRamo,
-            nomeRamo:          ramo.nomeRamo,
-            nomeAbreviado:     ramo.nomeAbreviado,
-            inicioVigencia:    ramo.inicioVigencia,
-            fimVigencia:       ramo.fimVigencia,
-            ramoAtivo:         ramo.ramoAtivo
+            codigoRamo: ramo.codigoRamo,
+            nomeRamo: ramo.nomeRamo,
+            nomeAbreviado: ramo.nomeAbreviado,
+            inicioVigencia: ramo.inicioVigencia,
+            fimVigencia: ramo.fimVigencia,
+            ramoAtivo: ramo.ramoAtivo
           });
+          this.form.get('identificadorRamo')?.disable();
         }
       }
     });
@@ -86,39 +76,28 @@ export class CadastroRamoComponent implements OnInit {
 
   private buildForm(): void {
     this.form = this.fb.group({
-      seguradoraId:      [null, Validators.required],
-      grupoId:           [null, Validators.required],
-      grupoNome:         [{ value: '', disabled: true }],
-
+      grupoId: [null, Validators.required],
+      grupoNome: [{ value: '', disabled: true }],
       identificadorRamo: [null, [Validators.required, Validators.pattern(/^\d+$/)]],
-      codigoRamo:        [{ value: '', disabled: true }],
-
-      nomeRamo:          ['', Validators.required],
-      nomeAbreviado:     [''],
-
-      inicioVigencia:    [null, Validators.required],
-      fimVigencia:       [null, Validators.required],
-      ramoAtivo:         [true]
+      codigoRamo: [{ value: '', disabled: true }],
+      nomeRamo: ['', Validators.required],
+      nomeAbreviado: [''],
+      inicioVigencia: [null, Validators.required],
+      fimVigencia: [null, Validators.required],
+      ramoAtivo: [true]
     }, {
       validators: [
         dateRangeValidator,
         this.uniqueIdentificadorValidator.bind(this)
       ]
     });
-
-    // atualiza código quando mudar grupo ou identificador
-    this.form.get('grupoId')!.valueChanges.subscribe(() => this.updateCodigo());
-    this.form.get('identificadorRamo')!.valueChanges.subscribe(() => this.updateCodigo());
   }
 
   private updateCodigo(): void {
-    const g  = this.form.get('grupoId')!.value;
-    const ir = this.form.get('identificadorRamo')!.value;
-    const prefix = g != null && ir != null ? `${g}` : '';
-    this.form.patchValue(
-      { codigoRamo: prefix + (ir ?? '') },
-      { emitEvent: false }
-    );
+    const grupoId = this.form.get('grupoId')!.value;
+    const identificador = this.form.get('identificadorRamo')!.value;
+    const codigo = grupoId != null && identificador != null ? `${grupoId}${identificador}` : '';
+    this.form.patchValue({ codigoRamo: codigo }, { emitEvent: false });
   }
 
   private uniqueIdentificadorValidator(c: AbstractControl): ValidationErrors | null {
@@ -132,28 +111,34 @@ export class CadastroRamoComponent implements OnInit {
     return null;
   }
 
-  openInicioPicker(): void { this.inicioDate.nativeElement.showPicker(); }
-  openFimPicker(): void    { this.fimDate.nativeElement.showPicker();  }
+  openInicioPicker(): void {
+    this.inicioDate.nativeElement.showPicker();
+  }
+
+  openFimPicker(): void {
+    this.fimDate.nativeElement.showPicker();
+  }
 
   save(): void {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       return;
     }
+
     const v = this.form.getRawValue();
     const ramo: Ramo = {
       grupo: {
-        id:           +v.grupoId,
-        nome:         v.grupoNome,
-        seguradoraId: +v.seguradoraId
+        id: +v.grupoId,
+        nome: v.grupoNome,
+        seguradoraId: 0 // ajustável se necessário
       },
       identificadorRamo: v.identificadorRamo.toString(),
-      codigoRamo:        v.codigoRamo,
-      nomeRamo:          v.nomeRamo,
-      nomeAbreviado:     v.nomeAbreviado,
-      inicioVigencia:    v.inicioVigencia,
-      fimVigencia:       v.fimVigencia,
-      ramoAtivo:         v.ramoAtivo
+      codigoRamo: v.codigoRamo,
+      nomeRamo: v.nomeRamo,
+      nomeAbreviado: v.nomeAbreviado,
+      inicioVigencia: v.inicioVigencia,
+      fimVigencia: v.fimVigencia,
+      ramoAtivo: v.ramoAtivo
     };
 
     const op$ = this.isEdit

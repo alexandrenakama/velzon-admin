@@ -35,12 +35,12 @@ export class CadastroSeguradoraComponent implements OnInit {
   ];
 
   colunasContato: DefinicaoColuna[] = [
+    { campo: 'nomeContato',  cabecalho: 'Nome Contato'  },
     { campo: 'tipoPessoa',   cabecalho: 'Tipo Pessoa'   },
     { campo: 'ddd',          cabecalho: 'DDD'           },
     { campo: 'telefone',     cabecalho: 'Telefone'      },
     { campo: 'tipoTelefone', cabecalho: 'Tipo Telefone' },
-    { campo: 'email',        cabecalho: 'Email'         },
-    { campo: 'nomeContato',  cabecalho: 'Nome Contato'  }
+    { campo: 'email',        cabecalho: 'Email'         }
   ];
 
   constructor(
@@ -70,7 +70,7 @@ export class CadastroSeguradoraComponent implements OnInit {
         ativa: seg.ativa,
         cnpj: seg.cnpj
       });
-
+      this.form.get('id')?.disable(); 
       this.enderecos.clear();
       seg.enderecos.forEach(e => this.enderecos.push(this.fb.group(e)));
       this.contatos.clear();
@@ -85,7 +85,7 @@ export class CadastroSeguradoraComponent implements OnInit {
       ativa: [true],
       cnpj: ['', [
         Validators.required,
-        Validators.pattern(/^\d{2}\.\d{3}\.\d{3}\/\d{4}\-\d{2}$/)
+        Validators.pattern(/^\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}$/)
       ]],
       enderecos: this.fb.array([]),
       contatos: this.fb.array([])
@@ -137,13 +137,9 @@ export class CadastroSeguradoraComponent implements OnInit {
     this.contatos.push(this.buildContatoGroup());
   }
 
-  onEditarEndereco(e: Endereco): void {
-    // Lógica de edição (se necessário)
-  }
+  onEditarEndereco(e: Endereco): void {}
 
-  onEditarContato(c: Contato): void {
-    // Lógica de edição (se necessário)
-  }
+  onEditarContato(c: Contato): void {}
 
   onApagarEndereco(e: Endereco): void {
     const lista: Endereco[] = this.enderecos.value as Endereco[];
@@ -152,21 +148,20 @@ export class CadastroSeguradoraComponent implements OnInit {
 
     const ref = this.modal.open(ConfirmModalComponent, { centered: true, backdrop: 'static' });
     ref.componentInstance.title = 'Confirma exclusão';
-    ref.componentInstance.message = `Deseja realmente apagar o endereço “${e.logradouro}, ${e.numero}”?`;
+    ref.componentInstance.message = `Deseja realmente apagar o endereço “${e.tipoLogradouro} ${e.logradouro}, ${e.numero}”?`;
     ref.componentInstance.confirmText = 'Apagar';
     ref.componentInstance.cancelText = 'Cancelar';
 
     ref.result.then(ok => {
       if (!ok) return;
 
-      // Exibe o toast ANTES do update
       this.toast.show('Endereço apagado com sucesso.', {
         classname: 'bg-danger text-light', delay: 3000
       });
 
       this.enderecos.removeAt(idx);
 
-      const v = this.form.value;
+      const v = this.form.getRawValue();
       const seg: Seguradora = {
         id: +v.id,
         nome: v.nome,
@@ -200,14 +195,13 @@ export class CadastroSeguradoraComponent implements OnInit {
     ref.result.then(ok => {
       if (!ok) return;
 
-      // Exibe o toast ANTES do update
       this.toast.show('Contato apagado com sucesso.', {
         classname: 'bg-danger text-light', delay: 3000
       });
 
       this.contatos.removeAt(idx);
 
-      const v = this.form.value;
+      const v = this.form.getRawValue();
       const seg: Seguradora = {
         id: +v.id,
         nome: v.nome,
@@ -243,7 +237,7 @@ export class CadastroSeguradoraComponent implements OnInit {
       return;
     }
 
-    const v = this.form.value;
+    const v = this.form.getRawValue();
     const seg: Seguradora = {
       id: +v.id,
       nome: v.nome,

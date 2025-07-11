@@ -30,7 +30,7 @@ export class RamoService {
     {
       grupo: { id: 18, nome: 'Seguro Pet', seguradoraId: 1 },
       identificadorRamo: '1',
-      codigoRamo:        '1801',
+      codigoRamo:        '181',
       nomeRamo:          'Empresa Blindada',
       nomeAbreviado:     'Empresa',
       inicioVigencia:    '2025-02-07',
@@ -40,7 +40,7 @@ export class RamoService {
     {
       grupo: { id: 15, nome: 'Seguro Automotivo',    seguradoraId: 1 },
       identificadorRamo: '2',
-      codigoRamo:        '1502',
+      codigoRamo:        '152',
       nomeRamo:          'Empresa Blindada',
       nomeAbreviado:     'Empresa',
       inicioVigencia:    '2025-04-16',
@@ -50,7 +50,7 @@ export class RamoService {
     {
       grupo: { id: 12, nome: 'Seguro Residencial',   seguradoraId: 1 },
       identificadorRamo: '3',
-      codigoRamo:        '1203',
+      codigoRamo:        '123',
       nomeRamo:          'Auto Protegido',
       nomeAbreviado:     'Auto',
       inicioVigencia:    '2025-01-06',
@@ -60,7 +60,7 @@ export class RamoService {
     {
       grupo: { id: 20, nome: 'Seguro Tecnológico',   seguradoraId: 1 },
       identificadorRamo: '4',
-      codigoRamo:        '2004',
+      codigoRamo:        '204',
       nomeRamo:          'Tech Seguro',
       nomeAbreviado:     'Tech',
       inicioVigencia:    '2025-02-07',
@@ -70,7 +70,7 @@ export class RamoService {
     {
       grupo: { id: 11, nome: 'Seguro Agrícola',      seguradoraId: 1 },
       identificadorRamo: '5',
-      codigoRamo:        '1105',
+      codigoRamo:        '115',
       nomeRamo:          'Empresa Blindada',
       nomeAbreviado:     'Empresa',
       inicioVigencia:    '2025-04-16',
@@ -80,7 +80,7 @@ export class RamoService {
     {
       grupo: { id: 15, nome: 'Seguro Automotivo',    seguradoraId: 1 },
       identificadorRamo: '6',
-      codigoRamo:        '1506',
+      codigoRamo:        '156',
       nomeRamo:          'Educação Garantida',
       nomeAbreviado:     'Educação',
       inicioVigencia:    '2025-06-25',
@@ -90,7 +90,7 @@ export class RamoService {
     {
       grupo: { id: 17, nome: 'Seguro Saúde',         seguradoraId: 1 },
       identificadorRamo: '7',
-      codigoRamo:        '1707',
+      codigoRamo:        '177',
       nomeRamo:          'Pet Protegido',
       nomeAbreviado:     'Pet',
       inicioVigencia:    '2025-06-15',
@@ -100,7 +100,7 @@ export class RamoService {
     {
       grupo: { id: 11, nome: 'Seguro Agrícola',      seguradoraId: 1 },
       identificadorRamo: '8',
-      codigoRamo:        '1108',
+      codigoRamo:        '118',
       nomeRamo:          'Casa Segura',
       nomeAbreviado:     'Casa',
       inicioVigencia:    '2025-06-02',
@@ -110,7 +110,7 @@ export class RamoService {
     {
       grupo: { id: 16, nome: 'Seguro Viagem',        seguradoraId: 1 },
       identificadorRamo: '9',
-      codigoRamo:        '1609',
+      codigoRamo:        '169',
       nomeRamo:          'Auto Protegido',
       nomeAbreviado:     'Auto',
       inicioVigencia:    '2025-01-24',

@@ -26,6 +26,7 @@
                 {{ form.getError('uniqueId') }}
               </div>
             </div>
+
             <div class="col-md-6 mb-3">
               <label for="nome" class="form-label">Nome</label>
               <input id="nome" type="text" formControlName="nome" class="form-control" />
@@ -33,6 +34,7 @@
                 Nome é obrigatório.
               </div>
             </div>
+
             <div class="col-md-2 mb-3 d-flex align-items-center">
               <label for="ativaSwitch" class="form-label mb-0 me-2">Ativa</label>
               <div class="form-check form-switch mb-0">
@@ -42,6 +44,7 @@
                 </label>
               </div>
             </div>
+
             <div class="col-md-4 mb-3">
               <label for="cnpj" class="form-label">CNPJ</label>
               <input id="cnpj" type="text" formControlName="cnpj" cnpjMask maxlength="18" class="form-control" placeholder="00.000.000/0000-00" />
@@ -54,7 +57,7 @@
 
           <!-- ENDEREÇOS via ListaBaseComponent -->
           <div class="mb-4">
-            <app-lista-base [todosItens]="enderecos.value" [colunas]="colunasEndereco" (editar)="onEditarEndereco($event)" (apagar)="onApagarEndereco($event)">
+            <app-lista-base [todosItens]="enderecos.value" [colunas]="colunasEndereco" [tamanhoPagina]="5" (editar)="onEditarEndereco($event)" (apagar)="onApagarEndereco($event)">
               <ng-template #toolbarTpl>
                 <button type="button" class="btn btn-secondary" (click)="openAddEndereco()">
                   + Novo Endereço
@@ -73,7 +76,7 @@
 
           <!-- CONTATOS via ListaBaseComponent -->
           <div class="mb-4">
-            <app-lista-base [todosItens]="contatos.value" [colunas]="colunasContato" (editar)="onEditarContato($event)" (apagar)="onApagarContato($event)">
+            <app-lista-base [todosItens]="contatos.value" [colunas]="colunasContato" [tamanhoPagina]="5" (editar)="onEditarContato($event)" (apagar)="onApagarContato($event)">
               <ng-template #toolbarTpl>
                 <button type="button" class="btn btn-secondary" (click)="openAddContato()">
                   + Novo Contato
@@ -92,12 +95,14 @@
 
           <!-- AÇÕES FINAIS -->
           <div class="d-flex gap-2">
-            <button type="submit" class="btn btn-primary" [disabled]="form.invalid">
+            <button type="submit" class="btn btn-primary" [disabled]="isEdit ? !form.dirty || form.invalid : form.invalid">
               {{ isEdit ? 'Atualizar' : 'Salvar' }}
             </button>
+
             <button type="button" class="btn btn-secondary" (click)="cancel()">
               Cancelar
             </button>
+
             <button *ngIf="isEdit" type="button" class="btn btn-outline-secondary" routerLink="/seguradora/cadastro">
               + Nova Seguradora
             </button>
