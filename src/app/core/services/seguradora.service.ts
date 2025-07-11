@@ -4,8 +4,9 @@ import { BehaviorSubject, Observable, of, throwError } from 'rxjs';
 import { catchError, tap, switchMap, take } from 'rxjs/operators';
 import { HttpClient } from '@angular/common/http';
 import { environment } from 'src/environments/environment';
-import { Seguradora } from 'src/app/store/Seguradora/seguradora.model';
-import { GrupoRamoService } from './grupo-ramo.service';
+
+import { Seguradora, Endereco, Contato } from 'src/app/store/Seguradora/seguradora.model';
+import { GrupoRamoService }               from './grupo-ramo.service';
 
 @Injectable({ providedIn: 'root' })
 export class SeguradoraService {
@@ -19,6 +20,7 @@ export class SeguradoraService {
       cnpj:    '12.345.678/0001-95',
       enderecos: [
         {
+          id:              1,
           tipoLogradouro: 'Rua',
           logradouro:      'das Flores',
           numero:          '123',
@@ -32,6 +34,7 @@ export class SeguradoraService {
       ],
       contatos: [
         {
+          id:            1,
           tipoPessoa:   'JURIDICA',
           ddd:          '11',
           telefone:     '987654321',
@@ -45,13 +48,13 @@ export class SeguradoraService {
   public seguradoras$ = this._seguradoras$.asObservable();
 
   constructor(
-    private http: HttpClient,
-    private grupoService: GrupoRamoService
+    private http:          HttpClient,
+    private grupoService:  GrupoRamoService
   ) {
     this.loadAll();
   }
 
-  loadAll(): void {
+  private loadAll(): void {
     this.http.get<Seguradora[]>(this.API).pipe(
       catchError(err => {
         console.warn('Falha ao carregar seguradoras do backend, mantendo mocks', err);
@@ -104,10 +107,6 @@ export class SeguradoraService {
     );
   }
 
-  /**
-   * Remove seguradora somente se não houver nenhum GrupoRamo
-   * com seguradoraId === id. Caso contrário, retorna erro.
-   */
   delete(id: number): Observable<void> {
     return this.grupoService.getAll().pipe(
       take(1),
@@ -133,6 +132,60 @@ export class SeguradoraService {
             return of(void 0);
           })
         );
+      })
+    );
+  }
+
+  /**
+   * DELETE /seguradoras/:segId/enderecos/:idx
+   */
+  deleteEndereco(segId: number, idx: number): Observable<void> {
+    const url = `${this.API}/${segId}/enderecos/${idx}`;
+    return this.http.delete<void>(url).pipe(
+      tap(() => {
+        const list = this._seguradoras$.getValue().map(s => {
+          if (s.id !== segId) return s;
+          const novosEnd = s.enderecos.filter((_, i) => i !== idx);
+          return { ...s, enderecos: novosEnd };
+        });
+        this._seguradoras$.next(list);
+      }),
+      catchError(err => {
+        console.warn('DELETE endereço falhou, removendo localmente', err);
+        const list = this._seguradoras$.getValue().map(s => {
+          if (s.id !== segId) return s;
+          const novosEnd = s.enderecos.filter((_, i) => i !== idx);
+          return { ...s, enderecos: novosEnd };
+        });
+        this._seguradoras$.next(list);
+        return of(void 0);
+      })
+    );
+  }
+
+  /**
+   * DELETE /seguradoras/:segId/contatos/:idx
+   */
+  deleteContato(segId: number, idx: number): Observable<void> {
+    const url = `${this.API}/${segId}/contatos/${idx}`;
+    return this.http.delete<void>(url).pipe(
+      tap(() => {
+        const list = this._seguradoras$.getValue().map(s => {
+          if (s.id !== segId) return s;
+          const novosCont = s.contatos.filter((_, i) => i !== idx);
+          return { ...s, contatos: novosCont };
+        });
+        this._seguradoras$.next(list);
+      }),
+      catchError(err => {
+        console.warn('DELETE contato falhou, removendo localmente', err);
+        const list = this._seguradoras$.getValue().map(s => {
+          if (s.id !== segId) return s;
+          const novosCont = s.contatos.filter((_, i) => i !== idx);
+          return { ...s, contatos: novosCont };
+        });
+        this._seguradoras$.next(list);
+        return of(void 0);
       })
     );
   }

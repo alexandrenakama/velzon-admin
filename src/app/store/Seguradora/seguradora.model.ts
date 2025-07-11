@@ -1,8 +1,13 @@
+// src/app/store/Seguradora/seguradora.model.ts
+
 import { GrupoRamo } from '../Grupo Ramo/grupo-ramo.model';
 
 export type PessoaTipo = 'FISICA' | 'JURIDICA';
 
 export interface Endereco {
+  /** Identificador único do endereço (gerado pelo back-end) */
+  id?:             number;
+
   tipoLogradouro: string;
   logradouro:      string;
   numero:          string;
@@ -15,12 +20,15 @@ export interface Endereco {
 }
 
 export interface Contato {
-  tipoPessoa:   PessoaTipo;
-  ddd:          string;
-  telefone:     string;
-  tipoTelefone: string;
-  email:        string;
-  nomeContato?: string;
+  /** Identificador único do contato (gerado pelo back-end) */
+  id?:            number;
+
+  tipoPessoa:     PessoaTipo;
+  ddd:            string;
+  telefone:       string;
+  tipoTelefone:   string;
+  email:          string;
+  nomeContato?:   string;
 }
 
 export interface Seguradora {
@@ -41,5 +49,4 @@ export interface Seguradora {
 
   /** Contatos associados */
   contatos:  Contato[];
-
 }
