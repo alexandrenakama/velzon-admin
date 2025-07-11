@@ -7,16 +7,13 @@ import {
   NgbAccordionModule,
   NgbDropdownModule,
   NgbToastModule,
-  NgbModalModule
+  NgbModalModule,
+  NgbPaginationModule
 } from '@ng-bootstrap/ng-bootstrap';
 
-// Swiper Slider
-import { SlickCarouselModule }             from 'ngx-slick-carousel';
+import { SlickCarouselModule } from 'ngx-slick-carousel';
+import { CountUpModule }       from 'ngx-countup';
 
-// Counter
-import { CountUpModule }                   from 'ngx-countup';
-
-// Components
 import { BreadcrumbsComponent }            from './breadcrumbs/breadcrumbs.component';
 import { ClientLogoComponent }             from './landing/index/client-logo/client-logo.component';
 import { ServicesComponent }               from './landing/index/services/services.component';
@@ -46,58 +43,54 @@ import { BlogComponent }                   from './landing/job/blog/blog.compone
 import { JobcategoriesComponent }          from './landing/job/jobcategories/jobcategories.component';
 import { JobFooterComponent }              from './landing/job/job-footer/job-footer.component';
 
-// Toasts
 import { ToastsContainer }                 from './toasts/toasts-container.component';
 
-// Directives
 import { ScrollspyDirective }              from './scrollspy.directive';
 import { LandingScrollspyDirective }       from './landingscrollspy.directive';
 
-// Nosso modal de confirmação genérico
 import { ConfirmModalComponent }           from './confirm-modal/confirm-modal.component';
-
-// Máscara de CNPJ
 import { CnpjMaskDirective }               from './cnpj/cnpj-mask.directive';
+
+import { ListaBaseComponent }              from './lista-base/lista-base.component';
+
+const SHARED_DECLARATIONS = [
+  BreadcrumbsComponent,
+  ClientLogoComponent,
+  ServicesComponent,
+  CollectionComponent,
+  CtaComponent,
+  DesignedComponent,
+  PlanComponent,
+  FaqsComponent,
+  ReviewComponent,
+  CounterComponent,
+  WorkProcessComponent,
+  TeamComponent,
+  ContactComponent,
+  FooterComponent,
+  MarketPlaceComponent,
+  WalletComponent,
+  FeaturesComponent,
+  CategoriesComponent,
+  DiscoverComponent,
+  TopCreatorComponent,
+  ProcessComponent,
+  FindjobsComponent,
+  CandidatesComponent,
+  BlogComponent,
+  JobcategoriesComponent,
+  JobFooterComponent,
+  ToastsContainer,
+  ScrollspyDirective,
+  LandingScrollspyDirective,
+  ConfirmModalComponent,
+  CnpjMaskDirective,
+  ListaBaseComponent
+];
 
 @NgModule({
   declarations: [
-    BreadcrumbsComponent,
-    ClientLogoComponent,
-    ServicesComponent,
-    CollectionComponent,
-    CtaComponent,
-    DesignedComponent,
-    PlanComponent,
-    FaqsComponent,
-    ReviewComponent,
-    CounterComponent,
-    WorkProcessComponent,
-    TeamComponent,
-    ContactComponent,
-    FooterComponent,
-
-    MarketPlaceComponent,
-    WalletComponent,
-    FeaturesComponent,
-    CategoriesComponent,
-    DiscoverComponent,
-    TopCreatorComponent,
-
-    ProcessComponent,
-    FindjobsComponent,
-    CandidatesComponent,
-    BlogComponent,
-    JobcategoriesComponent,
-    JobFooterComponent,
-
-    ScrollspyDirective,
-    LandingScrollspyDirective,
-
-    ToastsContainer,
-
-    ConfirmModalComponent,
-
-    CnpjMaskDirective
+    ...SHARED_DECLARATIONS
   ],
   imports: [
     CommonModule,
@@ -106,47 +99,13 @@ import { CnpjMaskDirective }               from './cnpj/cnpj-mask.directive';
     NgbDropdownModule,
     NgbToastModule,
     NgbModalModule,
+    NgbPaginationModule,
     SlickCarouselModule,
     CountUpModule
   ],
   exports: [
-    BreadcrumbsComponent,
-    ClientLogoComponent,
-    ServicesComponent,
-    CollectionComponent,
-    CtaComponent,
-    DesignedComponent,
-    PlanComponent,
-    FaqsComponent,
-    ReviewComponent,
-    CounterComponent,
-    WorkProcessComponent,
-    TeamComponent,
-    ContactComponent,
-    FooterComponent,
-
-    MarketPlaceComponent,
-    WalletComponent,
-    FeaturesComponent,
-    CategoriesComponent,
-    DiscoverComponent,
-    TopCreatorComponent,
-
-    ProcessComponent,
-    FindjobsComponent,
-    CandidatesComponent,
-    BlogComponent,
-    JobcategoriesComponent,
-    JobFooterComponent,
-
-    ScrollspyDirective,
-    LandingScrollspyDirective,
-
-    ToastsContainer,
-
-    ConfirmModalComponent,
-
-    CnpjMaskDirective
+    ...SHARED_DECLARATIONS,
+    NgbPaginationModule
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
