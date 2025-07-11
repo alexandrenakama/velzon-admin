@@ -4,11 +4,11 @@ import { NgModule }             from '@angular/core';
 import { CommonModule }         from '@angular/common';
 import { ReactiveFormsModule }  from '@angular/forms';
 import { RamoRoutingModule }    from './ramo-routing.module';
-import { ListaRamoComponent }   from './lista-ramo/lista-ramo.component';
-import { CadastroRamoComponent }    from './cadastro-ramo/cadastro-ramo.component';
 
-// ng-bootstrap pagination
-import { NgbPaginationModule }  from '@ng-bootstrap/ng-bootstrap';
+import { ListaRamoComponent }   from './lista-ramo/lista-ramo.component';
+import { CadastroRamoComponent }from './cadastro-ramo/cadastro-ramo.component';
+
+import { SharedModule }         from 'src/app/shared/shared.module';
 
 @NgModule({
   declarations: [
@@ -19,7 +19,7 @@ import { NgbPaginationModule }  from '@ng-bootstrap/ng-bootstrap';
     CommonModule,
     ReactiveFormsModule,
     RamoRoutingModule,
-    NgbPaginationModule  
+    SharedModule             
   ]
 })
 export class RamoModule {}
