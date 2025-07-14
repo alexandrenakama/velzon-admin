@@ -4,6 +4,11 @@ import { RouterModule, Routes } from '@angular/router';
 
 const routes: Routes = [
   {
+    path: 'seguradora',
+    loadChildren: () =>
+      import('./seguradora/seguradora.module').then(m => m.SeguradoraModule)
+  },
+  {
     path: 'ramo',
     loadChildren: () =>
       import('./ramo/ramo.module').then(m => m.RamoModule)

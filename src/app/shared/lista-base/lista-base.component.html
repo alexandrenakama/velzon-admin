@@ -1,0 +1,83 @@
+<!-- src/app/shared/lista-base/lista-base.component.html -->
+<div class="d-flex align-items-center mb-3">
+  <div class="input-group me-2" style="max-width:300px">
+    <input #campoBusca type="text" class="form-control" placeholder="Pesquisar..." (input)="aoPesquisar(campoBusca.value)" />
+    <span class="input-group-text"><i class="ri-search-line"></i></span>
+  </div>
+  <ng-container *ngIf="toolbarTpl">
+    <ng-container *ngTemplateOutlet="toolbarTpl"></ng-container>
+  </ng-container>
+</div>
+
+<div class="table-responsive">
+  <table class="table table-bordered text-center align-middle table-nowrap mb-0">
+    <thead class="table-light">
+      <tr>
+        <th *ngFor="let col of colunas" class="sortable" [style.width]="col.largura" (click)="col.ordenavel && aoOrdenar(col.campo)">
+          <span style="display:inline-flex; align-items:center; gap:4px;">
+            {{ col.cabecalho }}
+            <i *ngIf="campoOrdenacao === col.campo" [ngClass]="getIconClasses(col.campo)"></i>
+          </span>
+        </th>
+        <th style="width:150px">Ações</th>
+      </tr>
+    </thead>
+    <tbody>
+      <ng-container *ngIf="itensPaginados.length; else semDados">
+        <tr *ngFor="let item of itensPaginados">
+          <td *ngFor="let col of colunas">
+            <ng-container *ngIf="col.formatoData; else semData">
+              {{ obterPorCaminho(item, col.campo) | date:col.formatoData }}
+            </ng-container>
+            <ng-template #semData>
+              <ng-container [ngSwitch]="col.campo">
+                <ng-container *ngSwitchCase="'ativa'">
+                  <span class="badge" [ngClass]="obterPorCaminho(item,'ativa') ? 'bg-success' : 'bg-danger'">
+                    {{ obterPorCaminho(item,'ativa') ? 'Sim' : 'Não' }}
+                  </span>
+                </ng-container>
+                <ng-container *ngSwitchCase="'ramoAtivo'">
+                  <span class="badge" [ngClass]="obterPorCaminho(item,'ramoAtivo') ? 'bg-success' : 'bg-danger'">
+                    {{ obterPorCaminho(item,'ramoAtivo') ? 'Sim' : 'Não' }}
+                  </span>
+                </ng-container>
+                <ng-container *ngSwitchDefault>
+                  {{ obterPorCaminho(item, col.campo) }}
+                </ng-container>
+              </ng-container>
+            </ng-template>
+          </td>
+          <td>
+            <ng-container *ngTemplateOutlet="acoesTpl; context:{ $implicit: item }"></ng-container>
+          </td>
+        </tr>
+      </ng-container>
+      <ng-template #semDados>
+        <tr>
+          <td [attr.colspan]="colunas.length + 1" class="text-center text-muted">
+            Nenhum registro encontrado.
+          </td>
+        </tr>
+      </ng-template>
+    </tbody>
+  </table>
+</div>
+
+<div class="row justify-content-md-between align-items-md-center mt-3">
+  <div class="col-sm-6">
+    <div class="dataTables_info mb-2" role="status" aria-live="polite">
+      Mostrando {{ (pagina - 1) * tamanhoPagina + 1 }} até
+      {{ pagina * tamanhoPagina > tamanhoColecao
+      ? tamanhoColecao
+      : pagina * tamanhoPagina }}
+      de {{ tamanhoColecao }} entradas
+    </div>
+  </div>
+  <div class="col-sm-6">
+    <!-- só exibe paginação se tiver mais itens que cabem numa página -->
+    <div *ngIf="tamanhoColecao > tamanhoPagina" class="text-sm-right float-sm-end listjs-pagination mt-2 mt-sm-0">
+      <ngb-pagination class="pagination gap-1 mb-0" [collectionSize]="tamanhoColecao" [(page)]="pagina" [pageSize]="tamanhoPagina" (pageChange)="aoMudarPagina($event)" [directionLinks]="true" [boundaryLinks]="true" [ellipses]="false" [maxSize]="3" [rotate]="true" previousText="«" nextText="»">
+      </ngb-pagination>
+    </div>
+  </div>
+</div>

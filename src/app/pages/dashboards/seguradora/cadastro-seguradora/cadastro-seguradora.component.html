@@ -1,0 +1,112 @@
+<!-- src/app/pages/dashboards/seguradora/cadastro-seguradora/cadastro-seguradora.component.html -->
+<div class="row">
+  <div class="col-xl-12">
+    <div class="card">
+
+      <!-- Cabeçalho -->
+      <div class="card-header d-flex align-items-center">
+        <h4 class="card-title mb-0 flex-grow-1">
+          {{ isEdit ? 'Editar Seguradora' : 'Nova Seguradora' }}
+        </h4>
+      </div>
+
+      <div class="card-body">
+        <form [formGroup]="form" (ngSubmit)="save()">
+
+          <!-- 1ª linha: ID + Ativa -->
+          <div class="row g-3 mb-3 align-items-end">
+            <div class="col-md-2">
+              <label for="id" class="form-label">ID</label>
+              <input id="id" type="number" formControlName="id" class="form-control" placeholder="Ex: 123" />
+              <div *ngIf="form.get('id')?.touched && form.get('id')?.invalid" class="form-text text-danger">
+                <span *ngIf="form.get('id')?.hasError('required')">ID é obrigatório.</span>
+                <span *ngIf="form.get('id')?.hasError('pattern')">Deve ser inteiro.</span>
+              </div>
+              <div *ngIf="form.hasError('uniqueId')" class="form-text text-danger">
+                {{ form.getError('uniqueId') }}
+              </div>
+            </div>
+            <div class="col-md-2">
+              <label for="ativaSwitch" class="form-label">Ativa</label>
+              <div class="form-check form-switch">
+                <input id="ativaSwitch" type="checkbox" class="form-check-input" formControlName="ativa" />
+                <label for="ativaSwitch" class="form-check-label">
+                  {{ form.get('ativa')?.value ? 'Sim' : 'Não' }}
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <!-- 2ª linha: Nome + CNPJ -->
+          <div class="row g-3 mb-5">
+            <div class="col-md-8">
+              <label for="nome" class="form-label">Nome da Seguradora</label>
+              <input id="nome" type="text" formControlName="nome" class="form-control" placeholder="Digite o nome da seguradora" />
+              <div *ngIf="form.get('nome')?.touched && form.get('nome')?.invalid" class="form-text text-danger">
+                Nome é obrigatório.
+              </div>
+            </div>
+            <div class="col-md-4">
+              <label for="cnpj" class="form-label">CNPJ</label>
+              <input id="cnpj" type="text" formControlName="cnpj" mascara="cnpj" maxlength="18" class="form-control" placeholder="00.000.000/0000-00" />
+              <div *ngIf="form.get('cnpj')?.touched && form.get('cnpj')?.invalid" class="form-text text-danger">
+                <span *ngIf="form.get('cnpj')?.hasError('required')">CNPJ é obrigatório.</span>
+                <span *ngIf="form.get('cnpj')?.hasError('pattern')">Formato inválido.</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- ENDEREÇOS (com mais espaço acima) -->
+          <div class="mb-4 mt-4">
+            <app-lista-base [todosItens]="enderecos.value" [colunas]="colunasEndereco" [tamanhoPagina]="5" (editar)="onEditarEndereco($event)" (apagar)="onApagarEndereco($event)">
+              <ng-template #toolbarTpl>
+                <button type="button" class="btn btn-secondary" (click)="openAddEndereco()">
+                  + Novo Endereço
+                </button>
+              </ng-template>
+              <ng-template #acoesTpl let-item>
+                <button type="button" class="btn btn-sm btn-light me-1" (click)="onEditarEndereco(item)">
+                  Editar
+                </button>
+                <button type="button" class="btn btn-sm btn-danger" (click)="onApagarEndereco(item)">
+                  Apagar
+                </button>
+              </ng-template>
+            </app-lista-base>
+          </div>
+
+          <!-- CONTATOS -->
+          <div class="mb-4">
+            <app-lista-base [todosItens]="contatos.value" [colunas]="colunasContato" [tamanhoPagina]="5" (editar)="onEditarContato($event)" (apagar)="onApagarContato($event)">
+              <ng-template #toolbarTpl>
+                <button type="button" class="btn btn-secondary" (click)="openAddContato()">
+                  + Novo Contato
+                </button>
+              </ng-template>
+              <ng-template #acoesTpl let-item>
+                <button type="button" class="btn btn-sm btn-light me-1" (click)="onEditarContato(item)">
+                  Editar
+                </button>
+                <button type="button" class="btn btn-sm btn-danger" (click)="onApagarContato(item)">
+                  Apagar
+                </button>
+              </ng-template>
+            </app-lista-base>
+          </div>
+
+          <!-- AÇÕES FINAIS -->
+          <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-primary" [disabled]="isEdit ? !form.dirty || form.invalid : form.invalid">
+              {{ isEdit ? 'Atualizar' : 'Salvar' }}
+            </button>
+            <button type="button" class="btn btn-secondary" (click)="cancel()">Cancelar</button>
+            <button *ngIf="isEdit" type="button" class="btn btn-outline-secondary" routerLink="/seguradora/cadastro">
+              + Nova Seguradora
+            </button>
+          </div>
+
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

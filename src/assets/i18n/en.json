@@ -11,6 +11,7 @@
     "CADASTROS": {
       "TEXT": "Cadastros",
       "LIST": {
+        "SEGURADORA": "Seguradora",
         "GRUPO_RAMO": "Grupo Ramo",
         "RAMO": "Ramo"
       }

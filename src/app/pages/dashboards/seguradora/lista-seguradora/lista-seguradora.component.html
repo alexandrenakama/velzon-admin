@@ -1,15 +1,22 @@
-<!-- src/app/pages/dashboards/ramo/lista-ramo/lista-ramo.component.html -->
+<!-- src/app/pages/dashboards/seguradora/lista-seguradora/lista-seguradora.component.html -->
 <div class="row">
   <div class="col-xl-12">
     <div class="card">
+
+      <!-- Cabeçalho -->
       <div class="card-header">
-        <h4 class="card-title mb-0">Ramos Cadastrados</h4>
+        <h4 class="card-title mb-0">Seguradoras Cadastradas</h4>
       </div>
+
       <div class="card-body">
-        <app-lista-base #listaBase [todosItens]="allRamos" [colunas]="colunas" (editar)="onEdit($event)" (apagar)="onDelete($event)">
+        <!-- Componente genérico de listagem -->
+        <app-lista-base #listaBase [todosItens]="allSeguradoras" [colunas]="colunas" (editar)="onEdit($event)" (apagar)="onDelete($event)">
+          <!-- Toolbar: botão “+ Nova Seguradora” -->
           <ng-template #toolbarTpl>
-            <a class="btn btn-secondary" routerLink="cadastro">+ Novo Ramo</a>
+            <a class="btn btn-secondary" routerLink="cadastro">+ Nova Seguradora</a>
           </ng-template>
+
+          <!-- Ações por linha: Editar / Apagar -->
           <ng-template #acoesTpl let-item>
             <button class="btn btn-sm btn-light me-1" (click)="listaBase.editar.emit(item)">
               Editar
@@ -20,6 +27,7 @@
           </ng-template>
         </app-lista-base>
       </div>
+
     </div>
   </div>
 </div>

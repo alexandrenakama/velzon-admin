@@ -1,4 +1,5 @@
 // src/app/core/services/grupo-ramo.service.ts
+
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, of } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
@@ -12,11 +13,11 @@ export class GrupoRamoService {
 
   /** Mock inicial — futuramente virá do backend */
   private _groups$ = new BehaviorSubject<GrupoRamo[]>([
-    { id: 11, nome: 'Seguro Agrícola' },
-    { id: 12, nome: 'Seguro Residencial' },
-    { id: 21, nome: 'Seguro Auto' },
-    { id: 22, nome: 'Seguro Vida' },
-    { id: 31, nome: 'Seguro Saúde' }
+    { id: 11, nome: 'Seguro Agrícola',    seguradoraId: 1 },
+    { id: 12, nome: 'Seguro Residencial', seguradoraId: 1 },
+    { id: 21, nome: 'Seguro Automotivo',  seguradoraId: 1 },
+    { id: 22, nome: 'Seguro Vida',        seguradoraId: 1 },
+    { id: 31, nome: 'Seguro Saúde',       seguradoraId: 1 }
   ]);
 
   /** Observable público de grupos */

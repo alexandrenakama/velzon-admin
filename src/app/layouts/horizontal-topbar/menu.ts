@@ -14,6 +14,12 @@ export const MENU: MenuItem[] = [
     icon: 'ri-dashboard-2-line',
     subItems: [
       {
+        id: 11,
+        label: 'MENUITEMS.CADASTROS.LIST.SEGURADORA',
+        link: '/seguradora',
+        parentId: 2
+      },
+      {
         id: 4,
         label: 'MENUITEMS.CADASTROS.LIST.GRUPO_RAMO',
         link: '/grupo-ramo',
