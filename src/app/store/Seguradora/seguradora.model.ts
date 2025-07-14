@@ -2,7 +2,7 @@
 
 import { GrupoRamo } from '../Grupo Ramo/grupo-ramo.model';
 
-export type PessoaTipo = 'FISICA' | 'JURIDICA';
+export type PessoaTipo = 'Física' | 'Jurídica';
 
 export interface Endereco {
   id?:             number;

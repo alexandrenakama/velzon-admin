@@ -35,10 +35,10 @@ export class SeguradoraService {
       contatos: [
         {
           id:            1,
-          tipoPessoa:   'JURIDICA',
+          tipoPessoa:   'Física',
           ddd:          '11',
           telefone:     '987654321',
-          tipoTelefone: 'Celular',
+          tipoTelefone: 'Residencial',
           email:        'contato@porto.com.br',
           nomeContato:  'Maria Silva'
         }

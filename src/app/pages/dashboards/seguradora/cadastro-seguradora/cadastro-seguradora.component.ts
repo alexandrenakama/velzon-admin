@@ -1,3 +1,4 @@
+// src/app/pages/dashboards/seguradora/cadastro-seguradora/cadastro-seguradora.component.ts
 import { Component, OnInit } from '@angular/core';
 import {
   FormBuilder, FormGroup, FormArray,
@@ -10,6 +11,8 @@ import { Seguradora, Endereco, Contato } from 'src/app/store/Seguradora/segurado
 import { SeguradoraService } from 'src/app/core/services/seguradora.service';
 import { ToastService } from 'src/app/shared/toasts/toast-service';
 import { ConfirmModalComponent } from 'src/app/shared/confirm-modal/confirm-modal.component';
+import { EnderecoModalComponent } from './modal/endereco-modal.component';
+import { ContatoModalComponent } from './modal/contato-modal.component';
 import { DefinicaoColuna } from 'src/app/shared/lista-base/lista-base.component';
 
 @Component({
@@ -70,7 +73,7 @@ export class CadastroSeguradoraComponent implements OnInit {
         ativa: seg.ativa,
         cnpj: seg.cnpj
       });
-      this.form.get('id')?.disable(); 
+      this.form.get('id')?.disable();
       this.enderecos.clear();
       seg.enderecos.forEach(e => this.enderecos.push(this.fb.group(e)));
       this.contatos.clear();
@@ -102,121 +105,102 @@ export class CadastroSeguradoraComponent implements OnInit {
     return this.form.get('contatos') as FormArray;
   }
 
-  private buildEnderecoGroup(): FormGroup {
-    return this.fb.group({
-      id: [null],
-      tipoLogradouro: ['', Validators.required],
-      logradouro: ['', Validators.required],
-      numero: ['', Validators.required],
-      complemento: [''],
-      bairro: ['', Validators.required],
-      cidade: ['', Validators.required],
-      uf: ['', Validators.required],
-      cep: ['', Validators.required],
-      tipoEndereco: ['', Validators.required]
-    });
-  }
-
-  private buildContatoGroup(): FormGroup {
-    return this.fb.group({
-      id: [null],
-      tipoPessoa: ['FISICA', Validators.required],
-      ddd: ['', Validators.required],
-      telefone: ['', Validators.required],
-      tipoTelefone: ['', Validators.required],
-      email: ['', [Validators.required, Validators.email]],
-      nomeContato: ['']
-    });
-  }
-
   openAddEndereco(): void {
-    this.enderecos.push(this.buildEnderecoGroup());
+    const modalRef = this.modal.open(EnderecoModalComponent, { centered: true, backdrop: 'static' });
+    modalRef.componentInstance.endereco = null;
+    modalRef.result.then((novo: Endereco) => {
+      this.enderecos.push(this.fb.group(novo));
+    }).catch(() => {});
   }
 
-  openAddContato(): void {
-    this.contatos.push(this.buildContatoGroup());
-  }
-
-  onEditarEndereco(e: Endereco): void {}
-
-  onEditarContato(c: Contato): void {}
-
-  onApagarEndereco(e: Endereco): void {
-    const lista: Endereco[] = this.enderecos.value as Endereco[];
-    const idx = lista.findIndex(x => x.id === e.id);
+  onEditarEndereco(e: Endereco): void {
+    const idx = (this.enderecos.value as Endereco[]).findIndex(x => x.id === e.id);
     if (idx < 0) return;
 
+    const modalRef = this.modal.open(EnderecoModalComponent, { centered: true, backdrop: 'static' });
+    modalRef.componentInstance.endereco = e;
+    modalRef.result.then((editado: Endereco) => {
+      this.enderecos.at(idx).patchValue(editado);
+      const v = this.form.getRawValue();
+      const seg: Seguradora = {
+        id: +v.id, nome: v.nome, ativa: v.ativa, cnpj: v.cnpj,
+        enderecos: v.enderecos, contatos: v.contatos
+      };
+      this.service.update(seg).subscribe({
+        next: () => this.toast.show('Endereço atualizado com sucesso.', { classname: 'bg-info text-light', delay: 3000 }),
+        error: () => this.toast.show('Falha ao atualizar endereço.', { classname: 'bg-warning text-dark', delay: 5000 })
+      });
+    }).catch(() => {});
+  }
+
+  onApagarEndereco(e: Endereco): void {
+    const idx = (this.enderecos.value as Endereco[]).findIndex(x => x.id === e.id);
+    if (idx < 0) return;
     const ref = this.modal.open(ConfirmModalComponent, { centered: true, backdrop: 'static' });
     ref.componentInstance.title = 'Confirma exclusão';
     ref.componentInstance.message = `Deseja realmente apagar o endereço “${e.tipoLogradouro} ${e.logradouro}, ${e.numero}”?`;
     ref.componentInstance.confirmText = 'Apagar';
     ref.componentInstance.cancelText = 'Cancelar';
-
     ref.result.then(ok => {
       if (!ok) return;
-
-      this.toast.show('Endereço apagado com sucesso.', {
-        classname: 'bg-danger text-light', delay: 3000
-      });
-
-      this.enderecos.removeAt(idx);
-
       const v = this.form.getRawValue();
       const seg: Seguradora = {
-        id: +v.id,
-        nome: v.nome,
-        ativa: v.ativa,
-        cnpj: v.cnpj,
-        enderecos: v.enderecos,
-        contatos: v.contatos
+        id: +v.id, nome: v.nome, ativa: v.ativa, cnpj: v.cnpj,
+        enderecos: v.enderecos, contatos: v.contatos
       };
+      this.service.deleteEndereco(seg.id, idx).subscribe({
+        next: () => {
+          this.enderecos.removeAt(idx);
+          this.toast.show('Endereço apagado com sucesso.', { classname: 'bg-danger text-light', delay: 3000 });
+        },
+        error: () => this.toast.show('Falha ao apagar endereço.', { classname: 'bg-warning text-dark', delay: 5000 })
+      });
+    }).catch(() => {});
+  }
 
+  openAddContato(): void {
+    const modalRef = this.modal.open(ContatoModalComponent, { centered: true, backdrop: 'static' });
+    modalRef.componentInstance.contato = null;
+    modalRef.result.then((novo: Contato) => {
+      this.contatos.push(this.fb.group(novo));
+    }).catch(() => {});
+  }
+
+  onEditarContato(c: Contato): void {
+    const idx = (this.contatos.value as Contato[]).findIndex(x => x.id === c.id);
+    if (idx < 0) return;
+    const modalRef = this.modal.open(ContatoModalComponent, { centered: true, backdrop: 'static' });
+    modalRef.componentInstance.contato = c;
+    modalRef.result.then((editado: Contato) => {
+      this.contatos.at(idx).patchValue(editado);
+      const v = this.form.getRawValue();
+      const seg: Seguradora = {
+        id: +v.id, nome: v.nome, ativa: v.ativa, cnpj: v.cnpj,
+        enderecos: v.enderecos, contatos: v.contatos
+      };
       this.service.update(seg).subscribe({
-        error: () => {
-          this.toast.show('Falha ao apagar endereço. Tente novamente.', {
-            classname: 'bg-warning text-dark', delay: 5000
-          });
-        }
+        next: () => this.toast.show('Contato atualizado com sucesso.', { classname: 'bg-info text-light', delay: 3000 }),
+        error: () => this.toast.show('Falha ao atualizar contato.', { classname: 'bg-warning text-dark', delay: 5000 })
       });
     }).catch(() => {});
   }
 
   onApagarContato(c: Contato): void {
-    const lista: Contato[] = this.contatos.value as Contato[];
-    const idx = lista.findIndex(x => x.id === c.id);
+    const idx = (this.contatos.value as Contato[]).findIndex(x => x.id === c.id);
     if (idx < 0) return;
-
     const ref = this.modal.open(ConfirmModalComponent, { centered: true, backdrop: 'static' });
     ref.componentInstance.title = 'Confirma exclusão';
     ref.componentInstance.message = `Deseja realmente apagar o contato “${c.email}”?`;
     ref.componentInstance.confirmText = 'Apagar';
     ref.componentInstance.cancelText = 'Cancelar';
-
     ref.result.then(ok => {
       if (!ok) return;
-
-      this.toast.show('Contato apagado com sucesso.', {
-        classname: 'bg-danger text-light', delay: 3000
-      });
-
-      this.contatos.removeAt(idx);
-
-      const v = this.form.getRawValue();
-      const seg: Seguradora = {
-        id: +v.id,
-        nome: v.nome,
-        ativa: v.ativa,
-        cnpj: v.cnpj,
-        enderecos: v.enderecos,
-        contatos: v.contatos
-      };
-
-      this.service.update(seg).subscribe({
-        error: () => {
-          this.toast.show('Falha ao apagar contato. Tente novamente.', {
-            classname: 'bg-warning text-dark', delay: 5000
-          });
-        }
+      this.service.deleteContato(+this.form.getRawValue().id, idx).subscribe({
+        next: () => {
+          this.contatos.removeAt(idx);
+          this.toast.show('Contato apagado com sucesso.', { classname: 'bg-danger text-light', delay: 3000 });
+        },
+        error: () => this.toast.show('Falha ao apagar contato.', { classname: 'bg-warning text-dark', delay: 5000 })
       });
     }).catch(() => {});
   }
@@ -236,38 +220,26 @@ export class CadastroSeguradoraComponent implements OnInit {
       this.form.markAllAsTouched();
       return;
     }
-
     const v = this.form.getRawValue();
     const seg: Seguradora = {
-      id: +v.id,
-      nome: v.nome,
-      ativa: v.ativa,
-      cnpj: v.cnpj,
-      enderecos: v.enderecos,
-      contatos: v.contatos
+      id: +v.id, nome: v.nome, ativa: v.ativa, cnpj: v.cnpj,
+      enderecos: v.enderecos, contatos: v.contatos
     };
-
     const op$ = this.isEdit ? this.service.update(seg) : this.service.create(seg);
     op$.subscribe({
       next: () => {
-        const msg = this.isEdit
-          ? `Seguradora "${seg.nome}" atualizada!`
-          : `Seguradora "${seg.nome}" criada!`;
-
-        this.toast.show(msg, {
-          classname: this.isEdit ? 'bg-info text-light' : 'bg-success text-light',
-          delay: 5000
-        });
-
-        if (!this.isEdit) {
-          this.router.navigate(['/seguradora']);
-        }
+        this.toast.show(
+          this.isEdit
+            ? `Seguradora "${seg.nome}" atualizada!`
+            : `Seguradora "${seg.nome}" criada!`,
+          {
+            classname: this.isEdit ? 'bg-info text-light' : 'bg-success text-light',
+            delay: 5000
+          }
+        );
+        if (!this.isEdit) this.router.navigate(['/seguradora']);
       },
-      error: () => {
-        this.toast.show('Erro ao salvar seguradora.', {
-          classname: 'bg-warning text-dark', delay: 5000
-        });
-      }
+      error: () => this.toast.show('Erro ao salvar seguradora.', { classname: 'bg-warning text-dark', delay: 5000 })
     });
   }
 
