@@ -5,7 +5,7 @@ import { catchError, tap, switchMap, take } from 'rxjs/operators';
 import { HttpClient } from '@angular/common/http';
 import { environment } from 'src/environments/environment';
 
-import { Seguradora, Endereco, Contato } from 'src/app/store/Seguradora/seguradora.model';
+import { Seguradora, Endereco, Contato, PessoaTipo } from 'src/app/store/Seguradora/seguradora.model';
 import { GrupoRamoService }               from './grupo-ramo.service';
 
 @Injectable({ providedIn: 'root' })
@@ -14,11 +14,12 @@ export class SeguradoraService {
 
   private _seguradoras$ = new BehaviorSubject<Seguradora[]>([
     {
-      id:      1,
-      nome:    'Porto Seguros',
-      ativa:   true,
-      cnpj:    '12.345.678/0001-95',
-      enderecos: [
+      id:         1,
+      nome:       'Porto Seguros',
+      tipoPessoa: 'Jurídica' as PessoaTipo,
+      ativa:      true,
+      cnpj:       '12.345.678/0001-95',
+      enderecos:  [
         {
           id:              1,
           tipoLogradouro: 'Rua',
@@ -34,8 +35,7 @@ export class SeguradoraService {
       ],
       contatos: [
         {
-          id:            1,
-          tipoPessoa:   'Física',
+          id:           1,
           ddd:          '11',
           telefone:     '987654321',
           tipoTelefone: 'Residencial',
@@ -136,9 +136,6 @@ export class SeguradoraService {
     );
   }
 
-  /**
-   * DELETE /seguradoras/:segId/enderecos/:idx
-   */
   deleteEndereco(segId: number, idx: number): Observable<void> {
     const url = `${this.API}/${segId}/enderecos/${idx}`;
     return this.http.delete<void>(url).pipe(
@@ -163,9 +160,6 @@ export class SeguradoraService {
     );
   }
 
-  /**
-   * DELETE /seguradoras/:segId/contatos/:idx
-   */
   deleteContato(segId: number, idx: number): Observable<void> {
     const url = `${this.API}/${segId}/contatos/${idx}`;
     return this.http.delete<void>(url).pipe(

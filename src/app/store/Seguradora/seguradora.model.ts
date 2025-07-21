@@ -1,37 +1,37 @@
 // src/app/store/Seguradora/seguradora.model.ts
 
-import { GrupoRamo } from '../Grupo Ramo/grupo-ramo.model';
-
+// tipo de pessoa (pessoa física ou jurídica), agora aplicável à Seguradora
 export type PessoaTipo = 'Física' | 'Jurídica';
 
 export interface Endereco {
-  id?:             number;
-  tipoLogradouro: string;
-  logradouro:      string;
-  numero:          string;
-  complemento?:    string;
-  bairro:          string;
-  cidade:          string;
-  uf:              string;
-  cep:             string;
-  tipoEndereco:    string;
+  id?:           number;
+  tipoLogradouro:string;
+  logradouro:    string;
+  numero:        string;
+  complemento?:  string;
+  bairro:        string;
+  cidade:        string;
+  uf:            string;
+  cep:           string;
+  tipoEndereco:  string;
 }
 
 export interface Contato {
-  id?:            number;
-  tipoPessoa:     PessoaTipo;
-  ddd:            string;
-  telefone:       string;
-  tipoTelefone:   string;
-  email:          string;
-  nomeContato?:   string;
+  id?:           number;
+  ddd:           string;
+  telefone:      string;
+  tipoTelefone:  string;
+  email:         string;
+  nomeContato?:  string;
 }
 
+// agora a Seguradora tem seu tipo de pessoa
 export interface Seguradora {
-  id:        number;
-  nome:      string;
-  ativa:     boolean;
-  cnpj:      string;
-  enderecos: Endereco[];
-  contatos:  Contato[];
+  id:          number;
+  nome:        string;
+  tipoPessoa:  PessoaTipo;
+  ativa:       boolean;
+  cnpj:        string;
+  enderecos:   Endereco[];
+  contatos:    Contato[];
 }

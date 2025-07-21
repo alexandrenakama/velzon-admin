@@ -20,8 +20,7 @@ export class ContatoModalComponent implements OnInit {
   ngOnInit(): void {
     this.form = this.fb.group({
       id:           [this.contato?.id || null],
-      nomeContato:  [this.contato?.nomeContato || ''],
-      tipoPessoa:   [this.contato?.tipoPessoa || 'Física', Validators.required],
+      nomeContato:  [this.contato?.nomeContato || '', Validators.required],
       ddd:          [this.contato?.ddd         || '', Validators.required],
       telefone:     [this.contato?.telefone    || '', Validators.required],
       tipoTelefone: [this.contato?.tipoTelefone|| '', Validators.required],

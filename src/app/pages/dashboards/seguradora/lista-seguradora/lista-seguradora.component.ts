@@ -1,3 +1,4 @@
+// src/app/pages/dashboards/seguradora/lista-seguradora/lista-seguradora.component.ts
 import { Component, OnInit }      from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { NgbModal }               from '@ng-bootstrap/ng-bootstrap';
@@ -16,67 +17,60 @@ import { DefinicaoColuna }        from 'src/app/shared/lista-base/lista-base.com
   styleUrls: ['./lista-seguradora.component.scss']
 })
 export class ListaSeguradoraComponent implements OnInit {
-  /** dados puros */
   allSeguradoras: Seguradora[] = [];
 
-  /** colunas que vão para o <app-lista-base> */
   colunas: DefinicaoColuna[] = [
-    { campo: 'id',    cabecalho: 'ID',    ordenavel: true, largura: '80px' },
-    { campo: 'nome',  cabecalho: 'Nome',  ordenavel: true },
-    { campo: 'cnpj',  cabecalho: 'CNPJ',  ordenavel: true },
-    { campo: 'ativa', cabecalho: 'Ativa', ordenavel: true, largura: '100px' }
+    { campo: 'id',          cabecalho: 'ID',            ordenavel: true, largura: '80px'  },
+    { campo: 'nome',        cabecalho: 'Nome',          ordenavel: true              },
+    { campo: 'tipoPessoa',  cabecalho: 'Tipo Pessoa',   ordenavel: true, largura: '120px' },
+    { campo: 'cnpj',        cabecalho: 'Documento',     ordenavel: true              },
+    { campo: 'ativa',       cabecalho: 'Ativa',         ordenavel: true, largura: '100px' }
   ];
 
   constructor(
-    private service:       SeguradoraService,
-    private grupoRamoSvc:  GrupoRamoService,
-    private router:        Router,
-    private route:         ActivatedRoute,
-    private toast:         ToastService,
-    private modal:         NgbModal
+    private service:      SeguradoraService,
+    private grupoRamoSvc: GrupoRamoService,
+    private router:       Router,
+    private route:        ActivatedRoute,
+    private toast:        ToastService,
+    private modal:        NgbModal
   ) {}
 
   ngOnInit(): void {
-    this.service.getAll().subscribe(list => {
-      this.allSeguradoras = list;
-    });
+    this.service.getAll().subscribe(list => this.allSeguradoras = list);
   }
 
-  /** dispara ao clicar em “Editar” no componente genérico */
   onEdit(s: Seguradora) {
     this.router.navigate([ s.id, 'editar' ], { relativeTo: this.route });
   }
 
-  /** dispara ao clicar em “Apagar” no componente genérico */
   onDelete(s: Seguradora) {
-    this.grupoRamoSvc.getAll().subscribe(allGroups => {
-      const vinculados = allGroups.filter(g => g.seguradoraId === s.id).length;
+    this.grupoRamoSvc.getAll().subscribe(allG => {
+      const vinculados = allG.filter(g => g.seguradoraId === s.id).length;
       if (vinculados > 0) {
         this.toast.show(
-          `Falha ao apagar seguradora. Você tem ${vinculados} grupo(s) de ramo vinculados.`,
+          `Não foi possível apagar. Há ${vinculados} grupo(s) vinculados.`,
           { classname: 'bg-warning text-dark', delay: 6000 }
         );
         return;
       }
       const ref = this.modal.open(ConfirmModalComponent, { centered: true, backdrop: 'static' });
       ref.componentInstance.title       = 'Confirma exclusão';
-      ref.componentInstance.message     = `Deseja realmente apagar a seguradora “${s.nome}”?`;
+      ref.componentInstance.message     = `Deseja realmente apagar “${s.nome}”?`;
       ref.componentInstance.confirmText = 'Apagar';
       ref.componentInstance.cancelText  = 'Cancelar';
-
-      ref.result.then((ok: boolean) => {
+      ref.result.then(ok => {
         if (!ok) return;
         this.service.delete(s.id).subscribe({
           next: () => {
             this.toast.show(
-              `Seguradora “${s.nome}” apagada com sucesso!`,
+              `Seguradora “${s.nome}” apagada.`,
               { classname: 'bg-danger text-light', delay: 5000 }
             );
-            // atualiza lista
             this.allSeguradoras = this.allSeguradoras.filter(x => x.id !== s.id);
           },
           error: () => this.toast.show(
-            'Falha ao apagar seguradora. Tente novamente.',
+            'Erro ao apagar. Tente novamente.',
             { classname: 'bg-warning text-dark', delay: 5000 }
           )
         });

@@ -1,14 +1,11 @@
-<!-- src/app/pages/dashboards/grupo-ramo/cadastro-grupo-ramo/cadastro-grupo-ramo.component.html -->
 <div class="row">
   <div class="col-xl-12">
     <div class="card">
-
       <div class="card-header d-flex align-items-center">
         <h4 class="card-title mb-0 flex-grow-1">
           {{ isEdit ? 'Editar Grupo de Ramo' : 'Novo Grupo de Ramo' }}
         </h4>
       </div>
-
       <div class="card-body">
         <form [formGroup]="form" (ngSubmit)="save()">
 
@@ -17,15 +14,19 @@
             <label for="id" class="form-label">ID</label>
             <input id="id" type="number" formControlName="id" class="form-control" placeholder="Ex: 10" [readonly]="isEdit" />
             <div *ngIf="form.get('id')?.touched && form.get('id')?.invalid" class="form-text text-danger">
-              <span *ngIf="form.get('id')?.hasError('required')">ID é obrigatório.</span>
-              <span *ngIf="form.get('id')?.hasError('pattern')">Deve ser um número inteiro.</span>
+              <span *ngIf="form.get('id')?.hasError('required')">
+                ID é obrigatório.
+              </span>
+              <span *ngIf="form.get('id')?.hasError('pattern')">
+                Deve ser um número inteiro.
+              </span>
             </div>
             <div *ngIf="form.hasError('uniqueId')" class="form-text text-danger">
               {{ form.getError('uniqueId') }}
             </div>
           </div>
 
-          <!-- Nome -->
+          <!-- Nome do Grupo -->
           <div class="mb-4">
             <label for="nome" class="form-label">Nome do Grupo</label>
             <input id="nome" type="text" formControlName="nome" class="form-control" placeholder="Ex: Seguro Auto" />
@@ -34,22 +35,24 @@
             </div>
           </div>
 
-          <!-- Seguradora -->
+          <!-- Seguradora com visual de SELECT -->
           <div class="mb-4 position-relative">
             <label for="seguradoraSearch" class="form-label">Seguradora</label>
-            <input id="seguradoraSearch" type="text" class="form-select" formControlName="seguradoraNome" [ngbTypeahead]="searchSeguradora" [resultFormatter]="formatter" [inputFormatter]="formatter" [minLength]="0" (click)="openDropdown($event)" (selectItem)="onSelectSeguradora($event)" placeholder="Buscar seguradora (nome ou número)" autocomplete="off" />
+            <input id="seguradoraSearch" type="text" class="form-select dropdown-toggle" formControlName="seguradora" [ngbTypeahead]="searchSeguradora" [resultFormatter]="formatter" [inputFormatter]="formatter" [minLength]="0" (click)="openDropdown($event)" (selectItem)="onSelectSeguradora($event)" placeholder="Buscar seguradora (nome ou número)" autocomplete="off" />
             <input type="hidden" formControlName="seguradoraId" />
-            <div *ngIf="form.get('seguradoraId')?.touched && form.get('seguradoraId')?.invalid" class="form-text text-danger">
+            <div *ngIf="form.get('seguradora')?.touched && form.get('seguradora')?.invalid" class="form-text text-danger">
               Seguradora é obrigatória.
             </div>
           </div>
 
           <!-- Botões -->
           <div class="d-flex gap-2">
-            <button type="submit" class="btn btn-primary" [disabled]="isEdit ? (form.invalid || form.pristine) : form.invalid">
+            <button type="submit" class="btn btn-primary" [disabled]="isEdit ? (form.invalid || form.pristine) : false">
               {{ isEdit ? 'Atualizar' : 'Salvar' }}
             </button>
-            <button type="button" class="btn btn-secondary" (click)="cancel()">Cancelar</button>
+            <button type="button" class="btn btn-secondary" (click)="cancel()">
+              Cancelar
+            </button>
             <button *ngIf="isEdit" type="button" class="btn btn-outline-secondary" routerLink="/grupo-ramo/cadastro">
               + Novo Grupo
             </button>

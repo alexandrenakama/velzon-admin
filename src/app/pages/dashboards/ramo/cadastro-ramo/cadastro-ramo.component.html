@@ -1,4 +1,3 @@
-<!-- src/app/pages/dashboards/ramo/cadastro-ramo/cadastro-ramo.component.html -->
 <div class="row">
   <div class="col-xl-12">
     <div class="card">
@@ -13,12 +12,12 @@
       <div class="card-body">
         <form [formGroup]="form" (ngSubmit)="save()">
 
-          <!-- Grupo -->
+          <!-- Grupo com visual de SELECT -->
           <div class="mb-3 position-relative">
             <label for="grupoSearch" class="form-label">Grupo</label>
-            <input id="grupoSearch" type="text" class="form-select" formControlName="grupoNome" [ngbTypeahead]="searchGrupo" [resultFormatter]="formatter" [inputFormatter]="formatter" [minLength]="0" (click)="openDropdown($event)" (selectItem)="onSelectGrupo($event)" placeholder="Buscar grupo (nome ou número)" autocomplete="off" />
+            <input id="grupoSearch" type="text" class="form-select dropdown-toggle" formControlName="grupo" [ngbTypeahead]="searchGrupo" [resultFormatter]="formatter" [inputFormatter]="formatter" [minLength]="0" (click)="openDropdown($event)" (selectItem)="onSelectGrupo($event)" placeholder="Buscar grupo (nome ou número)" autocomplete="off" />
             <input type="hidden" formControlName="grupoId" />
-            <div *ngIf="form.get('grupoId')?.touched && form.get('grupoId')?.invalid" class="form-text text-danger">
+            <div *ngIf="form.get('grupo')?.touched && form.get('grupo')?.invalid" class="form-text text-danger">
               Grupo é obrigatório.
             </div>
           </div>
@@ -26,11 +25,17 @@
           <!-- Identificador / Código -->
           <div class="row g-3 mb-3">
             <div class="col-md-6">
-              <label for="identificadorRamo" class="form-label">Identificador do Ramo</label>
+              <label for="identificadorRamo" class="form-label">
+                Identificador do Ramo
+              </label>
               <input id="identificadorRamo" type="number" class="form-control" formControlName="identificadorRamo" placeholder="Ex: 12" [disabled]="isEdit" />
               <div *ngIf="form.get('identificadorRamo')?.touched && form.get('identificadorRamo')?.invalid" class="form-text text-danger">
-                <span *ngIf="form.get('identificadorRamo')?.hasError('required')">Identificador é obrigatório.</span>
-                <span *ngIf="form.get('identificadorRamo')?.hasError('pattern')">Deve ser um número inteiro.</span>
+                <span *ngIf="form.get('identificadorRamo')?.hasError('required')">
+                  Identificador é obrigatório.
+                </span>
+                <span *ngIf="form.get('identificadorRamo')?.hasError('pattern')">
+                  Deve ser um número inteiro.
+                </span>
               </div>
               <div *ngIf="form.hasError('uniqueIdentificador')" class="form-text text-danger">
                 {{ form.getError('uniqueIdentificador') }}
@@ -38,7 +43,7 @@
             </div>
             <div class="col-md-6">
               <label for="codigoRamo" class="form-label">Código do Ramo</label>
-              <input id="codigoRamo" type="text" class="form-control" formControlName="codigoRamo" placeholder="—" readonly />
+              <input id="codigoRamo" type="text" class="form-control" formControlName="codigoRamo" readonly />
             </div>
           </div>
 
@@ -61,14 +66,14 @@
           <div class="row g-3 mb-3">
             <div class="col-md-6">
               <label for="inicioVigencia" class="form-label">Início de Vigência</label>
-              <input #inicioDate id="inicioVigencia" type="date" class="form-control" formControlName="inicioVigencia" placeholder="dd/mm/aaaa" (click)="openInicioPicker()" />
+              <input #inicioDate id="inicioVigencia" type="date" class="form-control" formControlName="inicioVigencia" (click)="openInicioPicker()" />
               <div *ngIf="form.get('inicioVigencia')?.touched && form.get('inicioVigencia')?.invalid" class="form-text text-danger">
                 Início de vigência é obrigatório.
               </div>
             </div>
             <div class="col-md-6">
               <label for="fimVigencia" class="form-label">Fim de Vigência</label>
-              <input #fimDate id="fimVigencia" type="date" class="form-control" formControlName="fimVigencia" placeholder="dd/mm/aaaa" [min]="form.get('inicioVigencia')?.value" (click)="openFimPicker()" />
+              <input #fimDate id="fimVigencia" type="date" class="form-control" formControlName="fimVigencia" [min]="form.get('inicioVigencia')?.value" (click)="openFimPicker()" />
               <div *ngIf="form.get('fimVigencia')?.touched && form.get('fimVigencia')?.invalid" class="form-text text-danger">
                 Fim de vigência é obrigatório.
               </div>
@@ -89,7 +94,9 @@
             <button type="submit" class="btn btn-primary" [disabled]="isEdit ? (form.invalid || form.pristine) : false">
               {{ isEdit ? 'Atualizar' : 'Salvar' }}
             </button>
-            <button type="button" class="btn btn-secondary" (click)="cancel()">Cancelar</button>
+            <button type="button" class="btn btn-secondary" (click)="cancel()">
+              Cancelar
+            </button>
             <button *ngIf="isEdit" type="button" class="btn btn-outline-secondary" routerLink="/ramo/cadastro">
               + Novo Ramo
             </button>
