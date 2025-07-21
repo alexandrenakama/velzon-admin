@@ -10,20 +10,12 @@
   <form [formGroup]="form">
     <div class="row gx-3 gy-2">
 
-      <!-- Linha 1: Nome / Tipo de Pessoa -->
-      <div class="col-md-8">
+      <!-- Linha 1: Nome do Contato -->
+      <div class="col-12 mb-2">
         <label class="form-label">Nome do Contato</label>
         <input type="text" class="form-control" formControlName="nomeContato" placeholder="Digite o nome do contato" />
-      </div>
-      <div class="col-md-4">
-        <label class="form-label">Tipo de Pessoa</label>
-        <select class="form-select" formControlName="tipoPessoa">
-          <option value="">Selecione...</option>
-          <option value="Física">Física</option>
-          <option value="Jurídica">Jurídica</option>
-        </select>
-        <div *ngIf="form.get('tipoPessoa')?.touched && form.get('tipoPessoa')?.invalid" class="form-text text-danger">
-          Obrigatório.
+        <div *ngIf="form.get('nomeContato')?.touched && form.get('nomeContato')?.invalid" class="form-text text-danger">
+          Nome é obrigatório.
         </div>
       </div>
 
@@ -35,14 +27,14 @@
           Obrigatório.
         </div>
       </div>
-      <div class="col-md-4">
+      <div class="col-md-5">
         <label class="form-label">Telefone</label>
-        <input type="text" class="form-control" formControlName="telefone" mascara="telefone" maxlength="10" placeholder="9999-9999" />
+        <input type="text" class="form-control" formControlName="telefone" mascara="telefone" maxlength="10" placeholder="9999‑9999" />
         <div *ngIf="form.get('telefone')?.touched && form.get('telefone')?.invalid" class="form-text text-danger">
           Obrigatório.
         </div>
       </div>
-      <div class="col-md-6">
+      <div class="col-md-5">
         <label class="form-label">Tipo de Telefone</label>
         <select class="form-select" formControlName="tipoTelefone">
           <option value="">Selecione...</option>
@@ -54,9 +46,9 @@
         </div>
       </div>
 
-      <!-- Linha 3: E-mail -->
-      <div class="col-12">
-        <label class="form-label">E-mail</label>
+      <!-- Linha 3: E‑mail -->
+      <div class="col-12 mt-2">
+        <label class="form-label">E‑mail</label>
         <input type="email" class="form-control" formControlName="email" placeholder="contato@exemplo.com" />
         <div *ngIf="form.get('email')?.touched && form.get('email')?.invalid" class="form-text text-danger">
           <span *ngIf="form.get('email')?.hasError('required')">Obrigatório.</span>
@@ -72,7 +64,7 @@
   <button type="button" class="btn btn-secondary" (click)="cancelar()">
     Cancelar
   </button>
-  <button type="button" class="btn btn-primary" (click)="salvar()" [disabled]="form.invalid || form.pristine">
+  <button type="button" class="btn btn-primary" (click)="salvar()" [disabled]="contato ? (form.invalid || form.pristine) : false">
     {{ contato ? 'Atualizar' : 'Salvar' }}
   </button>
 </div>

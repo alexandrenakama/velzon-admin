@@ -1,4 +1,3 @@
-<!-- src/app/pages/dashboards/seguradora/cadastro-seguradora/cadastro-seguradora.component.html -->
 <div class="row">
   <div class="col-xl-12">
     <div class="card">
@@ -37,26 +36,37 @@
             </div>
           </div>
 
-          <!-- 2ª linha: Nome + CNPJ -->
+          <!-- 2ª linha: Nome + Tipo de Pessoa + Documento -->
           <div class="row g-3 mb-5">
-            <div class="col-md-8">
+            <div class="col-md-6">
               <label for="nome" class="form-label">Nome da Seguradora</label>
               <input id="nome" type="text" formControlName="nome" class="form-control" placeholder="Digite o nome da seguradora" />
               <div *ngIf="form.get('nome')?.touched && form.get('nome')?.invalid" class="form-text text-danger">
                 Nome é obrigatório.
               </div>
             </div>
-            <div class="col-md-4">
-              <label for="cnpj" class="form-label">CNPJ</label>
-              <input id="cnpj" type="text" formControlName="cnpj" mascara="cnpj" maxlength="18" class="form-control" placeholder="00.000.000/0000-00" />
-              <div *ngIf="form.get('cnpj')?.touched && form.get('cnpj')?.invalid" class="form-text text-danger">
-                <span *ngIf="form.get('cnpj')?.hasError('required')">CNPJ é obrigatório.</span>
-                <span *ngIf="form.get('cnpj')?.hasError('pattern')">Formato inválido.</span>
+            <div class="col-md-3">
+              <label for="tipoPessoa" class="form-label">Tipo de Pessoa</label>
+              <select id="tipoPessoa" formControlName="tipoPessoa" class="form-select">
+                <option [ngValue]="null" disabled>Selecione...</option>
+                <option *ngFor="let t of pessoaTipos" [value]="t">{{ t }}</option>
+              </select>
+              <div *ngIf="form.get('tipoPessoa')?.touched && form.get('tipoPessoa')?.invalid" class="form-text text-danger">
+                Tipo de Pessoa é obrigatório.
+              </div>
+            </div>
+            <div class="col-md-3">
+              <label for="documento" class="form-label">
+                {{ isJuridica ? 'CNPJ' : 'CPF' }}
+              </label>
+              <input id="documento" type="text" formControlName="documento" [mascara]="isJuridica ? 'cnpj' : 'cpf'" [maxlength]="isJuridica ? 18 : 14" class="form-control" [placeholder]="isJuridica ? '00.000.000/0000-00' : '000.000.000-00'" />
+              <div *ngIf="form.get('documento')?.touched && form.get('documento')?.invalid" class="form-text text-danger">
+                Documento é obrigatório.
               </div>
             </div>
           </div>
 
-          <!-- ENDEREÇOS (com mais espaço acima) -->
+          <!-- ENDEREÇOS -->
           <div class="mb-4 mt-4">
             <app-lista-base [todosItens]="enderecos.value" [colunas]="colunasEndereco" [tamanhoPagina]="5" (editar)="onEditarEndereco($event)" (apagar)="onApagarEndereco($event)">
               <ng-template #toolbarTpl>
@@ -73,6 +83,9 @@
                 </button>
               </ng-template>
             </app-lista-base>
+            <div *ngIf="submitted && enderecos.length === 0" class="form-text text-danger">
+              Inclua pelo menos um endereço.
+            </div>
           </div>
 
           <!-- CONTATOS -->
@@ -92,11 +105,14 @@
                 </button>
               </ng-template>
             </app-lista-base>
+            <div *ngIf="submitted && contatos.length === 0" class="form-text text-danger">
+              Inclua pelo menos um contato.
+            </div>
           </div>
 
           <!-- AÇÕES FINAIS -->
           <div class="d-flex gap-2">
-            <button type="submit" class="btn btn-primary" [disabled]="isEdit ? !form.dirty || form.invalid : form.invalid">
+            <button type="submit" class="btn btn-primary" [disabled]="isEdit ? (form.invalid || form.pristine) : false">
               {{ isEdit ? 'Atualizar' : 'Salvar' }}
             </button>
             <button type="button" class="btn btn-secondary" (click)="cancel()">Cancelar</button>

@@ -1,6 +1,7 @@
 <div class="row">
   <div class="col-xl-12">
     <div class="card">
+
       <!-- Cabeçalho -->
       <div class="card-header d-flex align-items-center">
         <h4 class="card-title mb-0 flex-grow-1">
@@ -11,52 +12,53 @@
       <div class="card-body">
         <form [formGroup]="form" (ngSubmit)="save()">
 
-          <!-- Grupo -->
-          <div class="mb-3">
-            <label for="grupoId" class="form-label">Grupo</label>
-            <select id="grupoId" formControlName="grupoId" class="form-select">
-              <option [ngValue]="null" disabled>-- selecione --</option>
-              <option *ngFor="let g of grupos" [ngValue]="g.id">
-                {{ g.id }} – {{ g.nome }}
-              </option>
-            </select>
+          <!-- Grupo com visual de SELECT -->
+          <div class="mb-3 position-relative">
+            <label for="grupoSearch" class="form-label">Grupo</label>
+            <input id="grupoSearch" type="text" class="form-select dropdown-toggle" formControlName="grupo" [ngbTypeahead]="searchGrupo" [resultFormatter]="formatter" [inputFormatter]="formatter" [minLength]="0" (click)="openDropdown($event)" (selectItem)="onSelectGrupo($event)" placeholder="Buscar grupo (nome ou número)" autocomplete="off" />
+            <input type="hidden" formControlName="grupoId" />
+            <div *ngIf="form.get('grupo')?.touched && form.get('grupo')?.invalid" class="form-text text-danger">
+              Grupo é obrigatório.
+            </div>
           </div>
 
-          <!-- Nome do Grupo -->
-          <div class="mb-3">
-            <label for="grupoNome" class="form-label">Nome do Grupo</label>
-            <input id="grupoNome" type="text" formControlName="grupoNome" class="form-control" readonly />
-          </div>
-
-          <!-- Identificador e Código -->
+          <!-- Identificador / Código -->
           <div class="row g-3 mb-3">
             <div class="col-md-6">
-              <label for="identificadorRamo" class="form-label">Identificador do Ramo</label>
-              <input id="identificadorRamo" type="number" formControlName="identificadorRamo" class="form-control" placeholder="Ex: 12" [disabled]="isEdit" />
+              <label for="identificadorRamo" class="form-label">
+                Identificador do Ramo
+              </label>
+              <input id="identificadorRamo" type="number" class="form-control" formControlName="identificadorRamo" placeholder="Ex: 12" [disabled]="isEdit" />
               <div *ngIf="form.get('identificadorRamo')?.touched && form.get('identificadorRamo')?.invalid" class="form-text text-danger">
-                <span *ngIf="form.get('identificadorRamo')?.hasError('required')">Identificador é obrigatório.</span>
-                <span *ngIf="form.get('identificadorRamo')?.hasError('pattern')">Deve ser um número inteiro.</span>
+                <span *ngIf="form.get('identificadorRamo')?.hasError('required')">
+                  Identificador é obrigatório.
+                </span>
+                <span *ngIf="form.get('identificadorRamo')?.hasError('pattern')">
+                  Deve ser um número inteiro.
+                </span>
               </div>
               <div *ngIf="form.hasError('uniqueIdentificador')" class="form-text text-danger">
                 {{ form.getError('uniqueIdentificador') }}
               </div>
             </div>
-
             <div class="col-md-6">
               <label for="codigoRamo" class="form-label">Código do Ramo</label>
-              <input id="codigoRamo" type="text" formControlName="codigoRamo" class="form-control" readonly />
+              <input id="codigoRamo" type="text" class="form-control" formControlName="codigoRamo" readonly />
             </div>
           </div>
 
-          <!-- Nome e Nome Abreviado -->
+          <!-- Nome / Nome Abreviado -->
           <div class="row g-3 mb-3">
             <div class="col-md-6">
               <label for="nomeRamo" class="form-label">Nome do Ramo</label>
-              <input id="nomeRamo" type="text" formControlName="nomeRamo" class="form-control" />
+              <input id="nomeRamo" type="text" class="form-control" formControlName="nomeRamo" placeholder="Digite o nome do ramo" />
+              <div *ngIf="form.get('nomeRamo')?.touched && form.get('nomeRamo')?.invalid" class="form-text text-danger">
+                Nome do Ramo é obrigatório.
+              </div>
             </div>
             <div class="col-md-6">
               <label for="nomeAbreviado" class="form-label">Nome Abreviado</label>
-              <input id="nomeAbreviado" type="text" formControlName="nomeAbreviado" class="form-control" />
+              <input id="nomeAbreviado" type="text" class="form-control" formControlName="nomeAbreviado" placeholder="Digite o nome abreviado" />
             </div>
           </div>
 
@@ -64,38 +66,42 @@
           <div class="row g-3 mb-3">
             <div class="col-md-6">
               <label for="inicioVigencia" class="form-label">Início de Vigência</label>
-              <input #inicioDate id="inicioVigencia" type="date" formControlName="inicioVigencia" class="form-control" (click)="openInicioPicker()" />
+              <input #inicioDate id="inicioVigencia" type="date" class="form-control" formControlName="inicioVigencia" (click)="openInicioPicker()" />
+              <div *ngIf="form.get('inicioVigencia')?.touched && form.get('inicioVigencia')?.invalid" class="form-text text-danger">
+                Início de vigência é obrigatório.
+              </div>
             </div>
             <div class="col-md-6">
               <label for="fimVigencia" class="form-label">Fim de Vigência</label>
-              <input #fimDate id="fimVigencia" type="date" formControlName="fimVigencia" class="form-control" [min]="form.get('inicioVigencia')?.value" (click)="openFimPicker()" />
+              <input #fimDate id="fimVigencia" type="date" class="form-control" formControlName="fimVigencia" [min]="form.get('inicioVigencia')?.value" (click)="openFimPicker()" />
+              <div *ngIf="form.get('fimVigencia')?.touched && form.get('fimVigencia')?.invalid" class="form-text text-danger">
+                Fim de vigência é obrigatório.
+              </div>
             </div>
           </div>
-
           <div *ngIf="form.hasError('dateRange')" class="form-text text-danger mb-3">
             {{ form.getError('dateRange') }}
           </div>
 
           <!-- Ativo -->
           <div class="form-check mb-4">
-            <input id="ramoAtivo" type="checkbox" formControlName="ramoAtivo" class="form-check-input" />
+            <input id="ramoAtivo" type="checkbox" class="form-check-input" formControlName="ramoAtivo" />
             <label for="ramoAtivo" class="form-check-label">Ramo Ativo</label>
           </div>
 
           <!-- Botões -->
           <div class="d-flex gap-2">
-            <button type="submit" class="btn btn-primary" [disabled]="isEdit ? !form.dirty || form.invalid : form.invalid">
+            <button type="submit" class="btn btn-primary" [disabled]="isEdit ? (form.invalid || form.pristine) : false">
               {{ isEdit ? 'Atualizar' : 'Salvar' }}
             </button>
-
             <button type="button" class="btn btn-secondary" (click)="cancel()">
               Cancelar
             </button>
-
             <button *ngIf="isEdit" type="button" class="btn btn-outline-secondary" routerLink="/ramo/cadastro">
               + Novo Ramo
             </button>
           </div>
+
         </form>
       </div>
     </div>

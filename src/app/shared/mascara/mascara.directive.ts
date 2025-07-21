@@ -1,7 +1,7 @@
 // src/app/shared/directives/mascara.directive.ts
 import { Directive, HostListener, ElementRef, Input } from '@angular/core';
 
-export type TipoMascara = 'cep' | 'cnpj' | 'telefone';
+export type TipoMascara = 'cep' | 'cnpj' | 'telefone' | 'cpf';
 
 @Directive({
   selector: '[mascara]'
@@ -38,17 +38,26 @@ export class MascaraDirective {
       }
 
     } else if (this.tipo === 'telefone') {
-      // sem DDD: 8 ou 9 dígitos
       if (v.length > 9) v = v.substr(0, 9);
-
       if (v.length <= 4) {
         masked = v;
       } else if (v.length <= 8) {
-        // 4+4
         masked = `${v.substr(0,4)}-${v.substr(4)}`;
       } else {
-        // 5+4
         masked = `${v.substr(0,5)}-${v.substr(5)}`;
+      }
+
+    } else if (this.tipo === 'cpf') {
+      // CPF: 11 dígitos no formato 000.000.000-00
+      if (v.length > 11) v = v.substr(0, 11);
+      if (v.length > 9) {
+        masked = `${v.substr(0,3)}.${v.substr(3,3)}.${v.substr(6,3)}-${v.substr(9)}`;
+      } else if (v.length > 6) {
+        masked = `${v.substr(0,3)}.${v.substr(3,3)}.${v.substr(6)}`;
+      } else if (v.length > 3) {
+        masked = `${v.substr(0,3)}.${v.substr(3)}`;
+      } else {
+        masked = v;
       }
     }
 

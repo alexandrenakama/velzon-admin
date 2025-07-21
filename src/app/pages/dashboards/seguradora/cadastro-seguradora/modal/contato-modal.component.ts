@@ -1,9 +1,8 @@
 // src/app/pages/dashboards/seguradora/cadastro-seguradora/modal/contato-modal.component.ts
-
 import { Component, Input, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { Contato, PessoaTipo } from 'src/app/store/Seguradora/seguradora.model';
+import { Contato } from 'src/app/store/Seguradora/seguradora.model';
 
 @Component({
   selector: 'app-contato-modal',
@@ -20,13 +19,15 @@ export class ContatoModalComponent implements OnInit {
 
   ngOnInit(): void {
     this.form = this.fb.group({
-      id:          [this.contato?.id || null],
-      nomeContato: [this.contato?.nomeContato || ''],
-      tipoPessoa:  [this.contato?.tipoPessoa || 'Física', Validators.required],
-      ddd:         [this.contato?.ddd         || '', Validators.required],
-      telefone:    [this.contato?.telefone    || '', Validators.required],
-      tipoTelefone:[this.contato?.tipoTelefone|| '', Validators.required],
-      email:       [this.contato?.email       || '', [Validators.required, Validators.email]]
+      id:           [this.contato?.id || null],
+      nomeContato:  [this.contato?.nomeContato || '', Validators.required],
+      ddd:          [this.contato?.ddd         || '', Validators.required],
+      telefone:     [this.contato?.telefone    || '', Validators.required],
+      tipoTelefone: [this.contato?.tipoTelefone|| '', Validators.required],
+      email:        [
+        this.contato?.email || '',
+        [Validators.required, Validators.email]
+      ]
     });
   }
 
@@ -35,7 +36,6 @@ export class ContatoModalComponent implements OnInit {
       this.form.markAllAsTouched();
       return;
     }
-    // fecha passando o objeto com tipoPessoa já em "Física" ou "Jurídica"
     this.activeModal.close(this.form.value as Contato);
   }
 
