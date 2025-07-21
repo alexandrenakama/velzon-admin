@@ -13,7 +13,7 @@
       <!-- Linha 1: CEP -->
       <div class="col-12">
         <label for="cep" class="form-label">CEP</label>
-        <input id="cep" type="text" class="form-control" formControlName="cep" mascara="cep" placeholder="00000-000" (blur)="buscarCep()" />
+        <input id="cep" type="text" class="form-control" formControlName="cep" mask="00000-000" placeholder="00000-000" />
         <div *ngIf="form.get('cep')?.touched && form.get('cep')?.hasError('required')" class="form-text text-danger">
           CEP é obrigatório.
         </div>
@@ -92,7 +92,7 @@
   <button type="button" class="btn btn-secondary" (click)="cancelar()">
     Cancelar
   </button>
-  <button type="button" class="btn btn-primary" (click)="salvar()" [disabled]="form.invalid || form.pristine">
+  <button type="button" class="btn btn-primary" (click)="salvar()" [disabled]="endereco ? (form.invalid || form.pristine) : false">
     {{ endereco ? 'Atualizar' : 'Salvar' }}
   </button>
 </div>

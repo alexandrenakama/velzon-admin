@@ -1,8 +1,12 @@
 // src/app/pages/dashboards/seguradora/cadastro-seguradora/cadastro-seguradora.component.ts
 import { Component, OnInit } from '@angular/core';
 import {
-  FormBuilder, FormGroup, FormArray,
-  Validators, AbstractControl, ValidationErrors
+  FormBuilder,
+  FormGroup,
+  FormArray,
+  Validators,
+  AbstractControl,
+  ValidationErrors
 } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
@@ -23,28 +27,11 @@ import { DefinicaoColuna } from 'src/app/shared/lista-base/lista-base.component'
 export class CadastroSeguradoraComponent implements OnInit {
   form!: FormGroup;
   isEdit = false;
+  submitted = false;
   private editingId?: number;
 
-  colunasEndereco: DefinicaoColuna[] = [
-    { campo: 'tipoLogradouro', cabecalho: 'Tipo Logradouro' },
-    { campo: 'logradouro',     cabecalho: 'Logradouro'      },
-    { campo: 'numero',         cabecalho: 'Número'          },
-    { campo: 'complemento',    cabecalho: 'Complemento'     },
-    { campo: 'bairro',         cabecalho: 'Bairro'          },
-    { campo: 'cidade',         cabecalho: 'Cidade'          },
-    { campo: 'uf',             cabecalho: 'UF'              },
-    { campo: 'cep',            cabecalho: 'CEP'             },
-    { campo: 'tipoEndereco',   cabecalho: 'Tipo Endereço'   }
-  ];
-
-  colunasContato: DefinicaoColuna[] = [
-    { campo: 'nomeContato',  cabecalho: 'Nome Contato'  },
-    { campo: 'tipoPessoa',   cabecalho: 'Tipo Pessoa'   },
-    { campo: 'ddd',          cabecalho: 'DDD'           },
-    { campo: 'telefone',     cabecalho: 'Telefone'      },
-    { campo: 'tipoTelefone', cabecalho: 'Tipo Telefone' },
-    { campo: 'email',        cabecalho: 'Email'         }
-  ];
+  colunasEndereco: DefinicaoColuna[] = [ /* ... */ ];
+  colunasContato: DefinicaoColuna[] = [ /* ... */ ];
 
   constructor(
     private fb: FormBuilder,
@@ -57,22 +44,14 @@ export class CadastroSeguradoraComponent implements OnInit {
 
   ngOnInit(): void {
     this.buildForm();
-
     this.route.paramMap.subscribe(params => {
       const idParam = params.get('id');
       if (!idParam) return;
       this.isEdit = true;
       this.editingId = +idParam;
-
       const seg = this.service.getById(this.editingId);
       if (!seg) return;
-
-      this.form.patchValue({
-        id: seg.id,
-        nome: seg.nome,
-        ativa: seg.ativa,
-        cnpj: seg.cnpj
-      });
+      this.form.patchValue({ id: seg.id, nome: seg.nome, ativa: seg.ativa, cnpj: seg.cnpj });
       this.form.get('id')?.disable();
       this.enderecos.clear();
       seg.enderecos.forEach(e => this.enderecos.push(this.fb.group(e)));
@@ -83,127 +62,22 @@ export class CadastroSeguradoraComponent implements OnInit {
 
   private buildForm(): void {
     this.form = this.fb.group({
-      id: [null, [Validators.required, Validators.pattern(/^\d+$/)]],
-      nome: ['', Validators.required],
-      ativa: [true],
-      cnpj: ['', [
-        Validators.required,
-        Validators.pattern(/^\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}$/)
-      ]],
+      id:        [null, [Validators.required, Validators.pattern(/^\d+$/)]],
+      nome:      ['', Validators.required],
+      ativa:     [true],
+      cnpj:      ['', [Validators.required, Validators.pattern(/^\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}$/)]],
       enderecos: this.fb.array([]),
-      contatos: this.fb.array([])
+      contatos:  this.fb.array([])
     }, {
-      validators: [this.uniqueIdValidator.bind(this)]
+      validators: [
+        this.uniqueIdValidator.bind(this),
+        this.requireAddressAndContact.bind(this)
+      ]
     });
   }
 
-  get enderecos(): FormArray {
-    return this.form.get('enderecos') as FormArray;
-  }
-
-  get contatos(): FormArray {
-    return this.form.get('contatos') as FormArray;
-  }
-
-  openAddEndereco(): void {
-    const modalRef = this.modal.open(EnderecoModalComponent, { centered: true, backdrop: 'static' });
-    modalRef.componentInstance.endereco = null;
-    modalRef.result.then((novo: Endereco) => {
-      this.enderecos.push(this.fb.group(novo));
-    }).catch(() => {});
-  }
-
-  onEditarEndereco(e: Endereco): void {
-    const idx = (this.enderecos.value as Endereco[]).findIndex(x => x.id === e.id);
-    if (idx < 0) return;
-
-    const modalRef = this.modal.open(EnderecoModalComponent, { centered: true, backdrop: 'static' });
-    modalRef.componentInstance.endereco = e;
-    modalRef.result.then((editado: Endereco) => {
-      this.enderecos.at(idx).patchValue(editado);
-      const v = this.form.getRawValue();
-      const seg: Seguradora = {
-        id: +v.id, nome: v.nome, ativa: v.ativa, cnpj: v.cnpj,
-        enderecos: v.enderecos, contatos: v.contatos
-      };
-      this.service.update(seg).subscribe({
-        next: () => this.toast.show('Endereço atualizado com sucesso.', { classname: 'bg-info text-light', delay: 3000 }),
-        error: () => this.toast.show('Falha ao atualizar endereço.', { classname: 'bg-warning text-dark', delay: 5000 })
-      });
-    }).catch(() => {});
-  }
-
-  onApagarEndereco(e: Endereco): void {
-    const idx = (this.enderecos.value as Endereco[]).findIndex(x => x.id === e.id);
-    if (idx < 0) return;
-    const ref = this.modal.open(ConfirmModalComponent, { centered: true, backdrop: 'static' });
-    ref.componentInstance.title = 'Confirma exclusão';
-    ref.componentInstance.message = `Deseja realmente apagar o endereço “${e.tipoLogradouro} ${e.logradouro}, ${e.numero}”?`;
-    ref.componentInstance.confirmText = 'Apagar';
-    ref.componentInstance.cancelText = 'Cancelar';
-    ref.result.then(ok => {
-      if (!ok) return;
-      const v = this.form.getRawValue();
-      const seg: Seguradora = {
-        id: +v.id, nome: v.nome, ativa: v.ativa, cnpj: v.cnpj,
-        enderecos: v.enderecos, contatos: v.contatos
-      };
-      this.service.deleteEndereco(seg.id, idx).subscribe({
-        next: () => {
-          this.enderecos.removeAt(idx);
-          this.toast.show('Endereço apagado com sucesso.', { classname: 'bg-danger text-light', delay: 3000 });
-        },
-        error: () => this.toast.show('Falha ao apagar endereço.', { classname: 'bg-warning text-dark', delay: 5000 })
-      });
-    }).catch(() => {});
-  }
-
-  openAddContato(): void {
-    const modalRef = this.modal.open(ContatoModalComponent, { centered: true, backdrop: 'static' });
-    modalRef.componentInstance.contato = null;
-    modalRef.result.then((novo: Contato) => {
-      this.contatos.push(this.fb.group(novo));
-    }).catch(() => {});
-  }
-
-  onEditarContato(c: Contato): void {
-    const idx = (this.contatos.value as Contato[]).findIndex(x => x.id === c.id);
-    if (idx < 0) return;
-    const modalRef = this.modal.open(ContatoModalComponent, { centered: true, backdrop: 'static' });
-    modalRef.componentInstance.contato = c;
-    modalRef.result.then((editado: Contato) => {
-      this.contatos.at(idx).patchValue(editado);
-      const v = this.form.getRawValue();
-      const seg: Seguradora = {
-        id: +v.id, nome: v.nome, ativa: v.ativa, cnpj: v.cnpj,
-        enderecos: v.enderecos, contatos: v.contatos
-      };
-      this.service.update(seg).subscribe({
-        next: () => this.toast.show('Contato atualizado com sucesso.', { classname: 'bg-info text-light', delay: 3000 }),
-        error: () => this.toast.show('Falha ao atualizar contato.', { classname: 'bg-warning text-dark', delay: 5000 })
-      });
-    }).catch(() => {});
-  }
-
-  onApagarContato(c: Contato): void {
-    const idx = (this.contatos.value as Contato[]).findIndex(x => x.id === c.id);
-    if (idx < 0) return;
-    const ref = this.modal.open(ConfirmModalComponent, { centered: true, backdrop: 'static' });
-    ref.componentInstance.title = 'Confirma exclusão';
-    ref.componentInstance.message = `Deseja realmente apagar o contato “${c.email}”?`;
-    ref.componentInstance.confirmText = 'Apagar';
-    ref.componentInstance.cancelText = 'Cancelar';
-    ref.result.then(ok => {
-      if (!ok) return;
-      this.service.deleteContato(+this.form.getRawValue().id, idx).subscribe({
-        next: () => {
-          this.contatos.removeAt(idx);
-          this.toast.show('Contato apagado com sucesso.', { classname: 'bg-danger text-light', delay: 3000 });
-        },
-        error: () => this.toast.show('Falha ao apagar contato.', { classname: 'bg-warning text-dark', delay: 5000 })
-      });
-    }).catch(() => {});
-  }
+  get enderecos(): FormArray { return this.form.get('enderecos') as FormArray; }
+  get contatos():  FormArray { return this.form.get('contatos')  as FormArray; }
 
   private uniqueIdValidator(c: AbstractControl): ValidationErrors | null {
     const id = c.get('id')?.value;
@@ -215,7 +89,23 @@ export class CadastroSeguradoraComponent implements OnInit {
     return null;
   }
 
+  private requireAddressAndContact(c: AbstractControl): ValidationErrors | null {
+    const hasAddress = (c.get('enderecos') as FormArray).length > 0;
+    const hasContact = (c.get('contatos')  as FormArray).length > 0;
+    return hasAddress && hasContact
+      ? null
+      : { requireAddressAndContact: 'Inclua pelo menos um endereço e um contato.' };
+  }
+
+  openAddEndereco(): void { /*...*/ }
+  onEditarEndereco(e: Endereco): void { /*...*/ }
+  onApagarEndereco(e: Endereco): void { /*...*/ }
+  openAddContato(): void { /*...*/ }
+  onEditarContato(c: Contato): void { /*...*/ }
+  onApagarContato(c: Contato): void { /*...*/ }
+
   save(): void {
+    this.submitted = true;
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       return;
@@ -232,10 +122,7 @@ export class CadastroSeguradoraComponent implements OnInit {
           this.isEdit
             ? `Seguradora "${seg.nome}" atualizada!`
             : `Seguradora "${seg.nome}" criada!`,
-          {
-            classname: this.isEdit ? 'bg-info text-light' : 'bg-success text-light',
-            delay: 5000
-          }
+          { classname: this.isEdit ? 'bg-info text-light' : 'bg-success text-light', delay: 5000 }
         );
         if (!this.isEdit) this.router.navigate(['/seguradora']);
       },

@@ -56,7 +56,7 @@
             </div>
           </div>
 
-          <!-- ENDEREÇOS (com mais espaço acima) -->
+          <!-- ENDEREÇOS -->
           <div class="mb-4 mt-4">
             <app-lista-base [todosItens]="enderecos.value" [colunas]="colunasEndereco" [tamanhoPagina]="5" (editar)="onEditarEndereco($event)" (apagar)="onApagarEndereco($event)">
               <ng-template #toolbarTpl>
@@ -65,12 +65,8 @@
                 </button>
               </ng-template>
               <ng-template #acoesTpl let-item>
-                <button type="button" class="btn btn-sm btn-light me-1" (click)="onEditarEndereco(item)">
-                  Editar
-                </button>
-                <button type="button" class="btn btn-sm btn-danger" (click)="onApagarEndereco(item)">
-                  Apagar
-                </button>
+                <button type="button" class="btn btn-sm btn-light me-1" (click)="onEditarEndereco(item)">Editar</button>
+                <button type="button" class="btn btn-sm btn-danger" (click)="onApagarEndereco(item)">Apagar</button>
               </ng-template>
             </app-lista-base>
           </div>
@@ -84,19 +80,20 @@
                 </button>
               </ng-template>
               <ng-template #acoesTpl let-item>
-                <button type="button" class="btn btn-sm btn-light me-1" (click)="onEditarContato(item)">
-                  Editar
-                </button>
-                <button type="button" class="btn btn-sm btn-danger" (click)="onApagarContato(item)">
-                  Apagar
-                </button>
+                <button type="button" class="btn btn-sm btn-light me-1" (click)="onEditarContato(item)">Editar</button>
+                <button type="button" class="btn btn-sm btn-danger" (click)="onApagarContato(item)">Apagar</button>
               </ng-template>
             </app-lista-base>
           </div>
 
+          <!-- Exibe erro APENAS após tentar salvar sem endereço ou contato -->
+          <div *ngIf="submitted && form.hasError('requireAddressAndContact')" class="form-text text-danger mb-3">
+            {{ form.getError('requireAddressAndContact') }}
+          </div>
+
           <!-- AÇÕES FINAIS -->
           <div class="d-flex gap-2">
-            <button type="submit" class="btn btn-primary" [disabled]="isEdit ? !form.dirty || form.invalid : form.invalid">
+            <button type="submit" class="btn btn-primary" [disabled]="isEdit && (form.invalid || form.pristine)">
               {{ isEdit ? 'Atualizar' : 'Salvar' }}
             </button>
             <button type="button" class="btn btn-secondary" (click)="cancel()">Cancelar</button>
