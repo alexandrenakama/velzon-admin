@@ -8,8 +8,9 @@ import { NgbModalModule, NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap'
 import { SharedModule }            from '../../shared/shared.module';
 import { DashboardsRoutingModule } from './dashboards-routing.module';
 
-// **Importe também o feature-module de Seguradora**:
+// feature-modules:
 import { SeguradoraModule }        from './seguradora/seguradora.module';
+import { ClienteModule }           from './cliente/cliente.module';
 import { RamoModule }              from './ramo/ramo.module';
 import { GrupoRamoModule }         from './grupo-ramo/grupo-ramo.module';
 
@@ -22,7 +23,9 @@ import { GrupoRamoModule }         from './grupo-ramo/grupo-ramo.module';
     NgbModalModule,
     SharedModule,
     NgbPaginationModule,
+
     SeguradoraModule,
+    ClienteModule,
     RamoModule,
     GrupoRamoModule,
 

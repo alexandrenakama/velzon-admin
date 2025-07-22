@@ -1,0 +1,70 @@
+<!-- src/app/pages/dashboards/seguradora/cadastro-seguradora/modal/contato-modal.component.html -->
+<div class="modal-header">
+  <h5 class="modal-title">
+    {{ contato ? 'Editar Contato' : 'Novo Contato' }}
+  </h5>
+  <button type="button" class="btn-close" aria-label="Close" (click)="cancelar()"></button>
+</div>
+
+<div class="modal-body">
+  <form [formGroup]="form">
+    <div class="row gx-3 gy-2">
+
+      <!-- Linha 1: Nome do Contato -->
+      <div class="col-12 mb-2">
+        <label class="form-label">Nome do Contato</label>
+        <input type="text" class="form-control" formControlName="nomeContato" placeholder="Digite o nome do contato" />
+        <div *ngIf="form.get('nomeContato')?.touched && form.get('nomeContato')?.invalid" class="form-text text-danger">
+          Nome é obrigatório.
+        </div>
+      </div>
+
+      <!-- Linha 2: DDD / Telefone / Tipo de Telefone -->
+      <div class="col-md-2">
+        <label class="form-label">DDD</label>
+        <input type="text" class="form-control" formControlName="ddd" maxlength="2" placeholder="11" />
+        <div *ngIf="form.get('ddd')?.touched && form.get('ddd')?.invalid" class="form-text text-danger">
+          Obrigatório.
+        </div>
+      </div>
+      <div class="col-md-5">
+        <label class="form-label">Telefone</label>
+        <input type="text" class="form-control" formControlName="telefone" mascara="telefone" maxlength="10" placeholder="9999‑9999" />
+        <div *ngIf="form.get('telefone')?.touched && form.get('telefone')?.invalid" class="form-text text-danger">
+          Obrigatório.
+        </div>
+      </div>
+      <div class="col-md-5">
+        <label class="form-label">Tipo de Telefone</label>
+        <select class="form-select" formControlName="tipoTelefone">
+          <option value="">Selecione...</option>
+          <option value="Comercial">Comercial</option>
+          <option value="Residencial">Residencial</option>
+        </select>
+        <div *ngIf="form.get('tipoTelefone')?.touched && form.get('tipoTelefone')?.invalid" class="form-text text-danger">
+          Obrigatório.
+        </div>
+      </div>
+
+      <!-- Linha 3: E‑mail -->
+      <div class="col-12 mt-2">
+        <label class="form-label">E‑mail</label>
+        <input type="email" class="form-control" formControlName="email" placeholder="contato@exemplo.com" />
+        <div *ngIf="form.get('email')?.touched && form.get('email')?.invalid" class="form-text text-danger">
+          <span *ngIf="form.get('email')?.hasError('required')">Obrigatório.</span>
+          <span *ngIf="form.get('email')?.hasError('email')">Formato inválido.</span>
+        </div>
+      </div>
+
+    </div>
+  </form>
+</div>
+
+<div class="modal-footer">
+  <button type="button" class="btn btn-secondary" (click)="cancelar()">
+    Cancelar
+  </button>
+  <button type="button" class="btn btn-primary" (click)="salvar()" [disabled]="contato ? (form.invalid || form.pristine) : false">
+    {{ contato ? 'Atualizar' : 'Salvar' }}
+  </button>
+</div>
