@@ -27,7 +27,6 @@ import { DefinicaoColuna }        from 'src/app/shared/lista-base/lista-base.com
 @Component({
   selector: 'app-cadastro-cliente',
   templateUrl: './cadastro-cliente.component.html',
-  styleUrls: ['./cadastro-cliente.component.scss']
 })
 export class CadastroClienteComponent implements OnInit {
   form!: FormGroup;

@@ -17,7 +17,6 @@ import { DefinicaoColuna }        from 'src/app/shared/lista-base/lista-base.com
 @Component({
   selector: 'app-lista-grupo-ramo',
   templateUrl: './lista-grupo-ramo.component.html',
-  styleUrls: ['./lista-grupo-ramo.component.scss']
 })
 export class ListaGrupoRamoComponent implements OnInit {
   allGroups: Array<GrupoRamo & { seguradoraNome: string }> = [];

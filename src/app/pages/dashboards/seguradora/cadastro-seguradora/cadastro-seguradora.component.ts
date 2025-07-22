@@ -26,7 +26,6 @@ import { DefinicaoColuna }         from 'src/app/shared/lista-base/lista-base.co
 @Component({
   selector: 'app-cadastro-seguradora',
   templateUrl: './cadastro-seguradora.component.html',
-  styleUrls: ['./cadastro-seguradora.component.scss']
 })
 export class CadastroSeguradoraComponent implements OnInit {
   form!: FormGroup;

@@ -14,7 +14,6 @@ import { DefinicaoColuna }        from 'src/app/shared/lista-base/lista-base.com
 @Component({
   selector: 'app-lista-seguradora',
   templateUrl: './lista-seguradora.component.html',
-  styleUrls: ['./lista-seguradora.component.scss']
 })
 export class ListaSeguradoraComponent implements OnInit {
   allSeguradoras: Seguradora[] = [];
