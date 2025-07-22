@@ -37,7 +37,7 @@ export class ListaRamoComponent implements OnInit {
       ordenavel: true,
       formatoData: 'dd/MM/yyyy'
     },
-    { campo: 'ramoAtivo',         cabecalho: 'Ativo',        ordenavel: true, largura: '100px' }
+    { campo: 'ativo',         cabecalho: 'Ativo',        ordenavel: true, largura: '100px' }
   ];
 
   constructor(

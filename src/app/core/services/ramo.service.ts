@@ -35,7 +35,7 @@ export class RamoService {
       nomeAbreviado:     'Empresa',
       inicioVigencia:    '2025-02-07',
       fimVigencia:       '2025-12-02',
-      ramoAtivo:         false
+      ativo:         false
     },
     {
       grupo: { id: 15, nome: 'Seguro Automotivo',    seguradoraId: 1 },
@@ -45,7 +45,7 @@ export class RamoService {
       nomeAbreviado:     'Empresa',
       inicioVigencia:    '2025-04-16',
       fimVigencia:       '2025-12-31',
-      ramoAtivo:         true
+      ativo:         true
     },
     {
       grupo: { id: 12, nome: 'Seguro Residencial',   seguradoraId: 1 },
@@ -55,7 +55,7 @@ export class RamoService {
       nomeAbreviado:     'Auto',
       inicioVigencia:    '2025-01-06',
       fimVigencia:       '2025-06-14',
-      ramoAtivo:         true
+      ativo:         true
     },
     {
       grupo: { id: 20, nome: 'Seguro Tecnológico',   seguradoraId: 1 },
@@ -65,7 +65,7 @@ export class RamoService {
       nomeAbreviado:     'Tech',
       inicioVigencia:    '2025-02-07',
       fimVigencia:       '2025-06-08',
-      ramoAtivo:         false
+      ativo:         false
     },
     {
       grupo: { id: 11, nome: 'Seguro Agrícola',      seguradoraId: 1 },
@@ -75,7 +75,7 @@ export class RamoService {
       nomeAbreviado:     'Empresa',
       inicioVigencia:    '2025-04-16',
       fimVigencia:       '2025-12-31',
-      ramoAtivo:         true
+      ativo:         true
     },
     {
       grupo: { id: 15, nome: 'Seguro Automotivo',    seguradoraId: 1 },
@@ -85,7 +85,7 @@ export class RamoService {
       nomeAbreviado:     'Educação',
       inicioVigencia:    '2025-06-25',
       fimVigencia:       '2025-10-23',
-      ramoAtivo:         true
+      ativo:         true
     },
     {
       grupo: { id: 17, nome: 'Seguro Saúde',         seguradoraId: 1 },
@@ -95,7 +95,7 @@ export class RamoService {
       nomeAbreviado:     'Pet',
       inicioVigencia:    '2025-06-15',
       fimVigencia:       '2025-12-11',
-      ramoAtivo:         false
+      ativo:         false
     },
     {
       grupo: { id: 11, nome: 'Seguro Agrícola',      seguradoraId: 1 },
@@ -105,7 +105,7 @@ export class RamoService {
       nomeAbreviado:     'Casa',
       inicioVigencia:    '2025-06-02',
       fimVigencia:       '2025-11-23',
-      ramoAtivo:         true
+      ativo:         true
     },
     {
       grupo: { id: 16, nome: 'Seguro Viagem',        seguradoraId: 1 },
@@ -115,7 +115,7 @@ export class RamoService {
       nomeAbreviado:     'Auto',
       inicioVigencia:    '2025-01-24',
       fimVigencia:       '2025-12-17',
-      ramoAtivo:         false
+      ativo:         false
     },
     {
       grupo: { id: 19, nome: 'Seguro Educacional',   seguradoraId: 1 },
@@ -125,7 +125,7 @@ export class RamoService {
       nomeAbreviado:     'Pet',
       inicioVigencia:    '2025-02-07',
       fimVigencia:       '2025-09-04',
-      ramoAtivo:         true
+      ativo:         true
     },
     {
       grupo: { id: 11, nome: 'Seguro Agrícola',      seguradoraId: 1 },
@@ -135,7 +135,7 @@ export class RamoService {
       nomeAbreviado:     'Auto',
       inicioVigencia:    '2025-01-08',
       fimVigencia:       '2025-11-29',
-      ramoAtivo:         false
+      ativo:         false
     },
     {
       grupo: { id: 19, nome: 'Seguro Educacional',   seguradoraId: 1 },
@@ -145,7 +145,7 @@ export class RamoService {
       nomeAbreviado:     'Pet',
       inicioVigencia:    '2025-03-22',
       fimVigencia:       '2025-11-16',
-      ramoAtivo:         true
+      ativo:         true
     },
     {
       grupo: { id: 20, nome: 'Seguro Tecnológico',   seguradoraId: 1 },
@@ -155,7 +155,7 @@ export class RamoService {
       nomeAbreviado:     'Tech',
       inicioVigencia:    '2025-04-17',
       fimVigencia:       '2025-07-28',
-      ramoAtivo:         false
+      ativo:         false
     },
     {
       grupo: { id: 17, nome: 'Seguro Saúde',         seguradoraId: 1 },
@@ -165,7 +165,7 @@ export class RamoService {
       nomeAbreviado:     'Pet',
       inicioVigencia:    '2025-05-12',
       fimVigencia:       '2025-12-12',
-      ramoAtivo:         true
+      ativo:         true
     },
     {
       grupo: { id: 15, nome: 'Seguro Automotivo',    seguradoraId: 1 },
@@ -175,7 +175,7 @@ export class RamoService {
       nomeAbreviado:     'Saúde',
       inicioVigencia:    '2025-02-01',
       fimVigencia:       '2025-07-24',
-      ramoAtivo:         false
+      ativo:         false
     },
     {
       grupo: { id: 13, nome: 'Seguro de Vida',       seguradoraId: 1 },
@@ -185,7 +185,7 @@ export class RamoService {
       nomeAbreviado:     'Vida',
       inicioVigencia:    '2025-01-01',
       fimVigencia:       '2025-07-18',
-      ramoAtivo:         true
+      ativo:         true
     },
     {
       grupo: { id: 17, nome: 'Seguro Saúde',         seguradoraId: 1 },
@@ -195,7 +195,7 @@ export class RamoService {
       nomeAbreviado:     'Auto',
       inicioVigencia:    '2025-04-28',
       fimVigencia:       '2025-11-29',
-      ramoAtivo:         false
+      ativo:         false
     },
     {
       grupo: { id: 18, nome: 'Seguro Pet',          seguradoraId: 1 },
@@ -205,7 +205,7 @@ export class RamoService {
       nomeAbreviado:     'Empresa',
       inicioVigencia:    '2025-02-28',
       fimVigencia:       '2025-08-26',
-      ramoAtivo:         false
+      ativo:         false
     },
     {
       grupo: { id: 12, nome: 'Seguro Residencial',   seguradoraId: 1 },
@@ -215,7 +215,7 @@ export class RamoService {
       nomeAbreviado:     'Casa',
       inicioVigencia:    '2025-04-19',
       fimVigencia:       '2025-11-20',
-      ramoAtivo:         true
+      ativo:         true
     },
     {
       grupo: { id: 20, nome: 'Seguro Tecnológico',   seguradoraId: 1 },
@@ -225,7 +225,7 @@ export class RamoService {
       nomeAbreviado:     'Tech',
       inicioVigencia:    '2025-03-15',
       fimVigencia:       '2025-10-31',
-      ramoAtivo:         true
+      ativo:         true
     },
     {
       grupo: { id: 15, nome: 'Seguro Automotivo',    seguradoraId: 1 },
@@ -235,7 +235,7 @@ export class RamoService {
       nomeAbreviado:     'Saúde',
       inicioVigencia:    '2025-06-15',
       fimVigencia:       '2025-11-01',
-      ramoAtivo:         false
+      ativo:         false
     },
     {
       grupo: { id: 13, nome: 'Seguro de Vida',       seguradoraId: 1 },
@@ -245,7 +245,7 @@ export class RamoService {
       nomeAbreviado:     'Vida',
       inicioVigencia:    '2025-02-06',
       fimVigencia:       '2025-12-14',
-      ramoAtivo:         true
+      ativo:         true
     },
     {
       grupo: { id: 14, nome: 'Seguro Empresarial',   seguradoraId: 1 },
@@ -255,7 +255,7 @@ export class RamoService {
       nomeAbreviado:     'Empresa',
       inicioVigencia:    '2025-03-04',
       fimVigencia:       '2025-07-15',
-      ramoAtivo:         true
+      ativo:         true
     },
     {
       grupo: { id: 12, nome: 'Seguro Residencial',   seguradoraId: 1 },
@@ -265,7 +265,7 @@ export class RamoService {
       nomeAbreviado:     'Casa',
       inicioVigencia:    '2025-04-01',
       fimVigencia:       '2025-12-10',
-      ramoAtivo:         false
+      ativo:         false
     },
     {
       grupo: { id: 20, nome: 'Seguro Tecnológico',   seguradoraId: 1 },
@@ -275,7 +275,7 @@ export class RamoService {
       nomeAbreviado:     'Tech',
       inicioVigencia:    '2025-01-01',
       fimVigencia:       '2025-08-11',
-      ramoAtivo:         true
+      ativo:         true
     }
   ]);
   public ramos$ = this._ramos$.asObservable();

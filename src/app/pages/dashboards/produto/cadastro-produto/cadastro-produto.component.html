@@ -1,0 +1,122 @@
+<div class="row">
+  <div class="col-xl-12">
+    <div class="card">
+      <div class="card-header d-flex align-items-center">
+        <h4 class="card-title mb-0 flex-grow-1">
+          {{ isEdit ? 'Editar Produto' : 'Novo Produto' }}
+        </h4>
+      </div>
+      <div class="card-body">
+        <form [formGroup]="form" (ngSubmit)="save()">
+          <div class="mb-3 position-relative">
+            <label for="ramoSearch" class="form-label">Ramo</label>
+            <input id="ramoSearch" type="text" class="form-select dropdown-toggle" formControlName="ramo" [ngbTypeahead]="searchRamo" [resultFormatter]="formatter" [inputFormatter]="formatter" [minLength]="0" (click)="openDropdown($event)" (selectItem)="onSelectRamo($event)" placeholder="Buscar ramo (nome ou ID)" autocomplete="off" />
+            <input type="hidden" formControlName="ramoId" />
+            <div *ngIf="form.get('ramo')?.touched && form.get('ramo')?.invalid" class="form-text text-danger">
+              Ramo é obrigatório.
+            </div>
+          </div>
+          <div class="mb-3">
+            <label for="id" class="form-label">ID do Produto</label>
+            <input id="id" type="number" class="form-control" formControlName="id" [disabled]="isEdit" placeholder="Ex: 2" />
+            <div *ngIf="form.get('id')?.touched && form.get('id')?.invalid" class="form-text text-danger">
+              <span *ngIf="form.get('id')?.hasError('required')">ID é obrigatório.</span>
+              <span *ngIf="form.get('id')?.hasError('pattern')">Deve ser um número inteiro.</span>
+            </div>
+            <div *ngIf="form.hasError('uniqueId')" class="form-text text-danger">
+              {{ form.getError('uniqueId') }}
+            </div>
+            <div *ngIf="form.hasError('idEqualsSusep')" class="form-text text-danger">
+              {{ form.getError('idEqualsSusep') }}
+            </div>
+          </div>
+          <div class="row g-3 mb-3">
+            <div class="col-md-6">
+              <label for="nomeProduto" class="form-label">Nome do Produto</label>
+              <input id="nomeProduto" type="text" class="form-control" formControlName="nomeProduto" placeholder="Digite o nome do produto" />
+              <div *ngIf="form.get('nomeProduto')?.touched && form.get('nomeProduto')?.invalid" class="form-text text-danger">
+                Nome do Produto é obrigatório.
+              </div>
+            </div>
+            <div class="col-md-6">
+              <label for="nomeAbreviadoProduto" class="form-label">Nome Abreviado</label>
+              <input id="nomeAbreviadoProduto" type="text" class="form-control" formControlName="nomeAbreviadoProduto" placeholder="Digite o nome abreviado" />
+            </div>
+          </div>
+          <div class="mb-3">
+            <label for="numeroProcessoSusep" class="form-label">Nº Processo SUSEP</label>
+            <input id="numeroProcessoSusep" type="number" class="form-control" formControlName="numeroProcessoSusep" placeholder="Ex: 123456" />
+            <div *ngIf="form.get('numeroProcessoSusep')?.touched && form.get('numeroProcessoSusep')?.invalid" class="form-text text-danger">
+              <span *ngIf="form.get('numeroProcessoSusep')?.hasError('required')">Número do Processo é obrigatório.</span>
+              <span *ngIf="form.get('numeroProcessoSusep')?.hasError('pattern')">Deve ser um número inteiro.</span>
+            </div>
+            <div *ngIf="form.hasError('uniqueSusep')" class="form-text text-danger">
+              {{ form.getError('uniqueSusep') }}
+            </div>
+            <div *ngIf="form.hasError('idEqualsSusep')" class="form-text text-danger">
+              {{ form.getError('idEqualsSusep') }}
+            </div>
+          </div>
+          <div class="row g-3 mb-3">
+            <div class="col-md-6">
+              <label for="inicioVigencia" class="form-label">Início de Vigência</label>
+              <input #inicioDate id="inicioVigencia" type="date" class="form-control" formControlName="inicioVigencia" (click)="openInicioPicker()" />
+              <div *ngIf="form.get('inicioVigencia')?.touched && form.get('inicioVigencia')?.invalid" class="form-text text-danger">
+                Início de vigência é obrigatório.
+              </div>
+            </div>
+            <div class="col-md-6">
+              <label for="fimVigencia" class="form-label">Fim de Vigência</label>
+              <input #fimDate id="fimVigencia" type="date" class="form-control" formControlName="fimVigencia" [min]="form.get('inicioVigencia')?.value" (click)="openFimPicker()" />
+              <div *ngIf="form.get('fimVigencia')?.touched && form.get('fimVigencia')?.invalid" class="form-text text-danger">
+                Fim de vigência é obrigatório.
+              </div>
+            </div>
+          </div>
+          <div *ngIf="form.hasError('dateRange')" class="form-text text-danger mb-3">
+            {{ form.getError('dateRange') }}
+          </div>
+          <div class="row g-3 mb-4">
+            <div class="col-auto">
+              <div class="form-check">
+                <input id="permitePessoaFisica" class="form-check-input" type="checkbox" formControlName="permitePessoaFisica" />
+                <label class="form-check-label fw-semibold" for="permitePessoaFisica">
+                  Permite Pessoa Física
+                </label>
+              </div>
+            </div>
+            <div class="col-auto">
+              <div class="form-check">
+                <input id="permitePessoaJuridica" class="form-check-input" type="checkbox" formControlName="permitePessoaJuridica" />
+                <label class="form-check-label fw-semibold" for="permitePessoaJuridica">
+                  Permite Pessoa Jurídica
+                </label>
+              </div>
+            </div>
+          </div>
+          <div class="row g-3 mb-4">
+            <div class="col-auto">
+              <div class="form-check">
+                <input id="produtoAtivo" class="form-check-input" type="checkbox" formControlName="produtoAtivo" />
+                <label class="form-check-label fw-semibold" for="produtoAtivo">
+                  Produto Ativo
+                </label>
+              </div>
+            </div>
+          </div>
+          <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-primary" [disabled]="isEdit ? (form.invalid || form.pristine) : false">
+              {{ isEdit ? 'Atualizar' : 'Salvar' }}
+            </button>
+            <button type="button" class="btn btn-secondary" (click)="cancel()">
+              Cancelar
+            </button>
+            <button *ngIf="isEdit" type="button" class="btn btn-outline-secondary" routerLink="/produto/cadastro">
+              + Novo Produto
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

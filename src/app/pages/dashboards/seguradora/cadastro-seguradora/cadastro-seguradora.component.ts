@@ -86,7 +86,7 @@ export class CadastroSeguradoraComponent implements OnInit {
         id:         seg.id,
         nome:       seg.nome,
         tipoPessoa: seg.tipoPessoa,
-        ativa:      seg.ativa,
+        ativo:      seg.ativo,
         documento:  seg.cnpj
       });
       this.form.get('id')?.disable();
@@ -252,7 +252,7 @@ export class CadastroSeguradoraComponent implements OnInit {
       id:         +v.id,
       nome:       v.nome,
       tipoPessoa: v.tipoPessoa as PessoaTipo,
-      ativa:      v.ativa,
+      ativo:      v.ativo,
       cnpj:       v.documento,
       enderecos:  v.enderecos,
       contatos:   v.contatos

@@ -9,5 +9,5 @@ export interface Ramo {
   nomeAbreviado?:    string;
   inicioVigencia:    string;
   fimVigencia:       string;
-  ramoAtivo:         boolean;
+  ativo:         boolean;
 }

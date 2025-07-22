@@ -31,16 +31,25 @@
             </ng-container>
             <ng-template #semData>
               <ng-container [ngSwitch]="col.campo">
-                <ng-container *ngSwitchCase="'ativa'">
-                  <span class="badge" [ngClass]="obterPorCaminho(item,'ativa') ? 'bg-success' : 'bg-danger'">
-                    {{ obterPorCaminho(item,'ativa') ? 'Sim' : 'Não' }}
+                <!-- Badge único para campo 'ativo' -->
+                <ng-container *ngSwitchCase="'ativo'">
+                  <span class="badge" [ngClass]="obterPorCaminho(item,'ativo') ? 'bg-success' : 'bg-danger'">
+                    {{ obterPorCaminho(item,'ativo') ? 'Sim' : 'Não' }}
                   </span>
                 </ng-container>
-                <ng-container *ngSwitchCase="'ramoAtivo'">
-                  <span class="badge" [ngClass]="obterPorCaminho(item,'ramoAtivo') ? 'bg-success' : 'bg-danger'">
-                    {{ obterPorCaminho(item,'ramoAtivo') ? 'Sim' : 'Não' }}
+                <!-- Badge para Permite Pessoa Física -->
+                <ng-container *ngSwitchCase="'permitePessoaFisica'">
+                  <span class="badge" [ngClass]="obterPorCaminho(item,'permitePessoaFisica') ? 'bg-success' : 'bg-danger'">
+                    {{ obterPorCaminho(item,'permitePessoaFisica') ? 'Sim' : 'Não' }}
                   </span>
                 </ng-container>
+                <!-- Badge para Permite Pessoa Jurídica -->
+                <ng-container *ngSwitchCase="'permitePessoaJuridica'">
+                  <span class="badge" [ngClass]="obterPorCaminho(item,'permitePessoaJuridica') ? 'bg-success' : 'bg-danger'">
+                    {{ obterPorCaminho(item,'permitePessoaJuridica') ? 'Sim' : 'Não' }}
+                  </span>
+                </ng-container>
+                <!-- Qualquer outro campo cai aqui -->
                 <ng-container *ngSwitchDefault>
                   {{ obterPorCaminho(item, col.campo) }}
                 </ng-container>
@@ -67,14 +76,11 @@
   <div class="col-sm-6">
     <div class="dataTables_info mb-2" role="status" aria-live="polite">
       Mostrando {{ (pagina - 1) * tamanhoPagina + 1 }} até
-      {{ pagina * tamanhoPagina > tamanhoColecao
-      ? tamanhoColecao
-      : pagina * tamanhoPagina }}
+      {{ pagina * tamanhoPagina > tamanhoColecao ? tamanhoColecao : pagina * tamanhoPagina }}
       de {{ tamanhoColecao }} entradas
     </div>
   </div>
   <div class="col-sm-6">
-    <!-- só exibe paginação se tiver mais itens que cabem numa página -->
     <div *ngIf="tamanhoColecao > tamanhoPagina" class="text-sm-right float-sm-end listjs-pagination mt-2 mt-sm-0">
       <ngb-pagination class="pagination gap-1 mb-0" [collectionSize]="tamanhoColecao" [(page)]="pagina" [pageSize]="tamanhoPagina" (pageChange)="aoMudarPagina($event)" [directionLinks]="true" [boundaryLinks]="true" [ellipses]="false" [maxSize]="3" [rotate]="true" previousText="«" nextText="»">
       </ngb-pagination>

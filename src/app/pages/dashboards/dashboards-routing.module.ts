@@ -17,6 +17,11 @@ const routes: Routes = [
     path: 'grupo-ramo',
     loadChildren: () =>
       import('./grupo-ramo/grupo-ramo.module').then(m => m.GrupoRamoModule)
+  },
+  {
+    path: 'produto',
+    loadChildren: () =>
+      import('./produto/produto.module').then(m => m.ProdutoModule)
   }
 ];
 
