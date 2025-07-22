@@ -31,7 +31,7 @@ export interface Seguradora {
   nome:        string;
   tipoPessoa:  PessoaTipo;
   ativo:       boolean;
-  cnpj:        string;
+  documento:        string;
   enderecos:   Endereco[];
   contatos:    Contato[];
 }
