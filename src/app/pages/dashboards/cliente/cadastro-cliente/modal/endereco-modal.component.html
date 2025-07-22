@@ -1,0 +1,98 @@
+<!-- src/app/pages/dashboards/seguradora/cadastro-seguradora/modal/endereco-modal.component.html -->
+<div class="modal-header">
+  <h5 class="modal-title">
+    {{ endereco ? 'Editar Endereço' : 'Novo Endereço' }}
+  </h5>
+  <button type="button" class="btn-close" aria-label="Close" (click)="cancelar()"></button>
+</div>
+
+<div class="modal-body">
+  <form [formGroup]="form">
+    <div class="row gx-3 gy-2">
+
+      <!-- Linha 1: CEP -->
+      <div class="col-12">
+        <label for="cep" class="form-label">CEP</label>
+        <input id="cep" type="text" class="form-control" formControlName="cep" mask="00000-000" placeholder="00000-000" />
+        <div *ngIf="form.get('cep')?.touched && form.get('cep')?.hasError('required')" class="form-text text-danger">
+          CEP é obrigatório.
+        </div>
+      </div>
+
+      <!-- Linha 2: Tipo Logradouro / Logradouro -->
+      <div class="col-md-4">
+        <label for="tipoLogradouro" class="form-label">Tipo Logradouro</label>
+        <input id="tipoLogradouro" type="text" class="form-control" formControlName="tipoLogradouro" placeholder="Rua, Av." />
+        <div *ngIf="form.get('tipoLogradouro')?.touched && form.get('tipoLogradouro')?.invalid" class="form-text text-danger">
+          Obrigatório.
+        </div>
+      </div>
+      <div class="col-md-8">
+        <label for="logradouro" class="form-label">Logradouro</label>
+        <input id="logradouro" type="text" class="form-control" formControlName="logradouro" placeholder="Nome do logradouro" />
+        <div *ngIf="form.get('logradouro')?.touched && form.get('logradouro')?.invalid" class="form-text text-danger">
+          Obrigatório.
+        </div>
+      </div>
+
+      <!-- Linha 3: Número / Complemento -->
+      <div class="col-md-3">
+        <label for="numero" class="form-label">Número</label>
+        <input id="numero" type="text" class="form-control" formControlName="numero" placeholder="Número" />
+        <div *ngIf="form.get('numero')?.touched && form.get('numero')?.invalid" class="form-text text-danger">
+          Obrigatório.
+        </div>
+      </div>
+      <div class="col-md-9">
+        <label for="complemento" class="form-label">Complemento</label>
+        <input id="complemento" type="text" class="form-control" formControlName="complemento" placeholder="Apto, bloco, lote" />
+      </div>
+
+      <!-- Linha 4: Bairro / Cidade / UF -->
+      <div class="col-md-4">
+        <label for="bairro" class="form-label">Bairro</label>
+        <input id="bairro" type="text" class="form-control" formControlName="bairro" placeholder="Bairro" />
+        <div *ngIf="form.get('bairro')?.touched && form.get('bairro')?.invalid" class="form-text text-danger">
+          Obrigatório.
+        </div>
+      </div>
+      <div class="col-md-5">
+        <label for="cidade" class="form-label">Cidade</label>
+        <input id="cidade" type="text" class="form-control" formControlName="cidade" placeholder="Cidade" />
+        <div *ngIf="form.get('cidade')?.touched && form.get('cidade')?.invalid" class="form-text text-danger">
+          Obrigatório.
+        </div>
+      </div>
+      <div class="col-md-3">
+        <label for="uf" class="form-label">UF</label>
+        <input id="uf" type="text" class="form-control" formControlName="uf" maxlength="2" placeholder="SP" />
+        <div *ngIf="form.get('uf')?.touched && form.get('uf')?.invalid" class="form-text text-danger">
+          Obrigatório.
+        </div>
+      </div>
+
+      <!-- Linha 5: Tipo Endereço -->
+      <div class="col-12">
+        <label for="tipoEndereco" class="form-label">Tipo Endereço</label>
+        <select id="tipoEndereco" class="form-select" formControlName="tipoEndereco">
+          <option value="">Selecione...</option>
+          <option value="Comercial">Comercial</option>
+          <option value="Residencial">Residencial</option>
+        </select>
+        <div *ngIf="form.get('tipoEndereco')?.touched && form.get('tipoEndereco')?.invalid" class="form-text text-danger">
+          Obrigatório.
+        </div>
+      </div>
+
+    </div>
+  </form>
+</div>
+
+<div class="modal-footer">
+  <button type="button" class="btn btn-secondary" (click)="cancelar()">
+    Cancelar
+  </button>
+  <button type="button" class="btn btn-primary" (click)="salvar()" [disabled]="endereco ? (form.invalid || form.pristine) : false">
+    {{ endereco ? 'Atualizar' : 'Salvar' }}
+  </button>
+</div>

@@ -20,7 +20,6 @@ import { dateRangeValidator } from './date-range.validator';
 @Component({
   selector: 'app-cadastro-ramo',
   templateUrl: './cadastro-ramo.component.html',
-  styleUrls: ['./cadastro-ramo.component.scss']
 })
 export class CadastroRamoComponent implements OnInit {
   @ViewChild('inicioDate') inicioDate!: ElementRef<HTMLInputElement>;

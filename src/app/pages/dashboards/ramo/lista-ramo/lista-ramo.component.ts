@@ -13,7 +13,6 @@ import { DefinicaoColuna }         from 'src/app/shared/lista-base/lista-base.co
 @Component({
   selector: 'app-lista-ramo',
   templateUrl: './lista-ramo.component.html',
-  styleUrls: ['./lista-ramo.component.scss']
 })
 export class ListaRamoComponent implements OnInit {
   allRamos: Ramo[] = [];

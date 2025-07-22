@@ -21,7 +21,6 @@ import { ToastService } from 'src/app/shared/toasts/toast-service';
 @Component({
   selector: 'app-cadastro-grupo-ramo',
   templateUrl: './cadastro-grupo-ramo.component.html',
-  styleUrls: ['./cadastro-grupo-ramo.component.scss']
 })
 export class CadastroGrupoRamoComponent implements OnInit {
   form!: FormGroup;

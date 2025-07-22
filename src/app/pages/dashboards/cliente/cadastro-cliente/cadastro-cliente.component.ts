@@ -1,3 +1,4 @@
+// src/app/pages/dashboards/cliente/cadastro-cliente/cadastro-cliente.component.ts
 import { Component, OnInit } from '@angular/core';
 import {
   FormBuilder,
@@ -11,29 +12,28 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 import {
-  Seguradora,
+  Cliente,
   Endereco,
   Contato,
   PessoaTipo
-} from 'src/app/store/Seguradora/seguradora.model';
-import { SeguradoraService }   from 'src/app/core/services/seguradora.service';
-import { ToastService }        from 'src/app/shared/toasts/toast-service';
-import { ConfirmModalComponent }   from 'src/app/shared/confirm-modal/confirm-modal.component';
-import { EnderecoModalComponent }  from './modal/endereco-modal.component';
-import { ContatoModalComponent }   from './modal/contato-modal.component';
-import { DefinicaoColuna }         from 'src/app/shared/lista-base/lista-base.component';
+} from 'src/app/store/Cliente/cliente.model';
+import { ClienteService }    from 'src/app/core/services/cliente.service';
+import { ToastService }      from 'src/app/shared/toasts/toast-service';
+import { ConfirmModalComponent }  from 'src/app/shared/confirm-modal/confirm-modal.component';
+import { EnderecoModalComponent } from './modal/endereco-modal.component';
+import { ContatoModalComponent }  from './modal/contato-modal.component';
+import { DefinicaoColuna }        from 'src/app/shared/lista-base/lista-base.component';
 
 @Component({
-  selector: 'app-cadastro-seguradora',
-  templateUrl: './cadastro-seguradora.component.html',
+  selector: 'app-cadastro-cliente',
+  templateUrl: './cadastro-cliente.component.html',
 })
-export class CadastroSeguradoraComponent implements OnInit {
+export class CadastroClienteComponent implements OnInit {
   form!: FormGroup;
   isEdit = false;
   submitted = false;
   private editingId?: number;
 
-  // pré‑seleciona "Jurídica" por padrão
   pessoaTipos: PessoaTipo[] = ['Física', 'Jurídica'];
 
   colunasEndereco: DefinicaoColuna[] = [
@@ -57,7 +57,7 @@ export class CadastroSeguradoraComponent implements OnInit {
 
   constructor(
     private fb: FormBuilder,
-    private service: SeguradoraService,
+    private service: ClienteService,
     private router: Router,
     private route: ActivatedRoute,
     private toast: ToastService,
@@ -67,7 +67,6 @@ export class CadastroSeguradoraComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    // sempre que mudar o tipo de pessoa, limpa o documento
     this.form.get('tipoPessoa')!.valueChanges.subscribe(() => {
       this.form.get('documento')!.reset();
     });
@@ -78,23 +77,23 @@ export class CadastroSeguradoraComponent implements OnInit {
 
       this.isEdit = true;
       this.editingId = +idParam;
-      const seg = this.service.getById(this.editingId);
-      if (!seg) return;
+      const cli = this.service.getById(this.editingId);
+      if (!cli) return;
 
       this.form.patchValue({
-        id:         seg.id,
-        nome:       seg.nome,
-        tipoPessoa: seg.tipoPessoa,
-        ativo:      seg.ativo,
-        documento:  seg.documento
+        id:         cli.id,
+        nome:       cli.nome,
+        tipoPessoa: cli.tipoPessoa,
+        ativo:      cli.ativo,
+        documento:  cli.documento
       });
       this.form.get('id')?.disable();
 
       this.enderecos.clear();
-      seg.enderecos.forEach(e => this.enderecos.push(this.fb.group(e)));
+      cli.enderecos.forEach(e => this.enderecos.push(this.fb.group(e)));
 
       this.contatos.clear();
-      seg.contatos.forEach(c => this.contatos.push(this.fb.group(c)));
+      cli.contatos.forEach(c => this.contatos.push(this.fb.group(c)));
     });
   }
 
@@ -102,8 +101,8 @@ export class CadastroSeguradoraComponent implements OnInit {
     this.form = this.fb.group({
       id:         [null, [Validators.required, Validators.pattern(/^\d+$/)]],
       nome:       ['', Validators.required],
-      tipoPessoa: ['Jurídica', Validators.required],
-      ativa:      [true],
+      tipoPessoa: ['Física', Validators.required],
+      ativo:      [true],
       documento:  ['', Validators.required],
       enderecos:  this.fb.array([]),
       contatos:   this.fb.array([])
@@ -127,7 +126,7 @@ export class CadastroSeguradoraComponent implements OnInit {
     if (id == null) return null;
     const existing = this.service.getById(+id);
     if (existing && (!this.isEdit || existing.id !== this.editingId)) {
-      return { uniqueId: 'Já existe uma seguradora com este ID.' };
+      return { uniqueId: 'Já existe um cliente com este ID.' };
     }
     return null;
   }
@@ -151,7 +150,6 @@ export class CadastroSeguradoraComponent implements OnInit {
   onEditarEndereco(e: Endereco): void {
     const i = this.enderecos.value.findIndex((x: Endereco) => x.id === e.id);
     if (i < 0) return;
-
     const modalRef = this.modal.open(EnderecoModalComponent, { centered: true, backdrop: 'static' });
     modalRef.componentInstance.endereco = e;
     modalRef.result
@@ -162,28 +160,21 @@ export class CadastroSeguradoraComponent implements OnInit {
   onApagarEndereco(e: Endereco): void {
     const i = this.enderecos.value.findIndex((x: Endereco) => x.id === e.id);
     if (i < 0) return;
-
     const ref = this.modal.open(ConfirmModalComponent, { centered: true, backdrop: 'static' });
     ref.componentInstance.title = 'Confirma exclusão';
     ref.componentInstance.message = `Deseja realmente apagar o endereço “${e.tipoLogradouro} ${e.logradouro}, ${e.numero}”?`;
     ref.componentInstance.confirmText = 'Apagar';
     ref.componentInstance.confirmButtonClass = 'btn-danger';
-
     ref.result.then(ok => {
       if (!ok) return;
-
       if (this.isEdit && this.editingId != null) {
-        this.service.deleteEndereco(this.editingId, i)
-          .subscribe({
-            next: () => {
-              this.enderecos.removeAt(i);
-              this.toast.show('Endereço excluído com sucesso.', { classname: 'bg-danger text-light', delay: 3000 });
-            },
-            error: err => {
-              console.error(err);
-              this.toast.show('Falha ao excluir endereço.', { classname: 'bg-warning text-dark', delay: 5000 });
-            }
-          });
+        this.service.deleteEndereco(this.editingId, i).subscribe({
+          next: () => {
+            this.enderecos.removeAt(i);
+            this.toast.show('Endereço excluído com sucesso.', { classname: 'bg-danger text-light', delay: 3000 });
+          },
+          error: () => this.toast.show('Falha ao excluir endereço.', { classname: 'bg-warning text-dark', delay: 5000 })
+        });
       } else {
         this.enderecos.removeAt(i);
       }
@@ -201,7 +192,6 @@ export class CadastroSeguradoraComponent implements OnInit {
   onEditarContato(c: Contato): void {
     const i = this.contatos.value.findIndex((x: Contato) => x.id === c.id);
     if (i < 0) return;
-
     const modalRef = this.modal.open(ContatoModalComponent, { centered: true, backdrop: 'static' });
     modalRef.componentInstance.contato = c;
     modalRef.result
@@ -212,28 +202,21 @@ export class CadastroSeguradoraComponent implements OnInit {
   onApagarContato(c: Contato): void {
     const i = this.contatos.value.findIndex((x: Contato) => x.id === c.id);
     if (i < 0) return;
-
     const ref = this.modal.open(ConfirmModalComponent, { centered: true, backdrop: 'static' });
     ref.componentInstance.title = 'Confirma exclusão';
     ref.componentInstance.message = `Deseja realmente apagar o contato “${c.email}”?`;
     ref.componentInstance.confirmText = 'Apagar';
     ref.componentInstance.confirmButtonClass = 'btn-danger';
-
     ref.result.then(ok => {
       if (!ok) return;
-
       if (this.isEdit && this.editingId != null) {
-        this.service.deleteContato(this.editingId, i)
-          .subscribe({
-            next: () => {
-              this.contatos.removeAt(i);
-              this.toast.show('Contato excluído com sucesso.', { classname: 'bg-danger text-light', delay: 3000 });
-            },
-            error: err => {
-              console.error(err);
-              this.toast.show('Falha ao excluir contato.', { classname: 'bg-warning text-dark', delay: 5000 });
-            }
-          });
+        this.service.deleteContato(this.editingId, i).subscribe({
+          next: () => {
+            this.contatos.removeAt(i);
+            this.toast.show('Contato excluído com sucesso.', { classname: 'bg-danger text-light', delay: 3000 });
+          },
+          error: () => this.toast.show('Falha ao excluir contato.', { classname: 'bg-warning text-dark', delay: 5000 })
+        });
       } else {
         this.contatos.removeAt(i);
       }
@@ -247,34 +230,34 @@ export class CadastroSeguradoraComponent implements OnInit {
       return;
     }
     const v = this.form.getRawValue();
-    const seg: Seguradora = {
+    const cli: Cliente = {
       id:         +v.id,
       nome:       v.nome,
       tipoPessoa: v.tipoPessoa as PessoaTipo,
       ativo:      v.ativo,
-      documento:       v.documento,
+      documento:  v.documento,
       enderecos:  v.enderecos,
       contatos:   v.contatos
     };
     const op$ = this.isEdit
-      ? this.service.update(seg)
-      : this.service.create(seg);
+      ? this.service.update(cli)
+      : this.service.create(cli);
 
     op$.subscribe({
       next: () => {
         this.toast.show(
           this.isEdit
-            ? `Seguradora "${seg.nome}" atualizada!`
-            : `Seguradora "${seg.nome}" criada!`,
+            ? `Cliente "${cli.nome}" atualizado!`
+            : `Cliente "${cli.nome}" criado!`,
           {
             classname: this.isEdit ? 'bg-info text-light' : 'bg-success text-light',
             delay: 5000
           }
         );
-        if (!this.isEdit) this.router.navigate(['/seguradora']);
+        if (!this.isEdit) this.router.navigate(['/cliente']);
       },
       error: () => {
-        this.toast.show('Erro ao salvar seguradora.', {
+        this.toast.show('Erro ao salvar cliente.', {
           classname: 'bg-warning text-dark',
           delay: 5000
         });
@@ -283,6 +266,6 @@ export class CadastroSeguradoraComponent implements OnInit {
   }
 
   cancel(): void {
-    this.router.navigate(['/seguradora']);
+    this.router.navigate(['/cliente']);
   }
 }

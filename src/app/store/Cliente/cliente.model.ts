@@ -1,6 +1,5 @@
-// src/app/store/Seguradora/seguradora.model.ts
+// src/app/store/Cliente/cliente.model.ts
 
-// tipo de pessoa (pessoa física ou jurídica), agora aplicável à Seguradora
 export type PessoaTipo = 'Física' | 'Jurídica';
 
 export interface Endereco {
@@ -25,13 +24,12 @@ export interface Contato {
   nomeContato?:  string;
 }
 
-// agora a Seguradora tem seu tipo de pessoa
-export interface Seguradora {
-  id:          number;
-  nome:        string;
-  tipoPessoa:  PessoaTipo;
-  ativo:       boolean;
-  documento:        string;
-  enderecos:   Endereco[];
-  contatos:    Contato[];
+export interface Cliente {
+  id:            number;
+  nome:          string;
+  tipoPessoa:    PessoaTipo;
+  ativo:         boolean;
+  documento:     string;
+  enderecos:     Endereco[];
+  contatos:      Contato[];
 }

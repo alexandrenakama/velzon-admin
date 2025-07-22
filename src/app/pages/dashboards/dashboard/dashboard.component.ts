@@ -9,7 +9,6 @@ import { BestSelling, Recentelling, TopSelling, statData } from 'src/app/core/da
 @Component({
   selector: 'app-dashboard',
   templateUrl: './dashboard.component.html',
-  styleUrls: ['./dashboard.component.scss']
 })
 export class DashboardComponent implements OnInit {
   // breadcrumb
