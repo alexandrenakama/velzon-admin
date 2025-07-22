@@ -24,7 +24,7 @@ export class ListaSeguradoraComponent implements OnInit {
     { campo: 'nome',        cabecalho: 'Nome',          ordenavel: true              },
     { campo: 'tipoPessoa',  cabecalho: 'Tipo Pessoa',   ordenavel: true, largura: '120px' },
     { campo: 'cnpj',        cabecalho: 'Documento',     ordenavel: true              },
-    { campo: 'ativa',       cabecalho: 'Ativa',         ordenavel: true, largura: '100px' }
+    { campo: 'ativo',       cabecalho: 'Ativo',         ordenavel: true, largura: '100px' }
   ];
 
   constructor(

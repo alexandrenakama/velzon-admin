@@ -65,7 +65,7 @@ export class CadastroRamoComponent implements OnInit {
               nomeAbreviado:     ramo.nomeAbreviado,
               inicioVigencia:    ramo.inicioVigencia,
               fimVigencia:       ramo.fimVigencia,
-              ramoAtivo:         ramo.ramoAtivo
+              ativo:         ramo.ativo
             });
             this.form.get('identificadorRamo')?.disable();
           }
@@ -172,7 +172,7 @@ export class CadastroRamoComponent implements OnInit {
       nomeAbreviado:     v.nomeAbreviado,
       inicioVigencia:    v.inicioVigencia,
       fimVigencia:       v.fimVigencia,
-      ramoAtivo:         v.ramoAtivo
+      ativo:         v.ativo
     };
     const op$ = this.isEdit
       ? this.ramoService.update(ramo)

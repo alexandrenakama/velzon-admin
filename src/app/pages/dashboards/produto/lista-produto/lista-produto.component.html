@@ -1,0 +1,25 @@
+<!-- src/app/pages/dashboards/produto/lista-produto/lista-produto.component.html -->
+<div class="row">
+  <div class="col-xl-12">
+    <div class="card">
+      <div class="card-header">
+        <h4 class="card-title mb-0">Produtos Cadastrados</h4>
+      </div>
+      <div class="card-body">
+        <app-lista-base #listaBase [todosItens]="allProdutos" [colunas]="colunas" (editar)="onEdit($event)" (apagar)="onDelete($event)">
+          <ng-template #toolbarTpl>
+            <a class="btn btn-secondary" routerLink="cadastro">+ Novo Produto</a>
+          </ng-template>
+          <ng-template #acoesTpl let-item>
+            <button class="btn btn-sm btn-light me-1" (click)="listaBase.editar.emit(item)">
+              Editar
+            </button>
+            <button class="btn btn-sm btn-danger" (click)="listaBase.apagar.emit(item)">
+              Apagar
+            </button>
+          </ng-template>
+        </app-lista-base>
+      </div>
+    </div>
+  </div>
+</div>

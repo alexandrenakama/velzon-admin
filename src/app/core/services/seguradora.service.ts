@@ -17,7 +17,7 @@ export class SeguradoraService {
       id:         1,
       nome:       'Porto Seguros',
       tipoPessoa: 'Jurídica' as PessoaTipo,
-      ativa:      true,
+      ativo:      true,
       cnpj:       '12.345.678/0001-95',
       enderecos:  [
         {

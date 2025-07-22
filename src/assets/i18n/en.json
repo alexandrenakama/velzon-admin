@@ -13,7 +13,9 @@
       "LIST": {
         "SEGURADORA": "Seguradora",
         "GRUPO_RAMO": "Grupo Ramo",
-        "RAMO": "Ramo"
+        "RAMO": "Ramo",
+        "PRODUTO": "Produto",
+        "CLIENTE": "Cliente"
       }
     },
     "APPS": {

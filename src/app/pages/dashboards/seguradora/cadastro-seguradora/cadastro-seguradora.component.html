@@ -1,18 +1,15 @@
 <div class="row">
   <div class="col-xl-12">
     <div class="card">
-
-      <!-- Cabeçalho -->
       <div class="card-header d-flex align-items-center">
         <h4 class="card-title mb-0 flex-grow-1">
           {{ isEdit ? 'Editar Seguradora' : 'Nova Seguradora' }}
         </h4>
       </div>
-
       <div class="card-body">
         <form [formGroup]="form" (ngSubmit)="save()">
 
-          <!-- 1ª linha: ID + Ativa -->
+          <!-- 1ª linha: ID -->
           <div class="row g-3 mb-3 align-items-end">
             <div class="col-md-2">
               <label for="id" class="form-label">ID</label>
@@ -25,19 +22,10 @@
                 {{ form.getError('uniqueId') }}
               </div>
             </div>
-            <div class="col-md-2">
-              <label for="ativaSwitch" class="form-label">Ativa</label>
-              <div class="form-check form-switch">
-                <input id="ativaSwitch" type="checkbox" class="form-check-input" formControlName="ativa" />
-                <label for="ativaSwitch" class="form-check-label">
-                  {{ form.get('ativa')?.value ? 'Sim' : 'Não' }}
-                </label>
-              </div>
-            </div>
           </div>
 
           <!-- 2ª linha: Nome + Tipo de Pessoa + Documento -->
-          <div class="row g-3 mb-5">
+          <div class="row g-3 mb-3">
             <div class="col-md-6">
               <label for="nome" class="form-label">Nome da Seguradora</label>
               <input id="nome" type="text" formControlName="nome" class="form-control" placeholder="Digite o nome da seguradora" />
@@ -56,9 +44,7 @@
               </div>
             </div>
             <div class="col-md-3">
-              <label for="documento" class="form-label">
-                {{ isJuridica ? 'CNPJ' : 'CPF' }}
-              </label>
+              <label for="documento" class="form-label">{{ isJuridica ? 'CNPJ' : 'CPF' }}</label>
               <input id="documento" type="text" formControlName="documento" [mascara]="isJuridica ? 'cnpj' : 'cpf'" [maxlength]="isJuridica ? 18 : 14" class="form-control" [placeholder]="isJuridica ? '00.000.000/0000-00' : '000.000.000-00'" />
               <div *ngIf="form.get('documento')?.touched && form.get('documento')?.invalid" class="form-text text-danger">
                 Documento é obrigatório.
@@ -66,8 +52,20 @@
             </div>
           </div>
 
+          <!-- Seguradora Ativa -->
+          <div class="row mb-5">
+            <div class="col-auto">
+              <div class="form-check">
+                <input id="ativa" class="form-check-input" type="checkbox" formControlName="ativa" />
+                <label class="form-check-label fw-semibold" for="ativa">
+                  Seguradora Ativa
+                </label>
+              </div>
+            </div>
+          </div>
+
           <!-- ENDEREÇOS -->
-          <div class="mb-4 mt-4">
+          <div class="mb-4">
             <app-lista-base [todosItens]="enderecos.value" [colunas]="colunasEndereco" [tamanhoPagina]="5" (editar)="onEditarEndereco($event)" (apagar)="onApagarEndereco($event)">
               <ng-template #toolbarTpl>
                 <button type="button" class="btn btn-secondary" (click)="openAddEndereco()">
@@ -75,12 +73,8 @@
                 </button>
               </ng-template>
               <ng-template #acoesTpl let-item>
-                <button type="button" class="btn btn-sm btn-light me-1" (click)="onEditarEndereco(item)">
-                  Editar
-                </button>
-                <button type="button" class="btn btn-sm btn-danger" (click)="onApagarEndereco(item)">
-                  Apagar
-                </button>
+                <button type="button" class="btn btn-sm btn-light me-1" (click)="onEditarEndereco(item)">Editar</button>
+                <button type="button" class="btn btn-sm btn-danger" (click)="onApagarEndereco(item)">Apagar</button>
               </ng-template>
             </app-lista-base>
             <div *ngIf="submitted && enderecos.length === 0" class="form-text text-danger">
@@ -97,12 +91,8 @@
                 </button>
               </ng-template>
               <ng-template #acoesTpl let-item>
-                <button type="button" class="btn btn-sm btn-light me-1" (click)="onEditarContato(item)">
-                  Editar
-                </button>
-                <button type="button" class="btn btn-sm btn-danger" (click)="onApagarContato(item)">
-                  Apagar
-                </button>
+                <button type="button" class="btn btn-sm btn-light me-1" (click)="onEditarContato(item)">Editar</button>
+                <button type="button" class="btn btn-sm btn-danger" (click)="onApagarContato(item)">Apagar</button>
               </ng-template>
             </app-lista-base>
             <div *ngIf="submitted && contatos.length === 0" class="form-text text-danger">

@@ -30,6 +30,18 @@ export const MENU: MenuItem[] = [
         label: 'MENUITEMS.CADASTROS.LIST.RAMO',
         link: '/ramo',
         parentId: 2
+      },
+      {
+        id: 12,
+        label: 'MENUITEMS.CADASTROS.LIST.PRODUTO',
+        link: '/produto',
+        parentId: 2
+      },
+      {
+        id: 13,
+        label: 'MENUITEMS.CADASTROS.LIST.CLIENTE',
+        link: '/cliente',
+        parentId: 2
       }
     ]
   },
