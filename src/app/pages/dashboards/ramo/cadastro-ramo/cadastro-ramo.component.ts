@@ -53,7 +53,6 @@ export class CadastroRamoComponent implements OnInit {
           this.editingId = id;
           const ramo = this.ramoService.getById(id);
           if (ramo) {
-            // encontra o GrupoRamo correspondente
             const grpObj = this.grupos.find(g => g.id === ramo.grupo.id) || null;
             this.form.patchValue({
               grupo:             grpObj,
@@ -64,7 +63,7 @@ export class CadastroRamoComponent implements OnInit {
               nomeAbreviado:     ramo.nomeAbreviado,
               inicioVigencia:    ramo.inicioVigencia,
               fimVigencia:       ramo.fimVigencia,
-              ativo:         ramo.ativo
+              ramoAtivo:         ramo.ativo
             });
             this.form.get('identificadorRamo')?.disable();
           }
@@ -74,12 +73,20 @@ export class CadastroRamoComponent implements OnInit {
 
     // atualiza o código sempre que mudar identificador ou grupo
     this.form.get('identificadorRamo')!.valueChanges.subscribe(() => this.updateCodigo());
+    // revalida unique e dateRange
+    this.form.get('grupo')!.valueChanges.subscribe(() => this.form.updateValueAndValidity());
+    this.form.get('identificadorRamo')!.valueChanges.subscribe(() => this.form.updateValueAndValidity());
+    this.form.get('inicioVigencia')!.valueChanges.subscribe(() => this.form.updateValueAndValidity());
+    this.form.get('fimVigencia')!.valueChanges.subscribe(() => this.form.updateValueAndValidity());
   }
 
   private buildForm() {
     this.form = this.fb.group(
       {
-        grupo:             [null as GrupoRamo | null, Validators.required],
+        grupo: [
+          null as GrupoRamo | null,
+          [Validators.required, this.grupoExistValidator.bind(this)]
+        ],
         grupoId:           [null, Validators.required],
         identificadorRamo: [null, [Validators.required, Validators.pattern(/^\d+$/)]],
         codigoRamo:        [{ value: '', disabled: true }],
@@ -98,7 +105,37 @@ export class CadastroRamoComponent implements OnInit {
     );
   }
 
-  // valida se identificador já existe
+  /** Se o usuário digitou texto e não selecionou objeto GrupoRamo, marca erro */
+  private grupoExistValidator(ctrl: AbstractControl): ValidationErrors | null {
+    const v = ctrl.value;
+    if (v != null && typeof v === 'string') {
+      return { invalidGrupo: true };
+    }
+    return null;
+  }
+
+  /** No blur do campo, ajusta erros e limpa grupoId caso inválido */
+  onBlurGrupo(): void {
+    const ctrl = this.form.get('grupo')!;
+    const val = ctrl.value;
+    let errors: ValidationErrors = ctrl.errors || {};
+
+    if (!val) {
+      delete errors['invalidGrupo'];
+    } else if (typeof val === 'string') {
+      errors['invalidGrupo'] = true;
+    } else {
+      errors = {};
+    }
+
+    ctrl.setErrors(Object.keys(errors).length ? errors : null);
+
+    if (!val || typeof val === 'string') {
+      this.form.patchValue({ grupoId: null });
+    }
+  }
+
+  /** Valida se identificador já existe */
   private uniqueIdentificadorValidator(ctrl: AbstractControl): ValidationErrors | null {
     const ident = ctrl.get('identificadorRamo')?.value?.toString();
     if (!ident) return null;
@@ -136,9 +173,6 @@ export class CadastroRamoComponent implements OnInit {
     this.updateCodigo();
   }
 
-  /** 
-   * Limpa seleção e abre dropdown ao clicar
-   */
   openDropdown(e: Event): void {
     e.stopPropagation();
     this.form.patchValue({ grupo: null, grupoId: null });
@@ -171,7 +205,7 @@ export class CadastroRamoComponent implements OnInit {
       nomeAbreviado:     v.nomeAbreviado,
       inicioVigencia:    v.inicioVigencia,
       fimVigencia:       v.fimVigencia,
-      ativo:         v.ativo
+      ativo:             v.ramoAtivo
     };
     const op$ = this.isEdit
       ? this.ramoService.update(ramo)

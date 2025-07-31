@@ -15,10 +15,20 @@
           <!-- Grupo com visual de SELECT -->
           <div class="mb-3 position-relative">
             <label for="grupoSearch" class="form-label">Grupo</label>
-            <input id="grupoSearch" type="text" class="form-select dropdown-toggle" formControlName="grupo" [ngbTypeahead]="searchGrupo" [resultFormatter]="formatter" [inputFormatter]="formatter" [minLength]="0" (click)="openDropdown($event)" (selectItem)="onSelectGrupo($event)" placeholder="Buscar grupo (nome ou número)" autocomplete="off" />
+            <input id="grupoSearch" type="text" class="form-select dropdown-toggle" formControlName="grupo" [ngbTypeahead]="searchGrupo" [resultFormatter]="formatter" [inputFormatter]="formatter" [minLength]="0" (click)="openDropdown($event)" (selectItem)="onSelectGrupo($event)" (blur)="onBlurGrupo()" placeholder="Buscar grupo (nome ou número)" autocomplete="off" />
             <input type="hidden" formControlName="grupoId" />
-            <div *ngIf="form.get('grupo')?.touched && form.get('grupo')?.invalid" class="form-text text-danger">
+
+            <!-- erro de required -->
+            <div *ngIf="form.get('grupo')?.touched && form.get('grupo')?.hasError('required')" class="form-text text-danger">
               Grupo é obrigatório.
+            </div>
+            <!-- erro de inválido (texto livre sem seleção) -->
+            <div *ngIf="
+                form.get('grupo')?.touched &&
+                form.get('grupo')?.hasError('invalidGrupo') &&
+                !form.get('grupo')?.hasError('required')
+              " class="form-text text-danger">
+              Grupo inválido. Selecione uma opção da lista.
             </div>
           </div>
 
