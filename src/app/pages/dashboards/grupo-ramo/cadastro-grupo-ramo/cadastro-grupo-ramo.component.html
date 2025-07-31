@@ -8,25 +8,18 @@
       </div>
       <div class="card-body">
         <form [formGroup]="form" (ngSubmit)="save()">
-
-          <!-- ID -->
           <div class="mb-3">
             <label for="id" class="form-label">ID</label>
             <input id="id" type="number" formControlName="id" class="form-control" placeholder="Ex: 10" [readonly]="isEdit" />
             <div *ngIf="form.get('id')?.touched && form.get('id')?.invalid" class="form-text text-danger">
-              <span *ngIf="form.get('id')?.hasError('required')">
-                ID é obrigatório.
-              </span>
-              <span *ngIf="form.get('id')?.hasError('pattern')">
-                Deve ser um número inteiro.
-              </span>
+              <span *ngIf="form.get('id')?.hasError('required')">ID é obrigatório.</span>
+              <span *ngIf="form.get('id')?.hasError('pattern')">Deve ser um número inteiro.</span>
             </div>
             <div *ngIf="form.hasError('uniqueId')" class="form-text text-danger">
               {{ form.getError('uniqueId') }}
             </div>
           </div>
 
-          <!-- Nome do Grupo -->
           <div class="mb-4">
             <label for="nome" class="form-label">Nome do Grupo</label>
             <input id="nome" type="text" formControlName="nome" class="form-control" placeholder="Ex: Seguro Auto" />
@@ -35,19 +28,25 @@
             </div>
           </div>
 
-          <!-- Seguradora com visual de SELECT -->
           <div class="mb-4 position-relative">
             <label for="seguradoraSearch" class="form-label">Seguradora</label>
-            <input id="seguradoraSearch" type="text" class="form-select dropdown-toggle" formControlName="seguradora" [ngbTypeahead]="searchSeguradora" [resultFormatter]="formatter" [inputFormatter]="formatter" [minLength]="0" (click)="openDropdown($event)" (selectItem)="onSelectSeguradora($event)" placeholder="Buscar seguradora (nome ou número)" autocomplete="off" />
+            <input id="seguradoraSearch" type="text" class="form-select dropdown-toggle" formControlName="seguradora" [ngbTypeahead]="searchSeguradora" [resultFormatter]="formatter" [inputFormatter]="formatter" [minLength]="0" (click)="openDropdown($event)" (selectItem)="onSelectSeguradora($event)" (blur)="onBlurSeguradora()" placeholder="Buscar seguradora (nome ou número)" autocomplete="off" />
             <input type="hidden" formControlName="seguradoraId" />
-            <div *ngIf="form.get('seguradora')?.touched && form.get('seguradora')?.invalid" class="form-text text-danger">
+
+            <div *ngIf="form.get('seguradora')?.touched && form.get('seguradora')?.hasError('required')" class="form-text text-danger">
               Seguradora é obrigatória.
+            </div>
+            <div *ngIf="
+                form.get('seguradora')?.touched &&
+                form.get('seguradora')?.hasError('invalidSeguradora') &&
+                !form.get('seguradora')?.hasError('required')
+              " class="form-text text-danger">
+              Seguradora inválida. Selecione uma opção da lista.
             </div>
           </div>
 
-          <!-- Botões -->
           <div class="d-flex gap-2">
-            <button type="submit" class="btn btn-primary" [disabled]="isEdit ? (form.invalid || form.pristine) : false">
+            <button type="submit" class="btn btn-primary" [disabled]="isEdit ? (form.invalid || form.pristine) : form.invalid">
               {{ isEdit ? 'Atualizar' : 'Salvar' }}
             </button>
             <button type="button" class="btn btn-secondary" (click)="cancel()">
@@ -57,7 +56,6 @@
               + Novo Grupo
             </button>
           </div>
-
         </form>
       </div>
     </div>
