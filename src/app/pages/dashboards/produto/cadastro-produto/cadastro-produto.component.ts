@@ -1,4 +1,3 @@
-// src/app/pages/dashboards/produto/cadastro-produto/cadastro-produto.component.ts
 import {
   Component,
   OnInit,
@@ -18,9 +17,9 @@ import { debounceTime, distinctUntilChanged, map } from 'rxjs/operators';
 import { NgbTypeaheadSelectItemEvent } from '@ng-bootstrap/ng-bootstrap';
 
 import { Produto } from 'src/app/store/Produto/produto.model';
-import { Ramo }   from 'src/app/store/Ramo/ramo.model';
+import { Ramo } from 'src/app/store/Ramo/ramo.model';
 import { ProdutoService } from 'src/app/core/services/produto.service';
-import { ToastService }   from 'src/app/shared/toasts/toast-service';
+import { ToastService } from 'src/app/shared/toasts/toast-service';
 import { dateRangeValidator } from './date-range.validator';
 
 @Component({
@@ -29,7 +28,7 @@ import { dateRangeValidator } from './date-range.validator';
 })
 export class CadastroProdutoComponent implements OnInit {
   @ViewChild('inicioDate') inicioDate!: ElementRef<HTMLInputElement>;
-  @ViewChild('fimDate')    fimDate!: ElementRef<HTMLInputElement>;
+  @ViewChild('fimDate') fimDate!: ElementRef<HTMLInputElement>;
 
   form!: FormGroup;
   isEdit = false;
@@ -47,11 +46,9 @@ export class CadastroProdutoComponent implements OnInit {
   ngOnInit(): void {
     this.buildForm();
 
-    // 1) carrega lista de ramos
+    // carregar lista de ramos e checar se é edição
     this.produtoService.getRamos().subscribe(list => {
       this.ramos = list;
-
-      // 2) checa se é edição
       this.route.paramMap.subscribe(params => {
         const idParam = params.get('id');
         if (idParam) {
@@ -79,18 +76,30 @@ export class CadastroProdutoComponent implements OnInit {
       });
     });
 
-    // revalida unicidade quando ID ou SUSEP mudam
+    // revalida unicidades e faixa de datas ao mudar valores
     this.form.get('id')!.valueChanges.subscribe(() => {
       this.form.updateValueAndValidity({ onlySelf: true, emitEvent: false });
     });
     this.form.get('numeroProcessoSusep')!.valueChanges.subscribe(() => {
       this.form.updateValueAndValidity({ onlySelf: true, emitEvent: false });
     });
+    this.form.get('inicioVigencia')!.valueChanges.subscribe(() => {
+      this.form.updateValueAndValidity();
+    });
+    this.form.get('fimVigencia')!.valueChanges.subscribe(() => {
+      this.form.updateValueAndValidity();
+    });
   }
 
   private buildForm() {
     this.form = this.fb.group({
-      ramo:                   [null as Ramo | null, Validators.required],
+      ramo: [
+        null as Ramo | null,
+        [
+          Validators.required,
+          this.ramoExistValidator.bind(this)
+        ]
+      ],
       ramoId:                 [null, Validators.required],
       id:                     [null, [Validators.required, Validators.pattern(/^\d+$/)]],
       nomeProduto:            ['', Validators.required],
@@ -111,7 +120,36 @@ export class CadastroProdutoComponent implements OnInit {
     });
   }
 
-  /** Verifica se já existe um produto com este ID */
+  /** Valida se o usuário não deixou texto solto em vez de selecionar um objeto Ramo */
+  private ramoExistValidator(ctrl: AbstractControl): ValidationErrors | null {
+    const v = ctrl.value;
+    if (v != null && typeof v === 'string') {
+      return { invalidRamo: true };
+    }
+    return null;
+  }
+
+  /** Ajusta erros e limpa ramoId ao perder o foco */
+  onBlurRamo(): void {
+    const ctrl = this.form.get('ramo')!;
+    const val = ctrl.value;
+    let errors: ValidationErrors = ctrl.errors || {};
+
+    if (!val) {
+      delete errors['invalidRamo'];
+    } else if (typeof val === 'string') {
+      errors['invalidRamo'] = true;
+    } else {
+      errors = {};
+    }
+
+    ctrl.setErrors(Object.keys(errors).length ? errors : null);
+
+    if (!val || typeof val === 'string') {
+      this.form.patchValue({ ramoId: null });
+    }
+  }
+
   private uniqueIdValidator(ctrl: AbstractControl): ValidationErrors | null {
     const idVal = ctrl.get('id')?.value;
     if (!idVal) return null;
@@ -122,7 +160,6 @@ export class CadastroProdutoComponent implements OnInit {
     return null;
   }
 
-  /** Verifica se já existe um produto com este Nº Processo SUSEP */
   private uniqueSusepValidator(ctrl: AbstractControl): ValidationErrors | null {
     const numVal = ctrl.get('numeroProcessoSusep')?.value;
     if (!numVal) return null;
@@ -133,7 +170,6 @@ export class CadastroProdutoComponent implements OnInit {
     return null;
   }
 
-  /** ID e Processo SUSEP não podem ser iguais */
   private idDiffersFromSusepValidator(ctrl: AbstractControl): ValidationErrors | null {
     const idVal  = ctrl.get('id')?.value;
     const numVal = ctrl.get('numeroProcessoSusep')?.value;
@@ -143,7 +179,7 @@ export class CadastroProdutoComponent implements OnInit {
     return null;
   }
 
-  // typeahead...
+  // Typeahead de ramo
   searchRamo: OperatorFunction<string, Ramo[]> = text$ =>
     text$.pipe(
       debounceTime(200),
@@ -160,15 +196,18 @@ export class CadastroProdutoComponent implements OnInit {
     );
 
   formatter = (r: Ramo) => r ? `${r.identificadorRamo} – ${r.nomeRamo}` : '';
+
   onSelectRamo(event: NgbTypeaheadSelectItemEvent<Ramo>) {
     const ramo = event.item;
     this.form.patchValue({ ramo, ramoId: ramo.identificadorRamo });
   }
+
   openDropdown(e: Event) {
     e.stopPropagation();
     this.form.patchValue({ ramo: null, ramoId: null });
     setTimeout(() => (e.target as HTMLElement).dispatchEvent(new Event('input')), 0);
   }
+
   openInicioPicker() { this.inicioDate.nativeElement.showPicker(); }
   openFimPicker()    { this.fimDate.nativeElement.showPicker(); }
 

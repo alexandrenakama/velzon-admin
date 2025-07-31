@@ -8,14 +8,28 @@
       </div>
       <div class="card-body">
         <form [formGroup]="form" (ngSubmit)="save()">
+
+          <!-- BLOCO RAMO COM VALIDAÇÃO CUSTOMIZADA -->
           <div class="mb-3 position-relative">
             <label for="ramoSearch" class="form-label">Ramo</label>
-            <input id="ramoSearch" type="text" class="form-select dropdown-toggle" formControlName="ramo" [ngbTypeahead]="searchRamo" [resultFormatter]="formatter" [inputFormatter]="formatter" [minLength]="0" (click)="openDropdown($event)" (selectItem)="onSelectRamo($event)" placeholder="Buscar ramo (nome ou ID)" autocomplete="off" />
+            <input id="ramoSearch" type="text" class="form-select dropdown-toggle" formControlName="ramo" [ngbTypeahead]="searchRamo" [resultFormatter]="formatter" [inputFormatter]="formatter" [minLength]="0" (click)="openDropdown($event)" (selectItem)="onSelectRamo($event)" (blur)="onBlurRamo()" placeholder="Buscar ramo (nome ou ID)" autocomplete="off" />
             <input type="hidden" formControlName="ramoId" />
-            <div *ngIf="form.get('ramo')?.touched && form.get('ramo')?.invalid" class="form-text text-danger">
+
+            <!-- Erro de required -->
+            <div *ngIf="form.get('ramo')?.touched && form.get('ramo')?.hasError('required')" class="form-text text-danger">
               Ramo é obrigatório.
             </div>
+            <!-- Erro de inválido (texto livre sem seleção) -->
+            <div *ngIf="
+                form.get('ramo')?.touched &&
+                form.get('ramo')?.hasError('invalidRamo') &&
+                !form.get('ramo')?.hasError('required')
+              " class="form-text text-danger">
+              Ramo inválido. Selecione uma opção da lista.
+            </div>
           </div>
+          <!-- /FIM BLOCO RAMO -->
+
           <div class="mb-3">
             <label for="id" class="form-label">ID do Produto</label>
             <input id="id" type="number" class="form-control" formControlName="id" [disabled]="isEdit" placeholder="Ex: 2" />
@@ -30,6 +44,7 @@
               {{ form.getError('idEqualsSusep') }}
             </div>
           </div>
+
           <div class="row g-3 mb-3">
             <div class="col-md-6">
               <label for="nomeProduto" class="form-label">Nome do Produto</label>
@@ -43,6 +58,7 @@
               <input id="nomeAbreviadoProduto" type="text" class="form-control" formControlName="nomeAbreviadoProduto" placeholder="Digite o nome abreviado" />
             </div>
           </div>
+
           <div class="mb-3">
             <label for="numeroProcessoSusep" class="form-label">Nº Processo SUSEP</label>
             <input id="numeroProcessoSusep" type="number" class="form-control" formControlName="numeroProcessoSusep" placeholder="Ex: 123456" />
@@ -57,6 +73,7 @@
               {{ form.getError('idEqualsSusep') }}
             </div>
           </div>
+
           <div class="row g-3 mb-3">
             <div class="col-md-6">
               <label for="inicioVigencia" class="form-label">Início de Vigência</label>
@@ -73,9 +90,11 @@
               </div>
             </div>
           </div>
+
           <div *ngIf="form.hasError('dateRange')" class="form-text text-danger mb-3">
             {{ form.getError('dateRange') }}
           </div>
+
           <div class="row g-3 mb-4">
             <div class="col-auto">
               <div class="form-check">
@@ -94,6 +113,7 @@
               </div>
             </div>
           </div>
+
           <div class="row g-3 mb-4">
             <div class="col-auto">
               <div class="form-check">
@@ -104,17 +124,17 @@
               </div>
             </div>
           </div>
+
           <div class="d-flex gap-2">
             <button type="submit" class="btn btn-primary" [disabled]="isEdit ? (form.invalid || form.pristine) : false">
               {{ isEdit ? 'Atualizar' : 'Salvar' }}
             </button>
-            <button type="button" class="btn btn-secondary" (click)="cancel()">
-              Cancelar
-            </button>
+            <button type="button" class="btn btn-secondary" (click)="cancel()">Cancelar</button>
             <button *ngIf="isEdit" type="button" class="btn btn-outline-secondary" routerLink="/produto/cadastro">
               + Novo Produto
             </button>
           </div>
+
         </form>
       </div>
     </div>
