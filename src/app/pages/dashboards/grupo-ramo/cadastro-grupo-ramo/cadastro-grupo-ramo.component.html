@@ -1,3 +1,4 @@
+<!-- cadastro-grupo-ramo.component.html -->
 <div class="row">
   <div class="col-xl-12">
     <div class="card">
@@ -8,6 +9,7 @@
       </div>
       <div class="card-body">
         <form [formGroup]="form" (ngSubmit)="save()">
+
           <div class="mb-3">
             <label for="id" class="form-label">ID</label>
             <input id="id" type="number" formControlName="id" class="form-control" placeholder="Ex: 10" [readonly]="isEdit" />
@@ -30,17 +32,19 @@
 
           <div class="mb-4 position-relative">
             <label for="seguradoraSearch" class="form-label">Seguradora</label>
-            <input id="seguradoraSearch" type="text" class="form-select dropdown-toggle" formControlName="seguradora" [ngbTypeahead]="searchSeguradora" [resultFormatter]="formatter" [inputFormatter]="formatter" [minLength]="0" (click)="openDropdown($event)" (selectItem)="onSelectSeguradora($event)" (blur)="onBlurSeguradora()" placeholder="Buscar seguradora (nome ou número)" autocomplete="off" />
+            <input #segInput id="seguradoraSearch" type="text" class="form-control" formControlName="seguradora" (click)="openSegList()" (input)="onSegInput(segInput.value)" (blur)="onBlurSeguradora(); closeSegList()" placeholder="Buscar seguradora (ID ou nome)" autocomplete="off" />
             <input type="hidden" formControlName="seguradoraId" />
+
+            <div *ngIf="showSegList && filteredSeguradoras.length" class="list-group border rounded position-absolute w-100 mt-1" style="max-height:200px; overflow-y:auto; z-index:1000;">
+              <button *ngFor="let s of filteredSeguradoras" type="button" class="list-group-item list-group-item-action border-0" (mousedown)="selectSeguradora(s)">
+                <ngb-highlight [result]="formatSeg(s)" [term]="searchTerm"></ngb-highlight>
+              </button>
+            </div>
 
             <div *ngIf="form.get('seguradora')?.touched && form.get('seguradora')?.hasError('required')" class="form-text text-danger">
               Seguradora é obrigatória.
             </div>
-            <div *ngIf="
-                form.get('seguradora')?.touched &&
-                form.get('seguradora')?.hasError('invalidSeguradora') &&
-                !form.get('seguradora')?.hasError('required')
-              " class="form-text text-danger">
+            <div *ngIf="form.get('seguradora')?.touched && form.get('seguradora')?.hasError('invalidSeguradora')" class="form-text text-danger">
               Seguradora inválida. Selecione uma opção da lista.
             </div>
           </div>
@@ -49,9 +53,7 @@
             <button type="submit" class="btn btn-primary" [disabled]="isEdit ? (form.invalid || form.pristine) : form.invalid">
               {{ isEdit ? 'Atualizar' : 'Salvar' }}
             </button>
-            <button type="button" class="btn btn-secondary" (click)="cancel()">
-              Cancelar
-            </button>
+            <button type="button" class="btn btn-secondary" (click)="cancel()">Cancelar</button>
             <button *ngIf="isEdit" type="button" class="btn btn-outline-secondary" routerLink="/grupo-ramo/cadastro">
               + Novo Grupo
             </button>

@@ -1,33 +1,35 @@
+<!-- cadastro-ramo.component.html -->
 <div class="row">
   <div class="col-xl-12">
     <div class="card">
-
       <!-- Cabeçalho -->
       <div class="card-header d-flex align-items-center">
         <h4 class="card-title mb-0 flex-grow-1">
           {{ isEdit ? 'Editar Ramo' : 'Novo Ramo' }}
         </h4>
       </div>
-
       <div class="card-body">
         <form [formGroup]="form" (ngSubmit)="save()">
 
-          <!-- Grupo com visual de SELECT -->
+          <!-- BLOCO GRUPO COM BUSCA, SCROLL, BORDA E HIGHLIGHT -->
           <div class="mb-3 position-relative">
             <label for="grupoSearch" class="form-label">Grupo</label>
-            <input id="grupoSearch" type="text" class="form-select dropdown-toggle" formControlName="grupo" [ngbTypeahead]="searchGrupo" [resultFormatter]="formatter" [inputFormatter]="formatter" [minLength]="0" (click)="openDropdown($event)" (selectItem)="onSelectGrupo($event)" (blur)="onBlurGrupo()" placeholder="Buscar grupo (nome ou número)" autocomplete="off" />
+            <div class="input-group">
+              <input #grupoInput id="grupoSearch" type="text" class="form-control" formControlName="grupo" (click)="openGrupoList()" (input)="onGrupoInput(grupoInput.value)" (blur)="onBlurGrupo(); closeGrupoList()" placeholder="Buscar grupo (ID ou nome)" autocomplete="off" />
+              <!-- ícone removido -->
+            </div>
             <input type="hidden" formControlName="grupoId" />
 
-            <!-- erro de required -->
+            <div *ngIf="showGrupoList && filteredGrupos.length" class="list-group border rounded position-absolute w-100 mt-1" style="max-height:200px; overflow-y:auto; z-index:1000;">
+              <button *ngFor="let g of filteredGrupos" type="button" class="list-group-item list-group-item-action border-0" (mousedown)="selectGrupo(g)">
+                <ngb-highlight [result]="g.id + ' – ' + g.nome" [term]="searchTerm"></ngb-highlight>
+              </button>
+            </div>
+
             <div *ngIf="form.get('grupo')?.touched && form.get('grupo')?.hasError('required')" class="form-text text-danger">
               Grupo é obrigatório.
             </div>
-            <!-- erro de inválido (texto livre sem seleção) -->
-            <div *ngIf="
-                form.get('grupo')?.touched &&
-                form.get('grupo')?.hasError('invalidGrupo') &&
-                !form.get('grupo')?.hasError('required')
-              " class="form-text text-danger">
+            <div *ngIf="form.get('grupo')?.touched && form.get('grupo')?.hasError('invalidGrupo')" class="form-text text-danger">
               Grupo inválido. Selecione uma opção da lista.
             </div>
           </div>
@@ -35,9 +37,7 @@
           <!-- Identificador / Código -->
           <div class="row g-3 mb-3">
             <div class="col-md-6">
-              <label for="identificadorRamo" class="form-label">
-                Identificador do Ramo
-              </label>
+              <label for="identificadorRamo" class="form-label">Identificador do Ramo</label>
               <input id="identificadorRamo" type="number" class="form-control" formControlName="identificadorRamo" placeholder="Ex: 12" [disabled]="isEdit" />
               <div *ngIf="form.get('identificadorRamo')?.touched && form.get('identificadorRamo')?.invalid" class="form-text text-danger">
                 <span *ngIf="form.get('identificadorRamo')?.hasError('required')">
@@ -57,7 +57,7 @@
             </div>
           </div>
 
-          <!-- Nome / Nome Abreviado -->
+          <!-- Nome / Abreviado -->
           <div class="row g-3 mb-3">
             <div class="col-md-6">
               <label for="nomeRamo" class="form-label">Nome do Ramo</label>
@@ -104,9 +104,7 @@
             <button type="submit" class="btn btn-primary" [disabled]="isEdit ? (form.invalid || form.pristine) : false">
               {{ isEdit ? 'Atualizar' : 'Salvar' }}
             </button>
-            <button type="button" class="btn btn-secondary" (click)="cancel()">
-              Cancelar
-            </button>
+            <button type="button" class="btn btn-secondary" (click)="cancel()">Cancelar</button>
             <button *ngIf="isEdit" type="button" class="btn btn-outline-secondary" routerLink="/ramo/cadastro">
               + Novo Ramo
             </button>

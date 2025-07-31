@@ -1,9 +1,12 @@
-import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
+// cadastro-grupo-ramo.component.ts
+import { Component, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
+import {
+  FormBuilder, FormGroup, Validators,
+  AbstractControl, ValidationErrors
+} from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { OperatorFunction } from 'rxjs';
+import { Subscription } from 'rxjs';
 import { debounceTime, distinctUntilChanged, map } from 'rxjs/operators';
-import { NgbTypeaheadSelectItemEvent } from '@ng-bootstrap/ng-bootstrap';
 import { GrupoRamo } from 'src/app/store/Grupo Ramo/grupo-ramo.model';
 import { Seguradora } from 'src/app/store/Seguradora/seguradora.model';
 import { GrupoRamoService } from 'src/app/core/services/grupo-ramo.service';
@@ -14,11 +17,16 @@ import { ToastService } from 'src/app/shared/toasts/toast-service';
   selector: 'app-cadastro-grupo-ramo',
   templateUrl: './cadastro-grupo-ramo.component.html',
 })
-export class CadastroGrupoRamoComponent implements OnInit {
+export class CadastroGrupoRamoComponent implements OnInit, OnDestroy {
   form!: FormGroup;
   isEdit = false;
   private editingId?: number;
   seguradoras: Seguradora[] = [];
+  filteredSeguradoras: Seguradora[] = [];
+  showSegList = false;
+  searchTerm = '';
+  private segSub?: Subscription;
+  @ViewChild('segInput') segInput!: ElementRef<HTMLInputElement>;
 
   constructor(
     private fb: FormBuilder,
@@ -33,6 +41,19 @@ export class CadastroGrupoRamoComponent implements OnInit {
     this.buildForm();
     this.segService.getAll().subscribe(list => {
       this.seguradoras = list;
+      this.segSub = this.form.get('seguradora')!.valueChanges.pipe(
+        debounceTime(200),
+        distinctUntilChanged(),
+        map(v => typeof v === 'string' ? v : ''),
+        map(term => {
+          this.searchTerm = term;
+          const t = term.trim().toLowerCase();
+          return this.seguradoras.filter(s =>
+            s.nome.toLowerCase().includes(t) || s.id.toString().startsWith(t)
+          );
+        })
+      ).subscribe(arr => this.filteredSeguradoras = arr);
+
       this.route.paramMap.subscribe(params => {
         const idParam = params.get('id');
         if (idParam) {
@@ -40,91 +61,93 @@ export class CadastroGrupoRamoComponent implements OnInit {
           this.editingId = +idParam;
           const grp = this.service.getById(this.editingId!);
           if (grp) {
-            const segObj = this.seguradoras.find(s => s.id === grp.seguradoraId) || null;
+            const segObj = this.seguradoras.find(s => s.id === grp.seguradoraId)!;
             this.form.patchValue({
               id: grp.id,
               nome: grp.nome,
-              seguradora: segObj,
-              seguradoraId: segObj ? segObj.id : null
+              seguradora: this.formatSeg(segObj),
+              seguradoraId: segObj.id
             });
             this.form.get('id')?.disable();
             this.onBlurSeguradora();
-            this.form.get('seguradora')?.markAsTouched();
           }
         }
       });
     });
   }
 
+  ngOnDestroy(): void {
+    this.segSub?.unsubscribe();
+  }
+
   private buildForm(): void {
     this.form = this.fb.group({
       id: [null, [Validators.required, Validators.pattern(/^\d+$/)]],
       nome: ['', Validators.required],
-      seguradora: [null as Seguradora | null, [Validators.required, this.segExistValidator.bind(this)]],
+      seguradora: ['', [Validators.required, this.segExistValidator.bind(this)]],
       seguradoraId: [null, Validators.required]
     }, {
       validators: [this.uniqueIdValidator.bind(this)]
     });
   }
 
-  private segExistValidator(ctrl: AbstractControl): ValidationErrors | null {
-    const v = ctrl.value;
-    if (v != null && typeof v === 'string') {
-      return { invalidSeguradora: true };
-    }
-    return null;
+  formatSeg(s: Seguradora) {
+    return `${s.id} – ${s.nome}`;
   }
 
-  private uniqueIdValidator(control: AbstractControl): ValidationErrors | null {
-    const id = control.get('id')?.value;
-    if (id == null) return null;
+  onSegInput(term: string): void {
+    this.searchTerm = term;
+    this.showSegList = true;
+  }
+
+  openSegList(): void {
+    this.showSegList = true;
+    if (!this.filteredSeguradoras.length) {
+      this.filteredSeguradoras = [...this.seguradoras];
+    }
+  }
+
+  closeSegList(): void {
+    setTimeout(() => this.showSegList = false, 200);
+  }
+
+  selectSeguradora(s: Seguradora): void {
+    this.form.patchValue({
+      seguradora: this.formatSeg(s),
+      seguradoraId: s.id
+    });
+    this.form.markAsDirty();
+    this.showSegList = false;
+  }
+
+  onBlurSeguradora(): void {
+    const ctrl = this.form.get('seguradora')!;
+    const val = ctrl.value as string;
+    const match = this.seguradoras.find(s => this.formatSeg(s) === val);
+    if (match) {
+      ctrl.setErrors(null);
+      this.form.patchValue({ seguradoraId: match.id }, { emitEvent: false });
+    } else {
+      ctrl.setErrors(val ? { invalidSeguradora: true } : { required: true });
+      this.form.patchValue({ seguradoraId: null }, { emitEvent: false });
+    }
+  }
+
+  private segExistValidator(ctrl: AbstractControl): ValidationErrors | null {
+    const v = ctrl.value as string;
+    return v && !this.seguradoras.some(s => this.formatSeg(s) === v)
+      ? { invalidSeguradora: true }
+      : null;
+  }
+
+  private uniqueIdValidator(ctrl: AbstractControl): ValidationErrors | null {
+    const id = ctrl.get('id')?.value;
+    if (!id) return null;
     const existing = this.service.getById(+id);
     if (existing && (!this.isEdit || existing.id !== this.editingId)) {
       return { uniqueId: 'Já existe um grupo com este ID.' };
     }
     return null;
-  }
-
-  onBlurSeguradora(): void {
-    const ctrl = this.form.get('seguradora')!;
-    const val = ctrl.value;
-    let errors: ValidationErrors = ctrl.errors || {};
-    if (!val) {
-      delete errors['invalidSeguradora'];
-    } else if (typeof val === 'string') {
-      errors['invalidSeguradora'] = true;
-    } else {
-      errors = {};
-    }
-    ctrl.setErrors(Object.keys(errors).length ? errors : null);
-    if (!val || typeof val === 'string') {
-      this.form.patchValue({ seguradoraId: null });
-    }
-  }
-
-  searchSeguradora: OperatorFunction<string, Seguradora[]> = text$ =>
-    text$.pipe(
-      debounceTime(200),
-      distinctUntilChanged(),
-      map(term => {
-        const t = term.trim().toLowerCase();
-        return this.seguradoras
-          .filter(s => s.nome.toLowerCase().includes(t) || s.id.toString().startsWith(t))
-          .slice(0, 20);
-      })
-    );
-
-  formatter = (s: Seguradora) => s ? `${s.id} – ${s.nome}` : '';
-
-  onSelectSeguradora(event: NgbTypeaheadSelectItemEvent<Seguradora>) {
-    const seg = event.item;
-    this.form.patchValue({ seguradora: seg, seguradoraId: seg.id });
-  }
-
-  openDropdown(e: Event): void {
-    e.stopPropagation();
-    this.form.patchValue({ seguradora: null, seguradoraId: null });
-    setTimeout(() => (e.target as HTMLElement).dispatchEvent(new Event('input')), 0);
   }
 
   save(): void {
@@ -133,7 +156,11 @@ export class CadastroGrupoRamoComponent implements OnInit {
       return;
     }
     const v = this.form.getRawValue();
-    const grupo: GrupoRamo = { id: +v.id, nome: v.nome, seguradoraId: +v.seguradoraId };
+    const grupo: GrupoRamo = {
+      id: +v.id,
+      nome: v.nome,
+      seguradoraId: +v.seguradoraId
+    };
     const op$ = this.isEdit ? this.service.update(grupo) : this.service.create(grupo);
     op$.subscribe({
       next: () => {

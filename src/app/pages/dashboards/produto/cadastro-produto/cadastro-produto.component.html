@@ -1,3 +1,4 @@
+<!-- cadastro-produto.component.html -->
 <div class="row">
   <div class="col-xl-12">
     <div class="card">
@@ -9,27 +10,30 @@
       <div class="card-body">
         <form [formGroup]="form" (ngSubmit)="save()">
 
-          <!-- BLOCO RAMO COM VALIDAÇÃO CUSTOMIZADA -->
+          <!-- BLOCO RAMO COM BUSCA, SCROLL, BORDA E HIGHLIGHT (SEM ÍCONE) -->
           <div class="mb-3 position-relative">
             <label for="ramoSearch" class="form-label">Ramo</label>
-            <input id="ramoSearch" type="text" class="form-select dropdown-toggle" formControlName="ramo" [ngbTypeahead]="searchRamo" [resultFormatter]="formatter" [inputFormatter]="formatter" [minLength]="0" (click)="openDropdown($event)" (selectItem)="onSelectRamo($event)" (blur)="onBlurRamo()" placeholder="Buscar ramo (nome ou ID)" autocomplete="off" />
+            <div class="input-group">
+              <input #ramoInput id="ramoSearch" type="text" class="form-control" formControlName="ramo" (click)="openRamoList()" (input)="onRamoInput(ramoInput.value)" (blur)="onBlurRamo(); closeRamoList()" placeholder="Buscar ramo (ID ou nome)" autocomplete="off" />
+              <!-- ícone removido -->
+            </div>
             <input type="hidden" formControlName="ramoId" />
 
-            <!-- Erro de required -->
+            <div *ngIf="showRamoList && filteredRamos.length" class="list-group border rounded position-absolute w-100 mt-1" style="max-height:200px; overflow-y:auto; z-index:1000;">
+              <button *ngFor="let r of filteredRamos" type="button" class="list-group-item list-group-item-action border-0" (mousedown)="selectRamo(r)">
+                <ngb-highlight [result]="r.identificadorRamo + ' – ' + r.nomeRamo" [term]="searchTerm"></ngb-highlight>
+              </button>
+            </div>
+
             <div *ngIf="form.get('ramo')?.touched && form.get('ramo')?.hasError('required')" class="form-text text-danger">
               Ramo é obrigatório.
             </div>
-            <!-- Erro de inválido (texto livre sem seleção) -->
-            <div *ngIf="
-                form.get('ramo')?.touched &&
-                form.get('ramo')?.hasError('invalidRamo') &&
-                !form.get('ramo')?.hasError('required')
-              " class="form-text text-danger">
+            <div *ngIf="form.get('ramo')?.touched && form.get('ramo')?.hasError('invalidRamo') && !form.get('ramo')?.hasError('required')" class="form-text text-danger">
               Ramo inválido. Selecione uma opção da lista.
             </div>
           </div>
-          <!-- /FIM BLOCO RAMO -->
 
+          <!-- DEMÁS CAMPOS DO FORMULÁRIO -->
           <div class="mb-3">
             <label for="id" class="form-label">ID do Produto</label>
             <input id="id" type="number" class="form-control" formControlName="id" [disabled]="isEdit" placeholder="Ex: 2" />
@@ -99,7 +103,7 @@
             <div class="col-auto">
               <div class="form-check">
                 <input id="permitePessoaFisica" class="form-check-input" type="checkbox" formControlName="permitePessoaFisica" />
-                <label class="form-check-label fw-semibold" for="permitePessoaFisica">
+                <label for="permitePessoaFisica" class="form-check-label fw-semibold">
                   Permite Pessoa Física
                 </label>
               </div>
@@ -107,7 +111,7 @@
             <div class="col-auto">
               <div class="form-check">
                 <input id="permitePessoaJuridica" class="form-check-input" type="checkbox" formControlName="permitePessoaJuridica" />
-                <label class="form-check-label fw-semibold" for="permitePessoaJuridica">
+                <label for="permitePessoaJuridica" class="form-check-label fw-semibold">
                   Permite Pessoa Jurídica
                 </label>
               </div>
@@ -118,7 +122,7 @@
             <div class="col-auto">
               <div class="form-check">
                 <input id="produtoAtivo" class="form-check-input" type="checkbox" formControlName="produtoAtivo" />
-                <label class="form-check-label fw-semibold" for="produtoAtivo">
+                <label for="produtoAtivo" class="form-check-label fw-semibold">
                   Produto Ativo
                 </label>
               </div>
