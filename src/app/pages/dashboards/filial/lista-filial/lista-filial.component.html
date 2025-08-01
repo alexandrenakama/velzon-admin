@@ -1,1 +1,31 @@
-<p>lista-filial works!</p>
+<!-- src/app/pages/dashboards/filial/lista-filial/lista-filial.component.html -->
+<div class="row">
+  <div class="col-xl-12">
+    <div class="card">
+
+      <div class="card-header">
+        <h4 class="card-title mb-0">Filiais Cadastradas</h4>
+      </div>
+
+      <div class="card-body">
+        <app-lista-base #listaBase [todosItens]="allFiliais" [colunas]="colunas" (editar)="onEdit($event)" (apagar)="onDelete($event)">
+
+          <ng-template #toolbarTpl>
+            <a class="btn btn-secondary" routerLink="cadastro">+ Nova Filial</a>
+          </ng-template>
+
+          <ng-template #acoesTpl let-item>
+            <button class="btn btn-sm btn-light me-1" (click)="listaBase.editar.emit(item)">
+              Editar
+            </button>
+            <button class="btn btn-sm btn-danger" (click)="listaBase.apagar.emit(item)">
+              Apagar
+            </button>
+          </ng-template>
+
+        </app-lista-base>
+      </div>
+
+    </div>
+  </div>
+</div>
