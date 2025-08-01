@@ -1,1 +1,31 @@
-<p>lista-assessoria works!</p>
+<!-- src/app/pages/dashboards/assessoria/lista-assessoria/lista-assessoria.component.html -->
+<div class="row">
+  <div class="col-xl-12">
+    <div class="card">
+
+      <div class="card-header">
+        <h4 class="card-title mb-0">Assessorias Cadastradas</h4>
+      </div>
+
+      <div class="card-body">
+        <app-lista-base #listaBase [todosItens]="allAssessorias" [colunas]="colunas" (editar)="onEdit($event)" (apagar)="onDelete($event)">
+
+          <ng-template #toolbarTpl>
+            <a class="btn btn-secondary" routerLink="cadastro">+ Nova Assessoria</a>
+          </ng-template>
+
+          <ng-template #acoesTpl let-item>
+            <button class="btn btn-sm btn-light me-1" (click)="listaBase.editar.emit(item)">
+              Editar
+            </button>
+            <button class="btn btn-sm btn-danger" (click)="listaBase.apagar.emit(item)">
+              Apagar
+            </button>
+          </ng-template>
+
+        </app-lista-base>
+      </div>
+
+    </div>
+  </div>
+</div>
