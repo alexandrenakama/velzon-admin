@@ -38,6 +38,11 @@ const routes: Routes = [
     loadChildren: () =>
       import('./filial/filial.module').then(m => m.FilialModule)
   },
+  {
+    path: 'grupo-usuario',
+    loadChildren: () =>
+      import('./grupo-usuario/grupo-usuario.module').then(m => m.GrupoUsuarioModule)
+  },
 ];
 
 @NgModule({

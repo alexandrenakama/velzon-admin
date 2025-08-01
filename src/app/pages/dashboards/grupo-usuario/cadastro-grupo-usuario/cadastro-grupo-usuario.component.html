@@ -1,1 +1,71 @@
-<p>cadastro-grupo-usuario works!</p>
+<!-- src/app/pages/dashboards/grupo-usuario/cadastro-grupo-usuario/cadastro-grupo-usuario.component.html -->
+<div class="row">
+  <div class="col-xl-12">
+    <div class="card">
+      <div class="card-header d-flex align-items-center">
+        <h4 class="card-title mb-0 flex-grow-1">
+          {{ isEdit ? 'Editar Grupo' : 'Novo Grupo' }}
+        </h4>
+      </div>
+      <div class="card-body">
+        <form [formGroup]="form" (ngSubmit)="save()">
+
+          <!-- ID e Cargo na mesma linha, margem inferior reduzida -->
+          <div class="row g-3 mb-2 align-items-start">
+            <div class="col-md-2">
+              <label for="id" class="form-label">ID</label>
+              <input id="id" type="number" formControlName="id" class="form-control" placeholder="Ex: 123" />
+              <div *ngIf="form.get('id')?.touched && form.get('id')?.invalid" class="form-text text-danger">
+                <span *ngIf="form.get('id')?.hasError('required')">
+                  ID é obrigatório.
+                </span>
+                <span *ngIf="form.get('id')?.hasError('pattern')">
+                  Deve ser inteiro.
+                </span>
+              </div>
+              <div *ngIf="form.hasError('uniqueId')" class="form-text text-danger">
+                {{ form.getError('uniqueId') }}
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <label for="cargo" class="form-label">Cargo</label>
+              <input id="cargo" type="text" formControlName="cargo" class="form-control" placeholder="Digite o cargo" />
+              <!-- placeholder para manter alinhamento -->
+              <div *ngIf="!(form.get('cargo')?.touched && form.get('cargo')?.invalid)" class="form-text">&nbsp;</div>
+              <div *ngIf="form.get('cargo')?.touched && form.get('cargo')?.invalid" class="form-text text-danger">
+                Cargo é obrigatório.
+              </div>
+            </div>
+          </div>
+
+          <!-- Ativo em linha separada (mantém distância para os botões) -->
+          <div class="row mb-4">
+            <div class="col-auto">
+              <div class="form-check">
+                <input id="ativo" type="checkbox" formControlName="ativo" class="form-check-input" />
+                <label for="ativo" class="form-check-label fw-semibold">
+                  Ativo
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <!-- Botões de ação -->
+          <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-primary" [disabled]="isEdit ? (form.invalid || form.pristine) : false">
+              {{ isEdit ? 'Atualizar' : 'Salvar' }}
+            </button>
+            <button type="button" class="btn btn-secondary" (click)="cancel()">
+              Cancelar
+            </button>
+            <button *ngIf="isEdit" type="button" class="btn btn-outline-secondary" routerLink="/grupo-usuario/cadastro">
+              + Novo Grupo
+            </button>
+          </div>
+
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
