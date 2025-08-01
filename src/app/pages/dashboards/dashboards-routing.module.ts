@@ -33,6 +33,11 @@ const routes: Routes = [
     loadChildren: () =>
       import('./assessoria/assessoria.module').then(m => m.AssessoriaModule)
   },
+  {
+    path: 'filial',
+    loadChildren: () =>
+      import('./filial/filial.module').then(m => m.FilialModule)
+  },
 ];
 
 @NgModule({

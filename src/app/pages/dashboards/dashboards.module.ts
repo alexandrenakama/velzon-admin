@@ -16,6 +16,7 @@ import { GrupoRamoModule }         from './grupo-ramo/grupo-ramo.module';
 import { ProdutoModule }           from './produto/produto.module';
 
 import { AssessoriaModule }        from './assessoria/assessoria.module';
+import { FilialModule }            from './filial/filial.module';
 
 @NgModule({
   imports: [
@@ -34,6 +35,7 @@ import { AssessoriaModule }        from './assessoria/assessoria.module';
     ProdutoModule,
 
     AssessoriaModule,
+    FilialModule,
 
     DashboardsRoutingModule
   ],
