@@ -42,6 +42,30 @@ export const MENU: MenuItem[] = [
         label: 'MENUITEMS.CADASTROS.LIST.CLIENTE',
         link: '/cliente',
         parentId: 2
+      },
+      {
+        id: 14,
+        label: 'MENUITEMS.CADASTROS.LIST.ASSESSORIA',
+        link: '/assessoria',
+        parentId: 2
+      },
+      {
+        id: 15,
+        label: 'MENUITEMS.CADASTROS.LIST.FILIAL',
+        link: '/filial',
+        parentId: 2
+      },
+      {
+        id: 16,
+        label: 'MENUITEMS.CADASTROS.LIST.GRUPO_USUARIO',
+        link: '/grupo-usuario',
+        parentId: 2
+      },
+      {
+        id: 17,
+        label: 'MENUITEMS.CADASTROS.LIST.USUARIO',
+        link: '/usuario',
+        parentId: 2
       }
     ]
   },

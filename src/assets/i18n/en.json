@@ -15,7 +15,11 @@
         "GRUPO_RAMO": "Grupo Ramo",
         "RAMO": "Ramo",
         "PRODUTO": "Produto",
-        "CLIENTE": "Cliente"
+        "CLIENTE": "Cliente",
+        "ASSESSORIA": "Assessoria",
+        "FILIAL": "Filial",
+        "GRUPO_USUARIO": "Grupo Usuário",
+        "USUARIO": "Usuário"
       }
     },
     "APPS": {

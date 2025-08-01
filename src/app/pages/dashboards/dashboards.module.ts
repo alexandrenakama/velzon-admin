@@ -13,6 +13,9 @@ import { SeguradoraModule }        from './seguradora/seguradora.module';
 import { ClienteModule }           from './cliente/cliente.module';
 import { RamoModule }              from './ramo/ramo.module';
 import { GrupoRamoModule }         from './grupo-ramo/grupo-ramo.module';
+import { ProdutoModule }           from './produto/produto.module';
+
+import { AssessoriaModule }        from './assessoria/assessoria.module';
 
 @NgModule({
   imports: [
@@ -28,6 +31,9 @@ import { GrupoRamoModule }         from './grupo-ramo/grupo-ramo.module';
     ClienteModule,
     RamoModule,
     GrupoRamoModule,
+    ProdutoModule,
+
+    AssessoriaModule,
 
     DashboardsRoutingModule
   ],
