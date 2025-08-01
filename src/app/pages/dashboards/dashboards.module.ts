@@ -13,12 +13,11 @@ import { SeguradoraModule }        from './seguradora/seguradora.module';
 import { ClienteModule }           from './cliente/cliente.module';
 import { RamoModule }              from './ramo/ramo.module';
 import { GrupoRamoModule }         from './grupo-ramo/grupo-ramo.module';
-import { ProdutoModule }           from './produto/produto.module';
 
 import { AssessoriaModule }        from './assessoria/assessoria.module';
 import { FilialModule }            from './filial/filial.module';
 import { GrupoUsuarioModule }      from './grupo-usuario/grupo-usuario.module';
-
+import { UsuarioModule }           from './usuario/usuario.module';
 
 @NgModule({
   imports: [
@@ -34,11 +33,11 @@ import { GrupoUsuarioModule }      from './grupo-usuario/grupo-usuario.module';
     ClienteModule,
     RamoModule,
     GrupoRamoModule,
-    ProdutoModule,
 
     AssessoriaModule,
     FilialModule,
     GrupoUsuarioModule,
+    UsuarioModule,
 
     DashboardsRoutingModule
   ],

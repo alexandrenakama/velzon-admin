@@ -43,6 +43,11 @@ const routes: Routes = [
     loadChildren: () =>
       import('./grupo-usuario/grupo-usuario.module').then(m => m.GrupoUsuarioModule)
   },
+  {
+    path: 'usuario',
+    loadChildren: () =>
+      import('./usuario/usuario.module').then(m => m.UsuarioModule)
+  }
 ];
 
 @NgModule({

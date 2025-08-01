@@ -9,12 +9,10 @@ import {
   ValidationErrors
 } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 import { GrupoUsuario }         from 'src/app/store/Grupo Usuario/grupo-usuario.model';
 import { GrupoUsuarioService }  from 'src/app/core/services/grupo-usuario.service';
 import { ToastService }         from 'src/app/shared/toasts/toast-service';
-import { ConfirmModalComponent }from 'src/app/shared/confirm-modal/confirm-modal.component';
 
 @Component({
   selector: 'app-cadastro-grupo-usuario',
@@ -24,19 +22,22 @@ export class CadastroGrupoUsuarioComponent implements OnInit {
   form!: FormGroup;
   isEdit = false;
   private editingId?: number;
+  allGrupos: GrupoUsuario[] = [];
 
   constructor(
     private fb: FormBuilder,
     private service: GrupoUsuarioService,
     private router: Router,
     private route: ActivatedRoute,
-    private toast: ToastService,
-    private modal: NgbModal
+    private toast: ToastService
   ) {
     this.buildForm();
   }
 
   ngOnInit(): void {
+    // carrega lista atual de grupos para validação
+    this.service.getAll().subscribe(list => this.allGrupos = list);
+
     this.route.paramMap.subscribe(params => {
       const idParam = params.get('id');
       if (!idParam) return;
@@ -60,7 +61,13 @@ export class CadastroGrupoUsuarioComponent implements OnInit {
       id:    [null, [Validators.required, Validators.pattern(/^\d+$/)]],
       cargo: ['', Validators.required],
       ativo: [true]
-    }, { validators: this.uniqueIdValidator.bind(this) });
+    }, {
+      // adiciona aqui o validador de cargo único
+      validators: [
+        this.uniqueIdValidator.bind(this),
+        this.uniqueCargoValidator.bind(this)
+      ]
+    });
   }
 
   private uniqueIdValidator(c: AbstractControl): ValidationErrors | null {
@@ -73,6 +80,21 @@ export class CadastroGrupoUsuarioComponent implements OnInit {
     return null;
   }
 
+  private uniqueCargoValidator(c: AbstractControl): ValidationErrors | null {
+    const cargoCtrl = c.get('cargo');
+    const cargo = cargoCtrl?.value?.trim().toLowerCase();
+    if (!cargo) return null;
+
+    // verifica se já existe outro grupo com mesmo cargo
+    const exists = this.allGrupos.some(g =>
+      g.cargo.trim().toLowerCase() === cargo &&
+      (!this.isEdit || g.id !== this.editingId)
+    );
+    return exists
+      ? { uniqueCargo: 'Já existe um grupo com este cargo.' }
+      : null;
+  }
+
   save(): void {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
@@ -81,7 +103,7 @@ export class CadastroGrupoUsuarioComponent implements OnInit {
     const v = this.form.getRawValue();
     const grp: GrupoUsuario = {
       id:    +v.id,
-      cargo: v.cargo,
+      cargo: v.cargo.trim(),
       ativo: v.ativo
     };
     const op$ = this.isEdit

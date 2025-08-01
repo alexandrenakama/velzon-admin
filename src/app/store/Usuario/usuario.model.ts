@@ -1,6 +1,6 @@
 // src/app/store/Usuario/usuario.model.ts
 
-import { GrupoUsuario } from '../GrupoUsuario/grupo-usuario.model';
+import { GrupoUsuario } from '../Grupo Usuario/grupo-usuario.model';
 
 export interface Usuario {
   id:            number;
