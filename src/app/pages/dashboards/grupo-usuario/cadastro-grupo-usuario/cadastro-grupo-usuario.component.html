@@ -10,11 +10,12 @@
       <div class="card-body">
         <form [formGroup]="form" (ngSubmit)="save()">
 
-          <!-- ID e Cargo na mesma linha -->
+          <!-- ID (menor) e Cargo (maior) na mesma linha -->
           <div class="row g-3 mb-4 align-items-start">
+            <!-- ID ocupa 2/12 da largura -->
             <div class="col-md-2">
               <label for="id" class="form-label">ID</label>
-              <input id="id" type="number" formControlName="id" class="form-control" placeholder="Ex: 123" />
+              <input id="id" type="number" formControlName="id" class="form-control" placeholder="Ex: 123" [readonly]="isEdit" />
               <div *ngIf="form.get('id')?.touched && form.get('id')?.invalid" class="form-text text-danger">
                 <span *ngIf="form.get('id')?.hasError('required')">ID é obrigatório.</span>
                 <span *ngIf="form.get('id')?.hasError('pattern')">Deve ser inteiro.</span>
@@ -24,10 +25,11 @@
               </div>
             </div>
 
-            <div class="col-md-6">
+            <!-- Cargo ocupa 10/12 da largura -->
+            <div class="col-md-10">
               <label for="cargo" class="form-label">Cargo</label>
               <input id="cargo" type="text" formControlName="cargo" class="form-control" placeholder="Digite o cargo" />
-              <!-- placeholder para manter alinhamento caso não haja erro -->
+              <!-- espaço reservado para manter altura uniforme -->
               <div *ngIf="!form.hasError('uniqueCargo') && !(form.get('cargo')?.touched && form.get('cargo')?.invalid)" class="form-text">&nbsp;</div>
               <div *ngIf="form.get('cargo')?.touched && form.get('cargo')?.invalid" class="form-text text-danger">
                 Cargo é obrigatório.
@@ -43,7 +45,9 @@
             <div class="col-auto">
               <div class="form-check">
                 <input id="ativo" type="checkbox" formControlName="ativo" class="form-check-input" />
-                <label for="ativo" class="form-check-label fw-semibold">Ativo</label>
+                <label for="ativo" class="form-check-label fw-semibold">
+                  Ativo
+                </label>
               </div>
             </div>
           </div>

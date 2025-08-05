@@ -20,7 +20,7 @@
             </div>
             <input type="hidden" formControlName="grupoId" />
 
-            <div *ngIf="showGrupoList && filteredGrupos.length" class="list-group border rounded position-absolute w-100 mt-1" style="max-height:200px; overflow-y:auto; z-index:1000;">
+            <div *ngIf="showGrupoList && filteredGrupos.length" class="list-group border rounded position-absolute w-100 mt-1 overflow-auto z-3">
               <button *ngFor="let g of filteredGrupos" type="button" class="list-group-item list-group-item-action border-0" (mousedown)="selectGrupo(g)">
                 <ngb-highlight [result]="g.id + ' – ' + g.nome" [term]="searchTerm"></ngb-highlight>
               </button>

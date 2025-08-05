@@ -1,4 +1,4 @@
-<!-- src/app/pages/dashboards/usuario/cadastro-usuario/cadastro-usuario.component.html -->
+<!-- cadastro-usuario.component.html -->
 <div class="row">
   <div class="col-xl-12">
     <div class="card">
@@ -12,9 +12,9 @@
 
           <!-- ID e Nome na mesma linha -->
           <div class="row g-3 mb-4 align-items-start">
-            <div class="col-md-2">
+            <div class="col-auto">
               <label for="id" class="form-label">ID</label>
-              <input id="id" type="number" formControlName="id" class="form-control" placeholder="Ex: 123" />
+              <input id="id" type="number" formControlName="id" class="form-control" placeholder="Ex: 123" [readonly]="isEdit" />
               <div *ngIf="form.get('id')?.touched && form.get('id')?.invalid" class="form-text text-danger">
                 <span *ngIf="form.get('id')?.hasError('required')">ID é obrigatório.</span>
                 <span *ngIf="form.get('id')?.hasError('pattern')">Deve ser inteiro.</span>
@@ -23,7 +23,7 @@
                 {{ form.getError('uniqueId') }}
               </div>
             </div>
-            <div class="col-md-6">
+            <div class="col">
               <label for="nome" class="form-label">Nome</label>
               <input id="nome" type="text" formControlName="nome" class="form-control" placeholder="Digite o nome" />
               <div *ngIf="form.get('nome')?.touched && form.get('nome')?.invalid" class="form-text text-danger">
@@ -32,7 +32,7 @@
             </div>
           </div>
 
-          <!-- Email e Senha na mesma linha -->
+          <!-- Email e Senha divididos igualmente -->
           <div class="row g-3 mb-4">
             <div class="col-md-6">
               <label for="email" class="form-label">Email</label>
@@ -42,7 +42,7 @@
                 <span *ngIf="form.get('email')?.hasError('email')">Email inválido.</span>
               </div>
             </div>
-            <div class="col-md-4">
+            <div class="col-md-6">
               <label for="senha" class="form-label">Senha</label>
               <input id="senha" type="password" formControlName="senha" class="form-control" placeholder="Digite a senha" />
               <div *ngIf="form.get('senha')?.touched && form.get('senha')?.invalid" class="form-text text-danger">
@@ -51,17 +51,23 @@
             </div>
           </div>
 
-          <!-- Grupo de Usuário -->
-          <div class="row g-3 mb-4">
-            <div class="col-md-6">
-              <label for="grupoUsuario" class="form-label">Grupo de Usuário</label>
-              <select id="grupoUsuario" formControlName="grupoUsuario" class="form-select">
-                <option [ngValue]="null" disabled>Selecione...</option>
-                <option *ngFor="let g of grupos" [value]="g.id">{{ g.cargo }}</option>
-              </select>
-              <div *ngIf="form.get('grupoUsuario')?.touched && form.get('grupoUsuario')?.invalid" class="form-text text-danger">
-                Grupo é obrigatório.
-              </div>
+          <!-- Grupo de Usuário com autocomplete (mesma estrutura do Grupo de Ramo) -->
+          <div class="mb-4 position-relative">
+            <label for="grupoUsuarioSearch" class="form-label">Grupo de Usuário</label>
+            <input #grpInput id="grupoUsuarioSearch" type="text" class="form-control" formControlName="grupoUsuario" (click)="openGroupList()" (input)="onGroupInput(grpInput.value)" (blur)="onBlurGrupo(); closeGroupList()" placeholder="Buscar grupo (ID ou cargo)" autocomplete="off" />
+            <input type="hidden" formControlName="grupoUsuarioId" />
+
+            <div *ngIf="showGroupList && filteredGrupos.length" class="list-group border rounded position-absolute w-100 mt-1 overflow-auto z-3" style="max-height: 200px;">
+              <button *ngFor="let g of filteredGrupos" type="button" class="list-group-item list-group-item-action border-0" (mousedown)="selectGrupo(g)">
+                {{ g.id }} – {{ g.cargo }}
+              </button>
+            </div>
+
+            <div *ngIf="form.get('grupoUsuario')?.touched && form.get('grupoUsuario')?.hasError('required')" class="form-text text-danger">
+              Grupo é obrigatório.
+            </div>
+            <div *ngIf="form.get('grupoUsuario')?.touched && form.get('grupoUsuario')?.hasError('invalidGrupo')" class="form-text text-danger">
+              Grupo inválido. Selecione uma opção da lista.
             </div>
           </div>
 
@@ -70,14 +76,16 @@
             <div class="col-auto">
               <div class="form-check">
                 <input id="ativo" type="checkbox" formControlName="ativo" class="form-check-input" />
-                <label for="ativo" class="form-check-label fw-semibold">Ativo</label>
+                <label for="ativo" class="form-check-label fw-semibold">
+                  Ativo
+                </label>
               </div>
             </div>
           </div>
 
           <!-- Botões de ação -->
           <div class="d-flex gap-2">
-            <button type="submit" class="btn btn-primary" [disabled]="isEdit ? (form.invalid || form.pristine) : false">
+            <button type="submit" class="btn btn-primary" [disabled]="isEdit ? (form.invalid || form.pristine) : form.invalid">
               {{ isEdit ? 'Atualizar' : 'Salvar' }}
             </button>
             <button type="button" class="btn btn-secondary" (click)="cancel()">Cancelar</button>
