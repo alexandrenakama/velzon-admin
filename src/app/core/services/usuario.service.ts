@@ -6,7 +6,9 @@ import { catchError, tap } from 'rxjs/operators';
 import { HttpClient } from '@angular/common/http';
 import { environment } from 'src/environments/environment';
 
-import { Usuario } from 'src/app/store/Usuario/usuario.model';
+import { Usuario }      from 'src/app/store/Usuario/usuario.model';
+import { GrupoUsuario } from 'src/app/store/Grupo Usuario/grupo-usuario.model';
+import { Funcao }        from 'src/app/store/Funcao/funcao.model';
 
 @Injectable({ providedIn: 'root' })
 export class UsuarioService {
@@ -19,7 +21,31 @@ export class UsuarioService {
       email: 'user@example.com',
       senha: '',
       ativo: true,
-      grupoUsuario: { id: 1, cargo: 'Administrador', ativo: true }
+      grupoUsuario: {
+        id:    1,
+        cargo: 'Administrador',
+        ativo: true,
+        funcoes: [
+          { id:  1, nome: 'Editar Seguradora',        descricao: 'Editar ou criar uma seguradora' },
+          { id:  2, nome: 'Apagar Seguradora',        descricao: 'Apagar uma seguradora' },
+          { id:  3, nome: 'Editar Grupo Ramo',        descricao: 'Editar ou criar um grupo ramo' },
+          { id:  4, nome: 'Apagar Grupo Ramo',        descricao: 'Apagar um grupo ramo' },
+          { id:  5, nome: 'Editar Ramo',              descricao: 'Editar ou criar um ramo' },
+          { id:  6, nome: 'Apagar Ramo',              descricao: 'Apagar um ramo' },
+          { id:  7, nome: 'Editar Produto',           descricao: 'Editar ou criar um produto' },
+          { id:  8, nome: 'Apagar Produto',           descricao: 'Apagar um produto' },
+          { id:  9, nome: 'Editar Cliente',           descricao: 'Editar ou criar um cliente' },
+          { id: 10, nome: 'Apagar Cliente',           descricao: 'Apagar um cliente' },
+          { id: 11, nome: 'Editar Assessoria',        descricao: 'Editar ou criar uma assessoria' },
+          { id: 12, nome: 'Apagar Assessoria',        descricao: 'Apagar uma assessoria' },
+          { id: 13, nome: 'Editar Filial',            descricao: 'Editar ou criar uma filial' },
+          { id: 14, nome: 'Apagar Filial',            descricao: 'Apagar uma filial' },
+          { id: 15, nome: 'Editar Grupo Usuário',     descricao: 'Editar ou criar um grupo usuário' },
+          { id: 16, nome: 'Apagar Grupo Usuário',     descricao: 'Apagar um grupo usuário' },
+          { id: 17, nome: 'Editar Usuário',           descricao: 'Editar ou criar um usuário' },
+          { id: 18, nome: 'Apagar Usuário',           descricao: 'Apagar um usuário' }
+        ]
+      }
     }
   ]);
   public usuarios$ = this._usuarios$.asObservable();

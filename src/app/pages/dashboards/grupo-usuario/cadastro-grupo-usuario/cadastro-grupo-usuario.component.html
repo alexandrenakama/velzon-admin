@@ -10,9 +10,8 @@
       <div class="card-body">
         <form [formGroup]="form" (ngSubmit)="save()">
 
-          <!-- ID (menor) e Cargo (maior) na mesma linha -->
+          <!-- ID e Cargo -->
           <div class="row g-3 mb-4 align-items-start">
-            <!-- ID ocupa 2/12 da largura -->
             <div class="col-md-2">
               <label for="id" class="form-label">ID</label>
               <input id="id" type="number" formControlName="id" class="form-control" placeholder="Ex: 123" [readonly]="isEdit" />
@@ -24,13 +23,9 @@
                 {{ form.getError('uniqueId') }}
               </div>
             </div>
-
-            <!-- Cargo ocupa 10/12 da largura -->
             <div class="col-md-10">
               <label for="cargo" class="form-label">Cargo</label>
               <input id="cargo" type="text" formControlName="cargo" class="form-control" placeholder="Digite o cargo" />
-              <!-- espaço reservado para manter altura uniforme -->
-              <div *ngIf="!form.hasError('uniqueCargo') && !(form.get('cargo')?.touched && form.get('cargo')?.invalid)" class="form-text">&nbsp;</div>
               <div *ngIf="form.get('cargo')?.touched && form.get('cargo')?.invalid" class="form-text text-danger">
                 Cargo é obrigatório.
               </div>
@@ -40,24 +35,42 @@
             </div>
           </div>
 
-          <!-- Ativo em linha separada -->
+          <!-- Ativo -->
           <div class="row mb-4">
             <div class="col-auto">
               <div class="form-check">
                 <input id="ativo" type="checkbox" formControlName="ativo" class="form-check-input" />
-                <label for="ativo" class="form-check-label fw-semibold">
-                  Ativo
-                </label>
+                <label for="ativo" class="form-check-label fw-semibold">Ativo</label>
               </div>
             </div>
           </div>
 
-          <!-- Botões de ação -->
+          <!-- Funções: use lista-base em modo checkbox -->
+          <div class="row mb-4">
+            <div class="col-xl-12">
+              <label class="form-label">Funções</label>
+              <app-lista-base [todosItens]="funcoesList" [colunas]="funcColunas" [tamanhoPagina]="10" [showSelection]="true" [masterChecked]="isAllSelected()" (masterToggle)="toggleAll($event)">
+                <!-- esconde toolbar padrão -->
+                <ng-template #toolbarTpl></ng-template>
+
+                <!-- checkbox em cada linha -->
+                <ng-template #acoesTpl let-fn>
+                  <div class="form-check">
+                    <input type="checkbox" class="form-check-input" [checked]="isChecked(fn)" (change)="onCheckboxChange($event, fn)" id="fn-{{ fn.id }}" />
+                  </div>
+                </ng-template>
+              </app-lista-base>
+            </div>
+          </div>
+
+          <!-- Botões Salvar / Cancelar / Novo -->
           <div class="d-flex gap-2">
             <button type="submit" class="btn btn-primary" [disabled]="form.invalid || (isEdit && form.pristine)">
               {{ isEdit ? 'Atualizar' : 'Salvar' }}
             </button>
-            <button type="button" class="btn btn-secondary" (click)="cancel()">Cancelar</button>
+            <button type="button" class="btn btn-secondary" (click)="cancel()">
+              Cancelar
+            </button>
             <button *ngIf="isEdit" type="button" class="btn btn-outline-secondary" routerLink="/grupo-usuario/cadastro">
               + Novo Grupo
             </button>

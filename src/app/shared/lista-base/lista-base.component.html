@@ -2,7 +2,9 @@
 <div class="d-flex align-items-center mb-3">
   <div class="input-group me-2" style="max-width:300px">
     <input #campoBusca type="text" class="form-control" placeholder="Pesquisar..." (input)="aoPesquisar(campoBusca.value)" />
-    <span class="input-group-text"><i class="ri-search-line"></i></span>
+    <span class="input-group-text">
+      <i class="ri-search-line"></i>
+    </span>
   </div>
   <ng-container *ngIf="toolbarTpl">
     <ng-container *ngTemplateOutlet="toolbarTpl"></ng-container>
@@ -13,54 +15,66 @@
   <table class="table table-bordered text-center align-middle table-nowrap mb-0">
     <thead class="table-light">
       <tr>
+        <!-- Master checkbox, mesma largura que ID -->
+        <th *ngIf="showSelection" style="width:80px" class="align-middle">
+          <div class="d-flex justify-content-center">
+            <input type="checkbox" class="form-check-input" [checked]="masterChecked" (change)="onMasterChange($event)" />
+          </div>
+        </th>
+
+        <!-- Colunas de dados -->
         <th *ngFor="let col of colunas" class="sortable" [style.width]="col.largura" (click)="col.ordenavel && aoOrdenar(col.campo)">
           <span style="display:inline-flex; align-items:center; gap:4px;">
             {{ col.cabecalho }}
             <i *ngIf="campoOrdenacao === col.campo" [ngClass]="getIconClasses(col.campo)"></i>
           </span>
         </th>
-        <th style="width:150px">Ações</th>
+
+        <!-- Ações originais -->
+        <th *ngIf="!showSelection" style="width:150px">Ações</th>
       </tr>
     </thead>
+
     <tbody>
       <ng-container *ngIf="itensPaginados.length; else semDados">
         <tr *ngFor="let item of itensPaginados">
+          <!-- Checkbox de seleção em cada linha -->
+          <td *ngIf="showSelection" style="width:80px">
+            <div class="d-flex justify-content-center">
+              <ng-container *ngTemplateOutlet="acoesTpl; context:{ $implicit: item }"></ng-container>
+            </div>
+          </td>
+
+          <!-- Dados -->
           <td *ngFor="let col of colunas">
             <ng-container *ngIf="col.formatoData; else semData">
               {{ obterPorCaminho(item, col.campo) | date:col.formatoData }}
             </ng-container>
             <ng-template #semData>
               <ng-container [ngSwitch]="col.campo">
-                <!-- Badge único para campo 'ativo' -->
                 <ng-container *ngSwitchCase="'ativo'">
-                  <span class="badge" [ngClass]="obterPorCaminho(item,'ativo') ? 'bg-success' : 'bg-danger'">
-                    {{ obterPorCaminho(item,'ativo') ? 'Sim' : 'Não' }}
+                  <span class="badge" [ngClass]="
+                      obterPorCaminho(item, 'ativo')
+                        ? 'bg-success'
+                        : 'bg-danger'
+                    ">
+                    {{ obterPorCaminho(item, 'ativo') ? 'Sim' : 'Não' }}
                   </span>
                 </ng-container>
-                <!-- Badge para Permite Pessoa Física -->
-                <ng-container *ngSwitchCase="'permitePessoaFisica'">
-                  <span class="badge" [ngClass]="obterPorCaminho(item,'permitePessoaFisica') ? 'bg-success' : 'bg-danger'">
-                    {{ obterPorCaminho(item,'permitePessoaFisica') ? 'Sim' : 'Não' }}
-                  </span>
-                </ng-container>
-                <!-- Badge para Permite Pessoa Jurídica -->
-                <ng-container *ngSwitchCase="'permitePessoaJuridica'">
-                  <span class="badge" [ngClass]="obterPorCaminho(item,'permitePessoaJuridica') ? 'bg-success' : 'bg-danger'">
-                    {{ obterPorCaminho(item,'permitePessoaJuridica') ? 'Sim' : 'Não' }}
-                  </span>
-                </ng-container>
-                <!-- Qualquer outro campo cai aqui -->
                 <ng-container *ngSwitchDefault>
                   {{ obterPorCaminho(item, col.campo) }}
                 </ng-container>
               </ng-container>
             </ng-template>
           </td>
-          <td>
+
+          <!-- Ações originais -->
+          <td *ngIf="!showSelection">
             <ng-container *ngTemplateOutlet="acoesTpl; context:{ $implicit: item }"></ng-container>
           </td>
         </tr>
       </ng-container>
+
       <ng-template #semDados>
         <tr>
           <td [attr.colspan]="colunas.length + 1" class="text-center text-muted">
@@ -76,7 +90,9 @@
   <div class="col-sm-6">
     <div class="dataTables_info mb-2" role="status" aria-live="polite">
       Mostrando {{ (pagina - 1) * tamanhoPagina + 1 }} até
-      {{ pagina * tamanhoPagina > tamanhoColecao ? tamanhoColecao : pagina * tamanhoPagina }}
+      {{ pagina * tamanhoPagina > tamanhoColecao
+      ? tamanhoColecao
+      : pagina * tamanhoPagina }}
       de {{ tamanhoColecao }} entradas
     </div>
   </div>

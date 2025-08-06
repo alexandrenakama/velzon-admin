@@ -1,4 +1,3 @@
-// src/app/shared/lista-base/lista-base.component.ts
 import {
   Component,
   Input,
@@ -28,6 +27,13 @@ export class ListaBaseComponent<T> implements OnInit, OnChanges {
   @Input() colunas: DefinicaoColuna[] = [];
   @Input() camposBusca: string[] = [];
   @Input() tamanhoPagina = 20;
+
+  /** Se true, exibe coluna de seleção em vez da “Ações” */
+  @Input() showSelection = false;
+  /** Estado do checkbox master no header */
+  @Input() masterChecked = false;
+  /** Dispara ao clicar no master checkbox */
+  @Output() masterToggle = new EventEmitter<boolean>();
 
   @ContentChild('toolbarTpl', { read: TemplateRef }) toolbarTpl!: TemplateRef<any>;
   @ContentChild('acoesTpl',   { read: TemplateRef }) acoesTpl!: TemplateRef<any>;
@@ -79,6 +85,12 @@ export class ListaBaseComponent<T> implements OnInit, OnChanges {
     this.atualizarLista();
   }
 
+  /** Invocado ao clicar no master checkbox do header */
+  onMasterChange(evt: Event) {
+    const checked = (evt.target as HTMLInputElement).checked;
+    this.masterToggle.emit(checked);
+  }
+
   protected atualizarLista(): void {
     let filtrados = this.todosItens.filter(item => {
       if (!this.termoBusca) return true;
@@ -94,7 +106,9 @@ export class ListaBaseComponent<T> implements OnInit, OnChanges {
         const bVal = this.obterPorCaminho(b, this.campoOrdenacao);
         return (aVal == null && bVal != null) ? -1
           : (bVal == null && aVal != null) ? 1
-          : (typeof aVal === 'string' ? aVal.localeCompare(bVal) : aVal < bVal ? -1 : aVal > bVal ? 1 : 0)
+          : (typeof aVal === 'string'
+              ? aVal.localeCompare(bVal)
+              : aVal < bVal ? -1 : aVal > bVal ? 1 : 0)
           * this.direcaoOrdenacao;
       });
     }
