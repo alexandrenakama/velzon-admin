@@ -65,7 +65,8 @@
 
           <!-- Botões Salvar / Cancelar / Novo -->
           <div class="d-flex gap-2">
-            <button type="submit" class="btn btn-primary" [disabled]="form.invalid || (isEdit && form.pristine)">
+            <!-- Botão Salvar SEM disabled -->
+            <button type="submit" class="btn btn-primary">
               {{ isEdit ? 'Atualizar' : 'Salvar' }}
             </button>
             <button type="button" class="btn btn-secondary" (click)="cancel()">

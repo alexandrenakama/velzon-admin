@@ -1,4 +1,4 @@
-<!-- cadastro-usuario.component.html -->
+<!-- src/app/pages/dashboards/usuario/cadastro-usuario/cadastro-usuario.component.html -->
 <div class="row">
   <div class="col-xl-12">
     <div class="card">
@@ -51,7 +51,7 @@
             </div>
           </div>
 
-          <!-- Grupo de Usuário com autocomplete (mesma estrutura do Grupo de Ramo) -->
+          <!-- Grupo de Usuário com autocomplete -->
           <div class="mb-4 position-relative">
             <label for="grupoUsuarioSearch" class="form-label">Grupo de Usuário</label>
             <input #grpInput id="grupoUsuarioSearch" type="text" class="form-control" formControlName="grupoUsuario" (click)="openGroupList()" (input)="onGroupInput(grpInput.value)" (blur)="onBlurGrupo(); closeGroupList()" placeholder="Buscar grupo (ID ou cargo)" autocomplete="off" />
@@ -71,21 +71,20 @@
             </div>
           </div>
 
-          <!-- Ativo em linha separada -->
+          <!-- Ativo -->
           <div class="row mb-4">
             <div class="col-auto">
               <div class="form-check">
                 <input id="ativo" type="checkbox" formControlName="ativo" class="form-check-input" />
-                <label for="ativo" class="form-check-label fw-semibold">
-                  Ativo
-                </label>
+                <label for="ativo" class="form-check-label fw-semibold">Ativo</label>
               </div>
             </div>
           </div>
 
           <!-- Botões de ação -->
           <div class="d-flex gap-2">
-            <button type="submit" class="btn btn-primary" [disabled]="isEdit ? (form.invalid || form.pristine) : form.invalid">
+            <!-- botão Salvar/Atualizar SEM disabled -->
+            <button type="submit" class="btn btn-primary">
               {{ isEdit ? 'Atualizar' : 'Salvar' }}
             </button>
             <button type="button" class="btn btn-secondary" (click)="cancel()">Cancelar</button>
