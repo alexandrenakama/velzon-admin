@@ -36,8 +36,8 @@ export class ListaProdutoComponent implements OnInit {
       ordenavel: true,
       formatoData: 'dd/MM/yyyy'
     },
-    { campo: 'permitePessoaFisica',   cabecalho: 'PF',            ordenavel: true, largura: '60px' },
-    { campo: 'permitePessoaJuridica', cabecalho: 'PJ',            ordenavel: true, largura: '60px' },
+    { campo: 'ativo',   cabecalho: 'PF',            ordenavel: true, largura: '60px' },
+    { campo: 'ativo', cabecalho: 'PJ',            ordenavel: true, largura: '60px' },
     { campo: 'ativo',          cabecalho: 'Ativo',         ordenavel: true, largura: '80px' }
   ];
 
