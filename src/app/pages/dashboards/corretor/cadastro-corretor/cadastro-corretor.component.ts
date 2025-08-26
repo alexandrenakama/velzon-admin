@@ -1,6 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import {
-  FormBuilder, FormGroup, Validators, AbstractControl, ValidationErrors, FormControl
+  FormBuilder, FormGroup, Validators, AbstractControl, ValidationErrors,
+  FormControl, FormArray, ValidatorFn
 } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
@@ -14,6 +15,7 @@ import { FilialService }   from 'src/app/core/services/filial.service';
 import { Produto } from 'src/app/store/Produto/produto.model';
 import { Filial }  from 'src/app/store/Filial/filial.model';
 import { ToastService } from 'src/app/shared/toasts/toast-service';
+import { DefinicaoColuna } from 'src/app/shared/lista-base/lista-base.component';
 
 @Component({
   selector: 'app-cadastro-corretor',
@@ -26,16 +28,40 @@ export class CadastroCorretorComponent implements OnInit, OnDestroy {
   private editingId?: number;
 
   pessoaTipos: PessoaTipo[] = ['Física', 'Jurídica'];
-  enderecoTipos: string[] = ['Residencial', 'Comercial'];
-  telefoneTipos: string[] = ['Residencial', 'Comercial'];
+  enderecoTipos: string[]   = ['Residencial', 'Comercial'];
+  telefoneTipos: string[]   = ['Residencial', 'Comercial'];
 
   allProdutos: Produto[] = [];
   allFiliais:  Filial[]  = [];
+
+  // IDs pré-selecionados quando em edição
+  private selectedProdutoIds: number[] = [];
+  private selectedFilialIds:  number[] = [];
+
+  // colunas das listas (como no exemplo do Grupo Usuário)
+  prodColunas: DefinicaoColuna[] = [
+    { campo: 'id',          cabecalho: 'ID',         ordenavel: true, largura: '80px' },
+    { campo: 'nomeProduto', cabecalho: 'Produto',    ordenavel: true },
+    { campo: 'nomeRamo',    cabecalho: 'Ramo',       ordenavel: true }
+  ];
+  filialColunas: DefinicaoColuna[] = [
+    { campo: 'id',         cabecalho: 'ID',          ordenavel: true, largura: '80px' },
+    { campo: 'nome',       cabecalho: 'Filial',      ordenavel: true },
+    { campo: 'tipoPessoa', cabecalho: 'Tipo Pessoa', ordenavel: true, largura: '120px' }
+  ];
 
   private cepSub?: Subscription;
 
   get isJuridica(): boolean {
     return this.form.get('tipoPessoa')?.value === 'Jurídica';
+  }
+
+  // atalhos
+  get produtoFlags(): FormArray<FormControl<boolean>> {
+    return this.form.get('produtoFlags') as FormArray<FormControl<boolean>>;
+  }
+  get filialFlags(): FormArray<FormControl<boolean>> {
+    return this.form.get('filialFlags') as FormArray<FormControl<boolean>>;
   }
 
   constructor(
@@ -52,16 +78,22 @@ export class CadastroCorretorComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    // carregar selects
-    this.produtoSvc.getAll().subscribe(p => this.allProdutos = p);
-    this.filialSvc.getAll().subscribe(f => this.allFiliais = f);
+    // carregar listas
+    this.produtoSvc.getAll().subscribe(p => {
+      this.allProdutos = p;
+      this.initProdutoFlags(this.selectedProdutoIds);
+    });
+    this.filialSvc.getAll().subscribe(f => {
+      this.allFiliais = f;
+      this.initFilialFlags(this.selectedFilialIds);
+    });
 
-    // troca tipoPessoa -> limpa documento
+    // trocar tipo pessoa limpa documento
     this.form.get('tipoPessoa')!.valueChanges.subscribe(() => {
       this.form.get('documento')!.reset();
     });
 
-    // CEP auto (debounce) como no modal da seguradora
+    // busca CEP auto (como no modal da seguradora)
     this.cepSub = this.form.get('endereco.cep')!.valueChanges.pipe(
       map(v => (v || '').toString().replace(/\D/g, '')),
       filter(digits => digits.length === 8),
@@ -92,9 +124,8 @@ export class CadastroCorretorComponent implements OnInit, OnDestroy {
         comissaoMaxima: cor.comissaoMaxima,
         comissaoPadrao: cor.comissaoPadrao,
       });
-      // ⚠️ não desabilita mais o ID — edição igual ao cadastro
 
-      // único endereço/contato: patch mantendo null para selects vazios
+      // único endereço/contato — mantém null para selects vazios (placeholder “Selecione…”)
       const e0 = cor.enderecos?.[0];
       const c0 = cor.contatos?.[0];
       if (e0) {
@@ -110,9 +141,12 @@ export class CadastroCorretorComponent implements OnInit, OnDestroy {
         });
       }
 
-      // selects por ID
-      this.form.get('produtoIds')!.setValue((cor.produtos || []).map(p => p.id));
-      this.form.get('filialIds')!.setValue((cor.filiais || []).map(f => f.id));
+      // preencher seleção de listas
+      this.selectedProdutoIds = (cor.produtos || []).map(p => p.id);
+      this.selectedFilialIds  = (cor.filiais  || []).map(f => f.id);
+      // se listas já carregadas, re-inicializa flags
+      if (this.allProdutos.length) this.initProdutoFlags(this.selectedProdutoIds);
+      if (this.allFiliais.length)  this.initFilialFlags(this.selectedFilialIds);
     });
   }
 
@@ -120,11 +154,12 @@ export class CadastroCorretorComponent implements OnInit, OnDestroy {
     this.cepSub?.unsubscribe();
   }
 
-  // ---------- utils de validação ----------
-  private minLengthArray(min: number) {
+  // --------- utils ----------
+  private minOneSelected(): ValidatorFn {
     return (ctrl: AbstractControl): ValidationErrors | null => {
-      const v = ctrl.value as unknown;
-      return Array.isArray(v) && v.length >= min ? null : { minLengthArray: { requiredLength: min } };
+      const arr = ctrl as FormArray;
+      const hasOne = (arr.value as boolean[]).some(v => v === true);
+      return hasOne ? null : { minOneSelected: true };
     };
   }
 
@@ -149,9 +184,9 @@ export class CadastroCorretorComponent implements OnInit, OnDestroy {
       endereco: this.buildEndereco(),
       contato:  this.buildContato(),
 
-      // exige ao menos 1 selecionado
-      produtoIds:   new FormControl<number[]>([], { nonNullable: true, validators: [Validators.required, this.minLengthArray(1)] }),
-      filialIds:    new FormControl<number[]>([], { nonNullable: true, validators: [Validators.required, this.minLengthArray(1)] }),
+      // listas com checkbox
+      produtoFlags: this.fb.array<FormControl<boolean>>([], { validators: [this.minOneSelected()] }),
+      filialFlags:  this.fb.array<FormControl<boolean>>([], { validators: [this.minOneSelected()] }),
     }, {
       validators: [
         this.uniqueIdValidator.bind(this),
@@ -176,8 +211,7 @@ export class CadastroCorretorComponent implements OnInit, OnDestroy {
       bairro:          [e?.bairro         ?? '', Validators.required],
       cidade:          [e?.cidade         ?? '', Validators.required],
       uf:              [e?.uf             ?? '', [Validators.required, Validators.maxLength(2)]],
-      // inicia com null para placeholder "Selecione..."
-      tipoEndereco:    [e?.tipoEndereco   ?? null, Validators.required],
+      tipoEndereco:    [e?.tipoEndereco   ?? null, Validators.required], // null -> placeholder
     });
   }
 
@@ -187,13 +221,11 @@ export class CadastroCorretorComponent implements OnInit, OnDestroy {
       nomeContato:  [c?.nomeContato ?? '', Validators.required],
       ddd:          [c?.ddd ?? '', [Validators.required, Validators.pattern(/^\d{2}$/)]],
       telefone:     [c?.telefone ?? '', [Validators.required]],
-      // inicia com null para placeholder "Selecione..."
-      tipoTelefone: [c?.tipoTelefone ?? null, Validators.required],
+      tipoTelefone: [c?.tipoTelefone ?? null, Validators.required], // null -> placeholder
       email:        [c?.email ?? '', [Validators.required, Validators.email]],
     });
   }
 
-  // ViaCEP (igual ao modal da seguradora)
   private buscarCep(digits: string): void {
     this.http.get<any>(`https://viacep.com.br/ws/${digits}/json/`)
       .subscribe(data => {
@@ -214,6 +246,67 @@ export class CadastroCorretorComponent implements OnInit, OnDestroy {
           }
         });
       });
+  }
+
+  private initProdutoFlags(selectedIds: number[]): void {
+  const controls = this.allProdutos.map(p =>
+    this.fb.control<boolean>(selectedIds.includes(p.id), { nonNullable: true })
+    // ou: new FormControl<boolean>(selectedIds.includes(p.id), { nonNullable: true })
+  );
+  this.form.setControl(
+    'produtoFlags',
+    this.fb.array<FormControl<boolean>>(controls, { validators: [this.minOneSelected()] })
+  );
+}
+
+private initFilialFlags(selectedIds: number[]): void {
+  const controls = this.allFiliais.map(f =>
+    this.fb.control<boolean>(selectedIds.includes(f.id), { nonNullable: true })
+    // ou: new FormControl<boolean>(selectedIds.includes(f.id), { nonNullable: true })
+  );
+  this.form.setControl(
+    'filialFlags',
+    this.fb.array<FormControl<boolean>>(controls, { validators: [this.minOneSelected()] })
+  );
+}
+
+
+  // master checkbox (Produtos)
+  produtosAllSelected(): boolean {
+    return this.produtoFlags.length > 0 && this.produtoFlags.controls.every(c => c.value === true);
+  }
+  produtosToggleAll(checked: boolean): void {
+    this.produtoFlags.controls.forEach(c => c.setValue(checked));
+    this.form.markAsDirty();
+  }
+  produtoIsChecked(p: Produto): boolean {
+    const idx = this.allProdutos.findIndex(x => x.id === p.id);
+    return this.produtoFlags.at(idx)?.value ?? false;
+  }
+  produtoCheckboxChange(evt: Event, p: Produto): void {
+    const checked = (evt.target as HTMLInputElement).checked;
+    const idx = this.allProdutos.findIndex(x => x.id === p.id);
+    this.produtoFlags.at(idx).setValue(checked);
+    this.form.markAsDirty();
+  }
+
+  // master checkbox (Filiais)
+  filiaisAllSelected(): boolean {
+    return this.filialFlags.length > 0 && this.filialFlags.controls.every(c => c.value === true);
+  }
+  filiaisToggleAll(checked: boolean): void {
+    this.filialFlags.controls.forEach(c => c.setValue(checked));
+    this.form.markAsDirty();
+  }
+  filialIsChecked(f: Filial): boolean {
+    const idx = this.allFiliais.findIndex(x => x.id === f.id);
+    return this.filialFlags.at(idx)?.value ?? false;
+  }
+  filialCheckboxChange(evt: Event, f: Filial): void {
+    const checked = (evt.target as HTMLInputElement).checked;
+    const idx = this.allFiliais.findIndex(x => x.id === f.id);
+    this.filialFlags.at(idx).setValue(checked);
+    this.form.markAsDirty();
   }
 
   // ----- Validators de Form -----
@@ -254,8 +347,9 @@ export class CadastroCorretorComponent implements OnInit, OnDestroy {
     }
 
     const v = this.form.getRawValue();
-    const produtosSel = (v.produtoIds as number[]).map(id => this.produtoSvc.getById(id)).filter(Boolean) as Produto[];
-    const filiaisSel  = (v.filialIds as number[]).map(id => this.filialSvc.getById(id)).filter(Boolean) as Filial[];
+
+    const produtosSel = this.allProdutos.filter((_, i) => (v.produtoFlags as boolean[])[i]);
+    const filiaisSel  = this.allFiliais.filter((_, i)  => (v.filialFlags  as boolean[])[i]);
 
     const cor: Corretor = {
       id:           +v.id,

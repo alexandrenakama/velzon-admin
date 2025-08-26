@@ -1,3 +1,4 @@
+<!-- src/app/pages/dashboards/corretor/cadastro-corretor/cadastro-corretor.component.html -->
 <div class="row">
   <div class="col-xl-12">
     <div class="card">
@@ -47,17 +48,6 @@
             </div>
           </div>
 
-          <!-- Corretor Ativo -->
-          <div class="row mb-4">
-            <div class="col-auto">
-              <div class="form-check">
-                <input id="ativo" class="form-check-input" type="checkbox" formControlName="ativo" />
-                <label class="form-check-label fw-semibold" for="ativo">Corretor Ativo</label>
-              </div>
-              <div *ngIf="isInvalid('ativo')" class="form-text text-danger">Campo obrigatório.</div>
-            </div>
-          </div>
-
           <!-- Data + Comissões -->
           <div class="row g-3 mb-4">
             <div class="col-md-3">
@@ -89,36 +79,6 @@
             <div *ngIf="form.hasError('range') || form.hasError('padrao')" class="form-text text-danger">
               <div *ngIf="form.getError('range') as r">{{ r }}</div>
               <div *ngIf="form.getError('padrao') as p">{{ p }}</div>
-            </div>
-          </div>
-
-          <!-- Produtos e Filiais (mínimo 1) -->
-          <div class="row g-3 mb-4">
-            <div class="col-md-6">
-              <label class="form-label">Produtos</label>
-              <select class="form-select" multiple [size]="6" formControlName="produtoIds" aria-label="Selecione os produtos do corretor" required>
-                <option *ngFor="let p of allProdutos" [value]="p.id">
-                  {{ p.nomeProduto }} — {{ p.nomeRamo }}
-                </option>
-              </select>
-              <div *ngIf="isInvalid('produtoIds')" class="form-text text-danger">
-                <span *ngIf="form.get('produtoIds')?.hasError('required') || form.get('produtoIds')?.hasError('minLengthArray')">
-                  Selecione pelo menos um item.
-                </span>
-              </div>
-            </div>
-            <div class="col-md-6">
-              <label class="form-label">Filiais</label>
-              <select class="form-select" multiple [size]="6" formControlName="filialIds" aria-label="Selecione as filiais do corretor" required>
-                <option *ngFor="let f of allFiliais" [value]="f.id">
-                  {{ f.nome }} ({{ f.tipoPessoa }})
-                </option>
-              </select>
-              <div *ngIf="isInvalid('filialIds')" class="form-text text-danger">
-                <span *ngIf="form.get('filialIds')?.hasError('required') || form.get('filialIds')?.hasError('minLengthArray')">
-                  Selecione pelo menos um item.
-                </span>
-              </div>
             </div>
           </div>
 
@@ -235,6 +195,55 @@
               </div>
             </div>
           </div>
+
+          <!-- ATIVO (no final, antes dos botões) -->
+          <div class="row mb-4">
+            <div class="col-auto">
+              <div class="form-check">
+                <input id="ativo" class="form-check-input" type="checkbox" formControlName="ativo" />
+                <label class="form-check-label fw-semibold" for="ativo">Corretor Ativo</label>
+              </div>
+              <div *ngIf="isInvalid('ativo')" class="form-text text-danger">Campo obrigatório.</div>
+            </div>
+          </div>
+
+          <!-- PRODUTOS (lista com checkbox) -->
+          <div class="row mb-4">
+            <div class="col-xl-12">
+              <label class="form-label">Produtos</label>
+              <app-lista-base [todosItens]="allProdutos" [colunas]="prodColunas" [tamanhoPagina]="8" [showSelection]="true" [masterChecked]="produtosAllSelected()" (masterToggle)="produtosToggleAll($event)">
+                <ng-template #toolbarTpl></ng-template>
+                <ng-template #acoesTpl let-item>
+                  <div class="form-check">
+                    <input type="checkbox" class="form-check-input" [checked]="produtoIsChecked(item)" (change)="produtoCheckboxChange($event, item)" id="prod-{{ item.id }}" />
+                  </div>
+                </ng-template>
+              </app-lista-base>
+              <div *ngIf="isInvalid('produtoFlags')" class="form-text text-danger mt-1">
+                Selecione pelo menos um produto.
+              </div>
+            </div>
+          </div>
+
+          <!-- FILIAIS (lista com checkbox) -->
+          <div class="row mb-4">
+            <div class="col-xl-12">
+              <label class="form-label">Filiais</label>
+              <app-lista-base [todosItens]="allFiliais" [colunas]="filialColunas" [tamanhoPagina]="8" [showSelection]="true" [masterChecked]="filiaisAllSelected()" (masterToggle)="filiaisToggleAll($event)">
+                <ng-template #toolbarTpl></ng-template>
+                <ng-template #acoesTpl let-item>
+                  <div class="form-check">
+                    <input type="checkbox" class="form-check-input" [checked]="filialIsChecked(item)" (change)="filialCheckboxChange($event, item)" id="fil-{{ item.id }}" />
+                  </div>
+                </ng-template>
+              </app-lista-base>
+              <div *ngIf="isInvalid('filialFlags')" class="form-text text-danger mt-1">
+                Selecione pelo menos uma filial.
+              </div>
+            </div>
+          </div>
+
+
 
           <!-- AÇÕES -->
           <div class="d-flex gap-2">
