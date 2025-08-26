@@ -1,5 +1,4 @@
-// src/app/pages/dashboards/dashboards-routing.module.ts
-import { NgModule }             from '@angular/core';
+import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 
 const routes: Routes = [
@@ -47,6 +46,11 @@ const routes: Routes = [
     path: 'usuario',
     loadChildren: () =>
       import('./usuario/usuario.module').then(m => m.UsuarioModule)
+  },
+  {
+    path: 'corretor',
+    loadChildren: () =>
+      import('./corretor/corretor.module').then(m => m.CorretorModule)
   }
 ];
 

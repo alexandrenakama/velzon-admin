@@ -1,0 +1,254 @@
+<div class="row">
+  <div class="col-xl-12">
+    <div class="card">
+      <div class="card-header d-flex align-items-center">
+        <h4 class="card-title mb-0 flex-grow-1">
+          {{ isEdit ? 'Editar Corretor' : 'Novo Corretor' }}
+        </h4>
+      </div>
+
+      <div class="card-body">
+        <form [formGroup]="form" (ngSubmit)="save()">
+
+          <!-- 1ª linha: ID -->
+          <div class="row g-3 mb-3 align-items-end">
+            <div class="col-md-2">
+              <label for="id" class="form-label">ID</label>
+              <input id="id" type="number" formControlName="id" class="form-control" placeholder="ID" required />
+              <div *ngIf="isInvalid('id')" class="form-text text-danger">
+                <span *ngIf="form.get('id')?.hasError('required')">Campo obrigatório.</span>
+                <span *ngIf="form.get('id')?.hasError('pattern')">Informe um número inteiro.</span>
+                <span *ngIf="form.hasError('uniqueId')">{{ form.getError('uniqueId') }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 2ª linha: Nome + Tipo de Pessoa + Documento -->
+          <div class="row g-3 mb-3">
+            <div class="col-md-6">
+              <label for="nome" class="form-label">Nome do Corretor</label>
+              <input id="nome" type="text" formControlName="nome" class="form-control" placeholder="Nome do corretor" required />
+              <div *ngIf="isInvalid('nome')" class="form-text text-danger">Campo obrigatório.</div>
+            </div>
+
+            <div class="col-md-3">
+              <label for="tipoPessoa" class="form-label">Tipo de Pessoa</label>
+              <select id="tipoPessoa" formControlName="tipoPessoa" class="form-select" required>
+                <option [ngValue]="null" disabled>Selecione...</option>
+                <option *ngFor="let t of pessoaTipos" [value]="t">{{ t }}</option>
+              </select>
+              <div *ngIf="isInvalid('tipoPessoa')" class="form-text text-danger">Campo obrigatório.</div>
+            </div>
+
+            <div class="col-md-3">
+              <label for="documento" class="form-label">{{ isJuridica ? 'CNPJ' : 'CPF' }}</label>
+              <input id="documento" type="text" formControlName="documento" [mascara]="isJuridica ? 'cnpj' : 'cpf'" [maxlength]="isJuridica ? 18 : 14" class="form-control" [placeholder]="isJuridica ? '00.000.000/0000-00' : '000.000.000-00'" required />
+              <div *ngIf="isInvalid('documento')" class="form-text text-danger">Campo obrigatório.</div>
+            </div>
+          </div>
+
+          <!-- Corretor Ativo -->
+          <div class="row mb-4">
+            <div class="col-auto">
+              <div class="form-check">
+                <input id="ativo" class="form-check-input" type="checkbox" formControlName="ativo" />
+                <label class="form-check-label fw-semibold" for="ativo">Corretor Ativo</label>
+              </div>
+              <div *ngIf="isInvalid('ativo')" class="form-text text-danger">Campo obrigatório.</div>
+            </div>
+          </div>
+
+          <!-- Data + Comissões -->
+          <div class="row g-3 mb-4">
+            <div class="col-md-3">
+              <label for="dataCadastro" class="form-label">Data do Cadastro</label>
+              <input id="dataCadastro" type="date" formControlName="dataCadastro" class="form-control" required />
+              <div *ngIf="isInvalid('dataCadastro')" class="form-text text-danger">Campo obrigatório.</div>
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">Comissão Mínima (%)</label>
+              <input type="number" formControlName="comissaoMinima" class="form-control" min="0" max="100" step="0.01" placeholder="0" required />
+              <div *ngIf="isInvalid('comissaoMinima')" class="form-text text-danger">
+                <span *ngIf="form.get('comissaoMinima')?.hasError('required')">Campo obrigatório.</span>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">Comissão Padrão (%)</label>
+              <input type="number" formControlName="comissaoPadrao" class="form-control" min="0" max="100" step="0.01" placeholder="0" required />
+              <div *ngIf="isInvalid('comissaoPadrao')" class="form-text text-danger">
+                <span *ngIf="form.get('comissaoPadrao')?.hasError('required')">Campo obrigatório.</span>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">Comissão Máxima (%)</label>
+              <input type="number" formControlName="comissaoMaxima" class="form-control" min="0" max="100" step="0.01" placeholder="0" required />
+              <div *ngIf="isInvalid('comissaoMaxima')" class="form-text text-danger">
+                <span *ngIf="form.get('comissaoMaxima')?.hasError('required')">Campo obrigatório.</span>
+              </div>
+            </div>
+            <div *ngIf="form.hasError('range') || form.hasError('padrao')" class="form-text text-danger">
+              <div *ngIf="form.getError('range') as r">{{ r }}</div>
+              <div *ngIf="form.getError('padrao') as p">{{ p }}</div>
+            </div>
+          </div>
+
+          <!-- Produtos e Filiais (mínimo 1) -->
+          <div class="row g-3 mb-4">
+            <div class="col-md-6">
+              <label class="form-label">Produtos</label>
+              <select class="form-select" multiple [size]="6" formControlName="produtoIds" aria-label="Selecione os produtos do corretor" required>
+                <option *ngFor="let p of allProdutos" [value]="p.id">
+                  {{ p.nomeProduto }} — {{ p.nomeRamo }}
+                </option>
+              </select>
+              <div *ngIf="isInvalid('produtoIds')" class="form-text text-danger">
+                <span *ngIf="form.get('produtoIds')?.hasError('required') || form.get('produtoIds')?.hasError('minLengthArray')">
+                  Selecione pelo menos um item.
+                </span>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Filiais</label>
+              <select class="form-select" multiple [size]="6" formControlName="filialIds" aria-label="Selecione as filiais do corretor" required>
+                <option *ngFor="let f of allFiliais" [value]="f.id">
+                  {{ f.nome }} ({{ f.tipoPessoa }})
+                </option>
+              </select>
+              <div *ngIf="isInvalid('filialIds')" class="form-text text-danger">
+                <span *ngIf="form.get('filialIds')?.hasError('required') || form.get('filialIds')?.hasError('minLengthArray')">
+                  Selecione pelo menos um item.
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- ENDEREÇO ÚNICO -->
+          <div class="mb-4" formGroupName="endereco">
+            <h6 class="mb-2">Endereço</h6>
+            <div class="row g-3">
+              <div class="col-md-3">
+                <label class="form-label">CEP</label>
+                <input class="form-control" formControlName="cep" mascara="cep" placeholder="00000-000" required />
+                <div *ngIf="isInvalid('endereco.cep')" class="form-text text-danger">
+                  <span *ngIf="form.get('endereco.cep')?.hasError('required')">Campo obrigatório.</span>
+                  <span *ngIf="form.get('endereco.cep')?.hasError('pattern')">CEP inválido.</span>
+                </div>
+              </div>
+
+              <div class="col-md-3">
+                <label class="form-label">Tipo Logradouro</label>
+                <input class="form-control" formControlName="tipoLogradouro" placeholder="Rua, Av., Alameda" required />
+                <div *ngIf="isInvalid('endereco.tipoLogradouro')" class="form-text text-danger">Campo obrigatório.</div>
+              </div>
+
+              <div class="col-md-3">
+                <label class="form-label">Logradouro</label>
+                <input class="form-control" formControlName="logradouro" placeholder="Nome da rua" required />
+                <div *ngIf="isInvalid('endereco.logradouro')" class="form-text text-danger">Campo obrigatório.</div>
+              </div>
+
+              <div class="col-md-3">
+                <label class="form-label">Número</label>
+                <input class="form-control" formControlName="numero" placeholder="Número" required />
+                <div *ngIf="isInvalid('endereco.numero')" class="form-text text-danger">Campo obrigatório.</div>
+              </div>
+
+              <div class="col-md-3">
+                <label class="form-label">Complemento</label>
+                <input class="form-control" formControlName="complemento" placeholder="Complemento" required />
+                <div *ngIf="isInvalid('endereco.complemento')" class="form-text text-danger">Campo obrigatório.</div>
+              </div>
+
+              <div class="col-md-3">
+                <label class="form-label">Bairro</label>
+                <input class="form-control" formControlName="bairro" placeholder="Bairro" required />
+                <div *ngIf="isInvalid('endereco.bairro')" class="form-text text-danger">Campo obrigatório.</div>
+              </div>
+
+              <div class="col-md-3">
+                <label class="form-label">Cidade</label>
+                <input class="form-control" formControlName="cidade" placeholder="Cidade" required />
+                <div *ngIf="isInvalid('endereco.cidade')" class="form-text text-danger">Campo obrigatório.</div>
+              </div>
+
+              <div class="col-md-3">
+                <label class="form-label">UF</label>
+                <input class="form-control" formControlName="uf" maxlength="2" placeholder="UF" required />
+                <div *ngIf="isInvalid('endereco.uf')" class="form-text text-danger">
+                  <span *ngIf="form.get('endereco.uf')?.hasError('required')">Campo obrigatório.</span>
+                  <span *ngIf="form.get('endereco.uf')?.hasError('maxlength')">Máximo 2 letras.</span>
+                </div>
+              </div>
+
+              <div class="col-md-3">
+                <label class="form-label">Tipo Endereço</label>
+                <select class="form-select" formControlName="tipoEndereco" required>
+                  <option [ngValue]="null" disabled>Selecione...</option>
+                  <option *ngFor="let t of enderecoTipos" [value]="t">{{ t }}</option>
+                </select>
+                <div *ngIf="isInvalid('endereco.tipoEndereco')" class="form-text text-danger">Campo obrigatório.</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- CONTATO ÚNICO -->
+          <div class="mb-4" formGroupName="contato">
+            <h6 class="mb-2">Contato</h6>
+            <div class="row g-3">
+              <div class="col-md-3">
+                <label class="form-label">Nome Contato</label>
+                <input class="form-control" formControlName="nomeContato" placeholder="Nome" required />
+                <div *ngIf="isInvalid('contato.nomeContato')" class="form-text text-danger">Campo obrigatório.</div>
+              </div>
+
+              <div class="col-md-3">
+                <label class="form-label">DDD</label>
+                <input class="form-control" formControlName="ddd" maxlength="2" placeholder="11" required />
+                <div *ngIf="isInvalid('contato.ddd')" class="form-text text-danger">
+                  <span *ngIf="form.get('contato.ddd')?.hasError('required')">Campo obrigatório.</span>
+                  <span *ngIf="form.get('contato.ddd')?.hasError('pattern')">DDD inválido.</span>
+                </div>
+              </div>
+
+              <div class="col-md-3">
+                <label class="form-label">Telefone</label>
+                <input class="form-control" formControlName="telefone" mascara="telefone" placeholder="99999-9999" required />
+                <div *ngIf="isInvalid('contato.telefone')" class="form-text text-danger">Campo obrigatório.</div>
+              </div>
+
+              <div class="col-md-3">
+                <label class="form-label">Tipo Telefone</label>
+                <select class="form-select" formControlName="tipoTelefone" required>
+                  <option [ngValue]="null" disabled>Selecione...</option>
+                  <option *ngFor="let t of telefoneTipos" [value]="t">{{ t }}</option>
+                </select>
+                <div *ngIf="isInvalid('contato.tipoTelefone')" class="form-text text-danger">Campo obrigatório.</div>
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label">Email</label>
+                <input class="form-control" formControlName="email" placeholder="email@empresa.com" required />
+                <div *ngIf="isInvalid('contato.email')" class="form-text text-danger">
+                  <span *ngIf="form.get('contato.email')?.hasError('required')">Campo obrigatório.</span>
+                  <span *ngIf="form.get('contato.email')?.hasError('email')">Email inválido.</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- AÇÕES -->
+          <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-primary" [disabled]="isEdit ? (form.invalid || form.pristine) : false">
+              {{ isEdit ? 'Atualizar' : 'Salvar' }}
+            </button>
+            <button type="button" class="btn btn-secondary" (click)="cancel()">Cancelar</button>
+            <button *ngIf="isEdit" type="button" class="btn btn-outline-secondary" routerLink="/corretor/cadastro">
+              + Novo Corretor
+            </button>
+          </div>
+
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

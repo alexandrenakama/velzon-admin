@@ -66,7 +66,13 @@ export const MENU: MenuItem[] = [
         label: 'MENUITEMS.CADASTROS.LIST.USUARIO',
         link: '/usuario',
         parentId: 2
-      }
+      },
+            {
+        id: 18,
+        label: 'MENUITEMS.CADASTROS.LIST.CORRETOR',
+        link: '/corretor',
+        parentId: 2
+      },
     ]
   },
   // Apps
